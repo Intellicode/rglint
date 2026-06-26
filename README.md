@@ -1,0 +1,2 @@
+# rglint
+Rust GraphQL Lint
