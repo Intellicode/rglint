@@ -1,0 +1,46 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/rglint",
+    "crates/rglint-core",
+    "crates/rglint-rules",
+    "crates/rglint-graphql-spec",
+    "crates/rglint-config",
+    "crates/rglint-derive",
+    "crates/rglint-test-harness",
+    "xtask",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/anomalyco/rglint"
+
+[workspace.dependencies]
+apollo-parser = "0.8"
+apollo-compiler = "1.32"
+miette = { version = "7", features = ["fancy-no-backtrace"] }
+thiserror = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+jsonschema = { version = "0.18", default-features = false, features = ["draft202012"] }
+regex = "1"
+clap = { version = "4", features = ["derive", "cargo"] }
+globset = "0.4"
+walkdir = "2"
+ignore = "0.4"
+rayon = "1"
+xxhash-rust = { version = "0.8", features = ["xxh3"] }
+
+# proc-macro deps
+proc-macro2 = "1"
+quote = "1"
+syn = { version = "2", features = ["full"] }
+
+# test deps
+insta = "1"
+
+# xtask deps
+anyhow = "1"
