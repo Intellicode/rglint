@@ -1,0 +1,13 @@
+[package]
+name = "rglint"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+clap.workspace = true
+miette.workspace = true
+rglint-core = { path = "../rglint-core" }
+rglint-config = { path = "../rglint-config" }
+rglint-rules = { path = "../rglint-rules" }
