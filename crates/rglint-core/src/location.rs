@@ -29,7 +29,12 @@ use apollo_parser::SyntaxNode;
 
 /// A byte range in a source file: `offset` is the 0-based start byte, `len` is
 /// the length in bytes. [`Span::end`] (`offset + len`) is exclusive.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+///
+/// `Span` is `Serialize`/`Deserialize` (as `{"offset":..,"len":..}`) so that
+/// [`Diagnostic`][crate::diagnostics::Diagnostic] and
+/// [`Fix`][crate::diagnostics::Fix] — which embed a `Span` — can round-trip
+/// through JSON for the JSON reporter (spec-058) and parity harness.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub struct Span {
     /// 0-based byte offset from the start of the file.
     pub offset: usize,
