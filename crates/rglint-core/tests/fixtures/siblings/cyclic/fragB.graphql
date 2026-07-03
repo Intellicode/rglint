@@ -1,0 +1,4 @@
+fragment B on User {
+  email
+  ...A
+}

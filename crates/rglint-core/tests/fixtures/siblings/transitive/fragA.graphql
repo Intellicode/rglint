@@ -1,0 +1,4 @@
+fragment A on User {
+  name
+  ...B
+}
