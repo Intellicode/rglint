@@ -11,7 +11,7 @@ mod schema;
 mod siblings;
 mod source;
 
-pub use context::RuleContext;
+pub use context::{RuleContext, RuleContextError};
 pub use diagnostics::{Diagnostic, DiagnosticBuilder, Fix, Severity, Suggestion};
 pub use documents::{
     DocumentLoadError, DocumentLoader, DocumentSpec, LoadedDocument, LoadedDocuments,
