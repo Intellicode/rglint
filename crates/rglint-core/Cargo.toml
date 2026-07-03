@@ -18,3 +18,5 @@ ignore.workspace = true
 rayon.workspace = true
 xxhash-rust.workspace = true
 regex.workspace = true
+jsonschema.workspace = true
+linkme.workspace = true
