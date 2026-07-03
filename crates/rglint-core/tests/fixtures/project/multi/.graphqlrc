@@ -1,0 +1,6 @@
+schema: ./web/schema.graphqls
+documents: ./web/doc.graphql
+projects:
+  admin:
+    schema: ./admin/schema.graphqls
+    documents: ./admin/doc.graphql
