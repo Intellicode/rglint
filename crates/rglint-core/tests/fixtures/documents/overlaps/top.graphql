@@ -1,0 +1,3 @@
+query Top {
+  user { id }
+}
