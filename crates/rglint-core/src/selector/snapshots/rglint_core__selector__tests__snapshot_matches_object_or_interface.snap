@@ -1,0 +1,14 @@
+---
+source: crates/rglint-core/src/selector/tests.rs
+expression: "parse(\":matches(ObjectTypeDefinition, InterfaceTypeDefinition)\").unwrap()"
+---
+Matches(
+    [
+        Kind(
+            "ObjectTypeDefinition",
+        ),
+        Kind(
+            "InterfaceTypeDefinition",
+        ),
+    ],
+)

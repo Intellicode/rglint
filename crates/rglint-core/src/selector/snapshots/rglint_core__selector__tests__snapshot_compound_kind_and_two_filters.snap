@@ -1,0 +1,39 @@
+---
+source: crates/rglint-core/src/selector/tests.rs
+expression: "parse(\"FieldDefinition[name.value=/^_/]:not(FieldDefinition)\").unwrap()"
+---
+Not(
+    [
+        Not(
+            [
+                Kind(
+                    "FieldDefinition",
+                ),
+            ],
+        ),
+        Not(
+            [
+                Attribute {
+                    target: NameValue,
+                    op: RegexMatch,
+                    value: Regex(
+                        Regex(
+                            "^_",
+                        ),
+                    ),
+                },
+            ],
+        ),
+        Not(
+            [
+                Not(
+                    [
+                        Kind(
+                            "FieldDefinition",
+                        ),
+                    ],
+                ),
+            ],
+        ),
+    ],
+)

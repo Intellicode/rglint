@@ -1,0 +1,17 @@
+---
+source: crates/rglint-core/src/selector/tests.rs
+expression: "parse(\"ObjectTypeDefinition FieldDefinition Name\").unwrap()"
+---
+Descendant(
+    Descendant(
+        Kind(
+            "ObjectTypeDefinition",
+        ),
+        Kind(
+            "FieldDefinition",
+        ),
+    ),
+    Kind(
+        "Name",
+    ),
+)

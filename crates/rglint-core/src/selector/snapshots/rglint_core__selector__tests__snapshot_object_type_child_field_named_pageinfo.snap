@@ -1,0 +1,31 @@
+---
+source: crates/rglint-core/src/selector/tests.rs
+expression: "parse(\"ObjectTypeDefinition > FieldDefinition[name.value=PageInfo]\").unwrap()"
+---
+Child(
+    Kind(
+        "ObjectTypeDefinition",
+    ),
+    Not(
+        [
+            Not(
+                [
+                    Kind(
+                        "FieldDefinition",
+                    ),
+                ],
+            ),
+            Not(
+                [
+                    Attribute {
+                        target: NameValue,
+                        op: Eq,
+                        value: Str(
+                            "PageInfo",
+                        ),
+                    },
+                ],
+            ),
+        ],
+    ),
+)
