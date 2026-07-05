@@ -95,4 +95,12 @@ impl<'a> Node<'a> {
         self.parent = Some(parent);
         self
     }
+
+    /// Builder: conditionally attach a parent node (`None` leaves it unset).
+    /// Used by the engine walk (spec-011) at the CST root where there is no
+    /// parent.
+    pub const fn with_parent_opt(mut self, parent: Option<&'a Node<'a>>) -> Self {
+        self.parent = parent;
+        self
+    }
 }

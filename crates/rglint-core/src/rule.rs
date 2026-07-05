@@ -55,12 +55,21 @@ impl Category {
 ///
 /// `Send + Sync + 'static` so the engine (spec-011) can hold the registry
 /// behind a shared reference and (later, spec-064) parallelize across files.
+///
+/// `create` returns a `Box<dyn Handler>` (implicitly `+'static`): handlers
+/// **do not** borrow from the [`RuleContext`] (or the rule itself) across
+/// their lifetime. Rules read what they need at `create` time (e.g. options
+/// via [`RuleContext::option`]) and **copy** it into the handler; the spec
+/// (Risks / Notes) calls this out — "design handlers to receive node data by
+/// value (copy what they need)". This keeps the engine's per-file storage a
+/// plain `Vec<ActiveRule>` with no self-referential borrows, and is the
+/// template all rules follow.
 pub trait Rule: Send + Sync + 'static {
     /// The rule's static metadata descriptor.
     fn meta(&self) -> &'static RuleMeta;
-    /// Build a fresh per-document [`Handler`], borrowing the context for at
-    /// most the handler's lifetime `'s`.
-    fn create<'s>(&'s self, ctx: &'s mut RuleContext) -> Box<dyn Handler + 's>;
+    /// Build a fresh per-document [`Handler`]. The handler does not borrow
+    /// from `ctx`; rules copy whatever they need at create time.
+    fn create(&self, ctx: &mut RuleContext) -> Box<dyn Handler>;
 }
 
 /// A per-document rule handler built by [`Rule::create`]. The engine (spec-011)
@@ -210,6 +219,15 @@ pub struct RuleEntry {
     /// The CST kinds the rule's handler cares about; the engine (spec-011)
     /// skips `on_node` dispatch for nodes not in this list.
     pub interested_kinds: &'static [SyntaxKind],
+}
+
+impl std::fmt::Debug for RuleEntry {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("RuleEntry")
+            .field("id", &self.meta.id)
+            .field("interested_kinds", &self.interested_kinds)
+            .finish_non_exhaustive()
+    }
 }
 
 /// `linkme` distributed slice aggregating every `#[derive(Rule)]` submission
