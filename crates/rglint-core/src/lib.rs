@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 
+mod cache;
 mod context;
 mod diagnostics;
 mod documents;
@@ -15,6 +16,7 @@ mod siblings;
 mod source;
 mod utils;
 
+pub use cache::{Cache, CacheIter, CacheKey, CachedResult};
 pub use context::{RuleContext, RuleContextError};
 pub use diagnostics::{Diagnostic, DiagnosticBuilder, Fix, Severity, Suggestion};
 pub use documents::{

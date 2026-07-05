@@ -34,6 +34,8 @@ walkdir = "2"
 ignore = "0.4"
 rayon = "1"
 xxhash-rust = { version = "0.8", features = ["xxh3"] }
+ahash = "0.8"
+tracing = "0.1"
 
 # proc-macro deps
 proc-macro2 = "1"

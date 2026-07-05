@@ -20,6 +20,9 @@ xxhash-rust.workspace = true
 regex.workspace = true
 jsonschema.workspace = true
 linkme.workspace = true
+ahash.workspace = true
+tracing.workspace = true
 
 [dev-dependencies]
 insta.workspace = true
+tempfile = "3"

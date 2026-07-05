@@ -76,3 +76,30 @@ but no graphql-eslint rule uses it.
 no graphql-eslint rule uses lookbehind in a selector regex. If a fixture
 demands it, switch the single offending rule's regex to `fancy-regex`
 rather than replacing the workspace-wide dependency.
+
+### Content-hash cache (spec-013)
+
+`rglint_core::cache::Cache` maps `(file_path, xxh3-64 content_hash) ->
+CachedResult { diagnostics }` so unchanged files skip re-linting on
+incremental runs. The store is either in-memory (no-op mode / tests) or a
+single `<target-dir>/rglint-cache.bin` written atomically (`*.tmp` then
+rename) with a `b"rglint"` magic header + version byte.
+
+**v1 caches diagnostics only.** A cache hit still re-parses the file
+(re-parsing is cheap relative to linting, and avoids serializing the parsed
+`LoadedSchema`/`Siblings` graph). Revisit if spec-065 profiling shows parse
+dominates.
+
+**Encode format is JSON, not bincode.** `Diagnostic.data` is a
+`serde_json::Value`, which drives the serde Deserializer via
+`deserialize_any` — unsupported by bincode (and postcard). The cache file
+therefore stores the entry map as a JSON array of `(key, value)` pairs after
+the magic+version header (JSON object keys must be strings, so a struct
+`CacheKey` cannot be a JSON map key — hence the array shape). This reuses the
+existing `serde_json` dep with acceptable size overhead for the small, rare
+cache file.
+
+**Loading never fails.** A missing, corrupt, truncated, or version-mismatched
+cache file is treated as an empty cache with a `tracing` warn — caching is a
+perf optimization, never a correctness or hard-error path. Version mismatches
+have no downgrade path in v1.
