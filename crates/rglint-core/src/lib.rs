@@ -3,6 +3,7 @@
 mod context;
 mod diagnostics;
 mod documents;
+mod engine;
 mod location;
 mod node;
 mod project;
@@ -16,6 +17,9 @@ pub use context::{RuleContext, RuleContextError};
 pub use diagnostics::{Diagnostic, DiagnosticBuilder, Fix, Severity, Suggestion};
 pub use documents::{
     DocumentLoadError, DocumentLoader, DocumentSpec, LoadedDocument, LoadedDocuments,
+};
+pub use engine::{
+    EnabledRule, LintEngine, LintEngineError, ProjectLintResult, RuleConfig, RulesConfig,
 };
 pub use location::{LineColumn, Location, Span};
 pub use node::Node;

@@ -86,10 +86,10 @@ fn expand(input: &DeriveInput) -> syn::Result<TokenStream> {
             fn meta(&self) -> &'static rglint_core::RuleMeta {
                 &#meta_ident
             }
-            fn create<'s>(
-                &'s self,
-                ctx: &'s mut rglint_core::RuleContext,
-            ) -> std::boxed::Box<dyn rglint_core::Handler + 's> {
+            fn create(
+                &self,
+                ctx: &mut rglint_core::RuleContext,
+            ) -> std::boxed::Box<dyn rglint_core::Handler> {
                 #struct_name::handler(self, ctx)
             }
         }

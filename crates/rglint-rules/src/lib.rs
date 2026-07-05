@@ -20,10 +20,10 @@
 //! struct MyRule;
 //!
 //! impl MyRule {
-//!     fn handler<'s>(
-//!         &'s self,
-//!         _ctx: &'s mut RuleContext,
-//!     ) -> Box<dyn Handler + 's> {
+//!     fn handler(
+//!         &self,
+//!         _ctx: &mut RuleContext,
+//!     ) -> Box<dyn Handler> {
 //!         Box::new(Noop)
 //!     }
 //! }
@@ -76,7 +76,7 @@ mod tests {
     struct DerivedRule;
 
     impl DerivedRule {
-        fn handler<'s>(&'s self, _ctx: &'s mut RuleContext) -> std::boxed::Box<dyn Handler + 's> {
+        fn handler(&self, _ctx: &mut RuleContext) -> std::boxed::Box<dyn Handler> {
             std::boxed::Box::new(NoopHandler)
         }
     }
@@ -86,7 +86,7 @@ mod tests {
     struct UnregisteredRule;
 
     impl UnregisteredRule {
-        fn handler<'s>(&'s self, _ctx: &'s mut RuleContext) -> std::boxed::Box<dyn Handler + 's> {
+        fn handler(&self, _ctx: &mut RuleContext) -> std::boxed::Box<dyn Handler> {
             std::boxed::Box::new(NoopHandler)
         }
     }
@@ -108,7 +108,7 @@ mod tests {
             );
             &META
         }
-        fn create<'s>(&'s self, ctx: &'s mut RuleContext) -> std::boxed::Box<dyn Handler + 's> {
+        fn create(&self, ctx: &mut RuleContext) -> std::boxed::Box<dyn Handler> {
             UnregisteredRule::handler(self, ctx)
         }
     }
