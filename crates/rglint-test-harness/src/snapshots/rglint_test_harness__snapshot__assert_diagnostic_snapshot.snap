@@ -1,0 +1,10 @@
+---
+source: crates/rglint-test-harness/src/snapshot.rs
+expression: rendered
+---
+query { a }
+^^^^^^
+> no-anonymous-operations: Anonymous operation. Give it a name.
+query { b }
+^^^^^^
+> no-anonymous-operations: Anonymous operation. Give it a name.
