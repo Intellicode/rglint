@@ -175,12 +175,14 @@ impl<'a> RuleContext<'a> {
         self.options
     }
 
-    /// Best-effort node-name helper. spec-012 implements the real version over
-    /// a typed `Node`; this stub returns an empty string until then. The
-    /// method signature is fixed here so rules can be written against it
-    /// today and gain real behavior once spec-012 lands.
+    /// Best-effort node-name helper. Delegates to spec-012's
+    /// [`node_name`][crate::node_name] over the typed `Node`. Returns an
+    /// empty string for nameless nodes (anonymous operations, `SelectionSet`,
+    /// …) — the `String` (rather than `Option`) return shape is fixed here so
+    /// rules can be written against it today and message-formatting code can
+    /// interpolate the result directly.
     pub fn node_name(&self, node: &Node<'_>) -> String {
-        node_name(node)
+        crate::node_name(node).unwrap_or_default()
     }
 
     /// Drain the buffered diagnostics. The engine calls this once after
@@ -198,14 +200,6 @@ impl<'a> RuleContext<'a> {
     pub fn severity(&self) -> Severity {
         self.severity
     }
-}
-
-/// Stub for the spec-012 `node_name` helper. Returns an empty string until
-/// spec-012 lands the real typed version over `apollo_compiler` AST nodes; the
-/// free-function shape mirrors what spec-012 will expose so the call site does
-/// not change.
-fn node_name(_node: &Node<'_>) -> String {
-    String::new()
 }
 
 #[cfg(test)]
@@ -429,9 +423,10 @@ mod tests {
     }
 
     #[test]
-    fn node_name_stub_returns_empty_string() {
-        // spec-009 lands a stub delegating to spec-012; assert it does not
-        // panic and returns *some* string (empty until spec-012).
+    fn node_name_delegates_to_spec_012_helper() {
+        // spec-012 lands the real `node_name`; `RuleContext::node_name` wraps
+        // it as a `String` (empty for nameless nodes) so rules can interpolate
+        // the result directly into messages.
         let src = make_source();
         let project = empty_project();
         let ctx = RuleContext::new(
@@ -444,9 +439,12 @@ mod tests {
             Severity::Warn,
         );
         use apollo_parser::SyntaxKind;
-        let node = Node::new(SyntaxKind::NAME);
-        let name = ctx.node_name(&node);
-        assert!(name.is_empty(), "stub returns an empty string");
+        // A nameless node → empty string (the `None` projection).
+        let anon = Node::new(SyntaxKind::NAME);
+        assert!(ctx.node_name(&anon).is_empty());
+        // A named node → the name verbatim.
+        let named = Node::new(SyntaxKind::OBJECT_TYPE_DEFINITION).with_name("Query");
+        assert_eq!(ctx.node_name(&named), "Query");
     }
 
     #[test]
