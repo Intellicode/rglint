@@ -1,0 +1,10 @@
+{
+  "errors": [
+    {
+      "rule": "no-anonymous-operations",
+      "message": "Anonymous operation. Give it a name.",
+      "line": 1,
+      "column": 0
+    }
+  ]
+}

@@ -44,6 +44,9 @@ syn = { version = "2", features = ["full"] }
 
 # test deps
 insta = "1"
+pretty_assertions = "1"
+proptest = "1"
+tempfile = "3"
 
 # xtask deps
 anyhow = "1"
