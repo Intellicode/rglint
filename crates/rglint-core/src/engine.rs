@@ -56,6 +56,7 @@ use apollo_parser::cst::CstNode;
 use apollo_parser::{Parser, SyntaxKind, SyntaxNode};
 
 use crate::diagnostics::{Diagnostic, Severity};
+use crate::location::Span;
 use crate::node::Node;
 use crate::project::Project;
 use crate::rule::{Handler, RuleEntry, ALL_RULES};
@@ -438,7 +439,22 @@ fn walk_node(
     interested_set: &[SyntaxKind],
 ) {
     let kind = syn.kind();
-    let node_view = Node::new(kind).with_parent_opt(parent_view);
+    // Populate the node view with the CST-derived name (the first NAME token
+    // child, if any) and the byte span. The name is owned (`String`) because
+    // `apollo-parser`'s rowan-backed `SyntaxToken::text` borrows from a
+    // short-lived token handle, so we copy out the identifier we need; the
+    // span is `Copy` so it rides for free. Rules consult `node.name` to
+    // distinguish named vs anonymous definitions (spec-016
+    // `no-anonymous-operations` is the first consumer) and `node.span` to
+    // report at the offending location.
+    let span = Span::from_syntax_node(syn);
+    let name = extract_name(syn);
+    let mut node_view = Node::new(kind);
+    if let Some(n) = name {
+        node_view = node_view.with_name(n);
+    }
+    node_view = node_view.with_span(span);
+    let node_view = node_view.with_parent_opt(parent_view);
 
     if interested_set.contains(&kind) {
         for a in actives.iter_mut() {
@@ -453,6 +469,35 @@ fn walk_node(
     for child in syn.children() {
         walk_node(&child, Some(&node_view), actives, interested_set);
     }
+}
+
+/// Extract the identifier text of the first `NAME` child of `syn`, if present,
+/// as an owned `String`. Most GraphQL CST kinds that *can* bear a name (every
+/// definition kind, `Field`, `FragmentSpread`, `Argument`, `NamedType`, …)
+/// attach it as a single `NAME` child node whose `IDENT` token carries the
+/// text; anonymous `OperationDefinition` (no `Name`) and inherently nameless
+/// kinds (`Selection`, `SelectionSet`, `Arguments`, …) yield `None`.
+///
+/// The text is owned out (rather than `&'a str` borrowing from `syn`) because
+/// `apollo-parser`'s rowan-backed `SyntaxToken::text` borrows from the token
+/// handle, not the long-lived green tree; the identifier is short so the
+/// allocation is negligible (rules visit at most a few hundred nodes per file).
+fn extract_name(syn: &SyntaxNode) -> Option<String> {
+    for child in syn.children() {
+        if child.kind() == SyntaxKind::NAME {
+            // The `NAME` node wraps a single `IDENT` token whose `text()` is
+            // the identifier; scan its children-with-tokens for the first
+            // `Token` element. A well-formed `NAME` always has exactly one
+            // child `IDENT` token, so this loop hits on the first iteration.
+            for token in child.children_with_tokens() {
+                if let apollo_parser::SyntaxElement::Token(t) = token {
+                    return Some(t.text().to_owned());
+                }
+            }
+            return None;
+        }
+    }
+    None
 }
 
 #[cfg(test)]

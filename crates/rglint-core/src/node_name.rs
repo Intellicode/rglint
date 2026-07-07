@@ -38,7 +38,7 @@ use crate::node::Node;
 /// borrowed CST node; the common case is a short identifier, so the
 /// allocation is negligible. Never panics.
 pub fn node_name(node: &Node<'_>) -> Option<String> {
-    node.name.map(|s| s.to_owned())
+    node.name.clone()
 }
 
 #[cfg(test)]

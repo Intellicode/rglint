@@ -45,7 +45,7 @@ of work (a few hours to ~2 days) and declares its dependencies on prior specs.
 
 | Spec | Title | Status |
 |------|-------|--------|
-| [spec-016](spec-016.md) | no-anonymous-operations | `[ ]` |
+| [spec-016](implemented/spec-016.md) | no-anonymous-operations | `[x]` |
 | [spec-017](spec-017.md) | unique-fragment-name | `[ ]` |
 | [spec-018](spec-018.md) | unique-operation-name | `[ ]` |
 | [spec-019](spec-019.md) | no-duplicate-fields | `[ ]` |

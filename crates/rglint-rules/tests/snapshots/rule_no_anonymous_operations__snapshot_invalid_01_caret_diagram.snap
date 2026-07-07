@@ -1,0 +1,7 @@
+---
+source: crates/rglint-rules/tests/rule_no_anonymous_operations.rs
+expression: rendered
+---
+query { a }
+^
+> no-anonymous-operations: Anonymous GraphQL operations are banned. Please give your operation a name

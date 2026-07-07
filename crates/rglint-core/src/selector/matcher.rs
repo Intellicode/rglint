@@ -102,11 +102,11 @@ fn compile_attribute(target: AttrKind, op: AttrOp, value: &AttrValue) -> Matcher
     match (target, op, value) {
         (AttrKind::NameValue, AttrOp::Eq, AttrValue::Str(s)) => {
             let s = s.clone();
-            Box::new(move |n: &Node, _| n.name.is_some_and(|name| name == s.as_str()))
+            Box::new(move |n: &Node, _| n.name.as_deref().is_some_and(|name| name == s.as_str()))
         }
         (AttrKind::NameValue, AttrOp::RegexMatch, AttrValue::Regex(r)) => {
             let r = r.clone();
-            Box::new(move |n: &Node, _| n.name.is_some_and(|name| r.is_match(name)))
+            Box::new(move |n: &Node, _| n.name.as_deref().is_some_and(|name| r.is_match(name)))
         }
         (AttrKind::DescriptionValue, AttrOp::Eq, AttrValue::Str(s)) => {
             let s = s.clone();

@@ -29,6 +29,14 @@ struct Attrs {
     deprecated: Option<bool>,
     replaced_by: Option<String>,
     has_suggestions: Option<bool>,
+    /// Optional `kinds = "..."` attribute — a `|`/`,`-separated list of
+    /// `apollo_parser::SyntaxKind` variant identifiers (e.g.
+    /// `"OPERATION_DEFINITION"` or `"OPERATION_DEFINITION|FIELD_DEFINITION"`)
+    /// the rule wants `Handler::on_node` to be called for. The macro emits
+    /// the slice `&[apollo_parser::SyntaxKind::VARIANT, ...]` for
+    /// `RuleEntry::interested_kinds`. Unknown variants surface as a
+    /// compile error at the use site, so typos are caught at build time.
+    kinds: Option<String>,
 }
 
 impl Attrs {
@@ -44,6 +52,7 @@ impl Attrs {
         "deprecated",
         "replaced_by",
         "has_suggestions",
+        "kinds",
     ];
 }
 
@@ -66,6 +75,13 @@ fn expand(input: &DeriveInput) -> syn::Result<TokenStream> {
     let static_suffix = struct_name.to_string().to_uppercase();
     let meta_ident = format_ident!("__RG_RULE_META_{}", static_suffix);
     let entry_ident = format_ident!("__RG_RULE_ENTRY_{}", static_suffix);
+
+    let interested_kinds_ts = interested_kinds_tokens(attrs.kinds.as_deref())?;
+    let interested_kinds_slice = if interested_kinds_ts.is_empty() {
+        quote! { &[] }
+    } else {
+        quote! { &[#interested_kinds_ts] }
+    };
 
     Ok(quote! {
         static #meta_ident: rglint_core::RuleMeta = rglint_core::RuleMeta::new(
@@ -100,9 +116,46 @@ fn expand(input: &DeriveInput) -> syn::Result<TokenStream> {
             factory: || -> std::boxed::Box<dyn rglint_core::Rule> {
                 std::boxed::Box::new(#struct_name)
             },
-            interested_kinds: &[],
+            interested_kinds: #interested_kinds_slice,
         };
     })
+}
+
+/// Expand a `kinds = "..."` attribute value into a token stream of
+/// `apollo_parser::SyntaxKind::V1, apollo_parser::SyntaxKind::V2, ...`,
+/// splitting on `|` or `,` and trimming whitespace. Each piece is expected to
+/// be a `SyntaxKind` variant identifier (e.g. `OPERATION_DEFINITION`); the
+/// macro emits it verbatim as an `apollo_parser::SyntaxKind::NAME` path so an
+/// unknown variant surfaces as a normal compiler error referencing the rule's
+/// call site. Returns an empty list when no `kinds` attribute was set.
+fn interested_kinds_tokens(kinds: Option<&str>) -> syn::Result<TokenStream> {
+    let Some(raw) = kinds else {
+        return Ok(quote! {});
+    };
+    let mut parts: Vec<String> = Vec::new();
+    for piece in raw.split(['|', ',']) {
+        let trimmed = piece.trim();
+        if trimmed.is_empty() {
+            continue;
+        }
+        parts.push(trimmed.to_owned());
+    }
+    let idents: Vec<TokenStream> = parts
+        .iter()
+        .map(|p| {
+            let i = syn::parse_str::<Ident>(p).map_err(|_| {
+                syn::Error::new(
+                    Span::call_site(),
+                    format!(
+                        "`#[rule(kinds = ...)]` expects `|`/`,`-separated SyntaxKind variant \
+                         identifiers, got `{p}`"
+                    ),
+                )
+            })?;
+            Ok::<TokenStream, syn::Error>(quote! { rglint_core::SyntaxKind::#i })
+        })
+        .collect::<syn::Result<_>>()?;
+    Ok(quote! { #(#idents),* })
 }
 
 fn parse_attrs(input: &DeriveInput) -> syn::Result<Attrs> {
@@ -118,6 +171,7 @@ fn parse_attrs(input: &DeriveInput) -> syn::Result<Attrs> {
         deprecated: None,
         replaced_by: None,
         has_suggestions: None,
+        kinds: None,
     };
 
     let mut found_rule_attr = false;
@@ -162,6 +216,7 @@ fn parse_attrs(input: &DeriveInput) -> syn::Result<Attrs> {
                 "has_suggestions" => {
                     attrs.has_suggestions = Some(expect_bool(&nv.value, "has_suggestions")?)
                 }
+                "kinds" => attrs.kinds = Some(expect_str(&nv.value, "kinds")?),
                 _ => unreachable!("validated against ALLOWED"),
             }
         }

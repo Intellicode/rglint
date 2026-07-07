@@ -1386,10 +1386,12 @@ dependencies = [
 name = "rglint-rules"
 version = "0.1.0"
 dependencies = [
+ "insta",
  "linkme",
  "regex",
  "rglint-core",
  "rglint-derive",
+ "rglint-test-harness",
  "serde",
  "serde_json",
  "thiserror 2.0.18",

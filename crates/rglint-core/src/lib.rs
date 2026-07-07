@@ -1,5 +1,10 @@
 #![allow(dead_code)]
 
+/// Re-export so the `#[derive(Rule)]` macro (in `rglint-derive`) can reference
+/// `apollo_parser::SyntaxKind` variants as `rglint_core::SyntaxKind::X` without
+/// forcing every rule consumer crate to depend on `apollo-parser` directly.
+pub use apollo_parser::SyntaxKind;
+
 mod cache;
 mod context;
 mod diagnostics;
