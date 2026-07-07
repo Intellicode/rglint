@@ -1,0 +1,7 @@
+documents = """
+            {
+              user(id: 1) {
+                id
+              }
+            }
+          """

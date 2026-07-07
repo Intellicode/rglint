@@ -1,0 +1,27 @@
+{
+  "source": "rules/require-deprecation-reason/index.test.ts",
+  "source_hash": "6133c652f81d7f94",
+  "rule": "require-deprecation-reason",
+  "valid_count": 2,
+  "invalid_count": 1,
+  "cases": [
+    {
+      "kind": "valid",
+      "id": "01",
+      "hash": "a69d70b1d6615b57",
+      "line": 6
+    },
+    {
+      "kind": "valid",
+      "id": "02",
+      "hash": "04f3bfb750bb7a49",
+      "line": 13
+    },
+    {
+      "kind": "invalid",
+      "id": "01",
+      "hash": "05ff439cb093e081",
+      "line": 34
+    }
+  ]
+}

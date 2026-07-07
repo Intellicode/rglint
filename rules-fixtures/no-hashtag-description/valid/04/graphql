@@ -1,0 +1,8 @@
+      # multiline
+      # multiline
+      # multiline
+
+      type Query {
+        foo: String
+      }
+    

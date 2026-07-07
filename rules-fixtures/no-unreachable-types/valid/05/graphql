@@ -1,0 +1,10 @@
+        # EnumTypeDefinition
+        enum Role {
+          ADMIN
+          USER
+        }
+
+        type Query {
+          role: Role
+        }
+      

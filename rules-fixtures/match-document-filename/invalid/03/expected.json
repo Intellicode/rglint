@@ -1,0 +1,1 @@
+{"errors":[{"column":0,"line":1,"message":"Unexpected filename \"userById.gql\". Rename it to \"UserById.query.gql\"","rule":"match-document-filename"}]}

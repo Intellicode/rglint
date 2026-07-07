@@ -1,0 +1,3 @@
+[options.query]
+style = "kebab-case"
+suffix = ".query"

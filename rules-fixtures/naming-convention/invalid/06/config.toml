@@ -1,0 +1,10 @@
+[options.EnumValueDefinition]
+style = "camelCase"
+suffix = "ENUM"
+
+[options.FieldDefinition]
+style = "camelCase"
+suffix = "AAA"
+
+[options.ObjectTypeDefinition]
+style = "camelCase"

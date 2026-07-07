@@ -1,0 +1,36 @@
+documents = """
+            {
+              user(id: 1) {
+                ... on User {
+                  address {
+                    zip
+                    events {
+                      ... on Event {
+                        by {
+                          id
+                        }
+                        can_rename: name
+                        data
+                      }
+                    }
+                  }
+                }
+              }
+            }
+
+            fragment UserFields on User {
+              can_rename: firstName
+              lastName
+            }
+
+            mutation {
+              deleteUser(id: 2) {
+                age
+              }
+              createUser(firstName: "Foo") {
+                address {
+                  country
+                }
+              }
+            }
+          """

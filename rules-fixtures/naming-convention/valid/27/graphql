@@ -1,0 +1,4 @@
+        fragment UserProfileFields_my_user on User {
+          id
+        }
+      

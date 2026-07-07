@@ -1,0 +1,4 @@
+        type Query {
+          test(cc: [Cc!]!, bb: [Bb!], aa: Aa!): Int
+        }
+      

@@ -1,0 +1,63 @@
+{
+  "source": "rules/require-deprecation-date/index.test.ts",
+  "source_hash": "19261063ffd58246",
+  "rule": "require-deprecation-date",
+  "valid_count": 4,
+  "invalid_count": 5,
+  "cases": [
+    {
+      "kind": "valid",
+      "id": "01",
+      "hash": "2ee730ed2a670ee0",
+      "line": 15
+    },
+    {
+      "kind": "valid",
+      "id": "02",
+      "hash": "122bcab95ff1299d",
+      "line": 16
+    },
+    {
+      "kind": "valid",
+      "id": "03",
+      "hash": "e2ee8b442b4d9bc9",
+      "line": 17
+    },
+    {
+      "kind": "valid",
+      "id": "04",
+      "hash": "e8cf029dc80b9574",
+      "line": 21
+    },
+    {
+      "kind": "invalid",
+      "id": "01",
+      "hash": "a8d9fe2e87684742",
+      "line": 29
+    },
+    {
+      "kind": "invalid",
+      "id": "02",
+      "hash": "9eac698eb2ac2ceb",
+      "line": 33
+    },
+    {
+      "kind": "invalid",
+      "id": "03",
+      "hash": "7bdc8aa3fd8b5a9c",
+      "line": 38
+    },
+    {
+      "kind": "invalid",
+      "id": "04",
+      "hash": "c1d1f56eca694d3f",
+      "line": 42
+    },
+    {
+      "kind": "invalid",
+      "id": "05",
+      "hash": "9e81f6d2e45fde6d",
+      "line": 46
+    }
+  ]
+}

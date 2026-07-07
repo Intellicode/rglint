@@ -1,0 +1,10 @@
+schema = """
+        input UserInput {
+          id: ID
+        }
+
+        type Query {
+          # InputValueDefinition
+          user(input: UserInput!): Boolean
+        }
+      """

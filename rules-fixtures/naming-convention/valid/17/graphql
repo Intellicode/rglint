@@ -1,0 +1,16 @@
+        type Test {
+          EU: ID
+          EUIntlFlag: ID
+          IE: ID
+          IEIntlFlag: ID
+          GB: ID
+          UKFlag: ID
+          UKService_Badge: ID
+          CCBleaching: ID
+          CCDryCleaning: ID
+          CCIroning: ID
+          UPC: ID
+          CMWA: ID
+          EAN13: ID
+        }
+      

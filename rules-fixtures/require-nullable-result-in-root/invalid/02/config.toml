@@ -1,0 +1,12 @@
+schema = """
+        type MyMutation
+        extend type MyMutation {
+          user: User!
+        }
+        interface User {
+          id: ID!
+        }
+        schema {
+          mutation: MyMutation
+        }
+      """

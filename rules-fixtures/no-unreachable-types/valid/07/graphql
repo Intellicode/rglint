@@ -1,0 +1,13 @@
+        # DirectiveDefinition
+        directive @auth(role: [Role!]!) on FIELD_DEFINITION
+
+        enum Role {
+          ADMIN
+          USER
+        }
+
+        type Query {
+          # Directive
+          user: ID @auth(role: [ADMIN])
+        }
+      

@@ -1,0 +1,39 @@
+{
+  "source": "rules/require-type-pattern-with-oneof/index.test.ts",
+  "source_hash": "fe01b871d33a5382",
+  "rule": "require-type-pattern-with-oneof",
+  "valid_count": 3,
+  "invalid_count": 2,
+  "cases": [
+    {
+      "kind": "valid",
+      "id": "01",
+      "hash": "a9476126dab24e8c",
+      "line": 6
+    },
+    {
+      "kind": "valid",
+      "id": "02",
+      "hash": "4935c8eabad74c5f",
+      "line": 12
+    },
+    {
+      "kind": "valid",
+      "id": "03",
+      "hash": "ab135a52b54d370d",
+      "line": 21
+    },
+    {
+      "kind": "invalid",
+      "id": "01",
+      "hash": "a6799cd796b359ef",
+      "line": 32
+    },
+    {
+      "kind": "invalid",
+      "id": "02",
+      "hash": "ebcedaeadecf2376",
+      "line": 42
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+        query Foo {
+          id
+        }
+        fragment Bar on Bar {
+          id
+        }
+        mutation Baz($name: String!) {
+          createFoo {
+            name
+          }
+        }
+      

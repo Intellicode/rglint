@@ -1,0 +1,6 @@
+[options]
+EnumValueDefinition = "UPPER_CASE"
+FragmentDefinition = "PascalCase"
+OperationDefinition = "PascalCase"
+VariableDefinition = "camelCase"
+types = "PascalCase"

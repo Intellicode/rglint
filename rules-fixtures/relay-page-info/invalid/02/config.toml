@@ -1,0 +1,11 @@
+schema = """
+        union PageInfo = UserConnection | Post
+        extend union PageInfo = Comment
+        type UserConnection {
+          edges: [UserEdge]
+          pageInfo: PageInfo!
+        }
+        type Post
+        type Comment
+        type UserEdge
+      """

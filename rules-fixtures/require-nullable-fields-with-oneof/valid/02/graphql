@@ -1,0 +1,5 @@
+      type User @oneOf {
+        foo: String
+        bar: [Int!]
+      }
+    

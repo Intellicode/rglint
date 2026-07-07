@@ -1,0 +1,3 @@
+[options]
+fields = ["ObjectTypeDefinition"]
+groups = ["id", "*", "createdAt", "updatedAt"]

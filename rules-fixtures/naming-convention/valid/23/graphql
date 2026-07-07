@@ -1,0 +1,7 @@
+        scalar IpAddress
+
+        type Test {
+          specialFeatureEnabled: Boolean!
+          userIpAddress: IpAddress!
+        }
+      

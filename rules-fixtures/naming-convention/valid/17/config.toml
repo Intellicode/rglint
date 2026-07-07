@@ -1,0 +1,3 @@
+[options.FieldDefinition]
+ignorePattern = "^(EU|IE|GB|UK|CC|UPC|CMWA|EAN13)"
+style = "camelCase"

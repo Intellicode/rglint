@@ -1,0 +1,1 @@
+{"errors":[{"column":0,"line":1,"message":"Field \"nodeId\" starts with the name of the parent type \"Node\"","rule":"no-typename-prefix"}]}

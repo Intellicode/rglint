@@ -1,0 +1,1 @@
+{"errors":[{"column":0,"line":1,"message":"Object field \"a\" is marked as deprecated in your GraphQL schema (reason: Use 'b' instead.)","rule":"no-deprecated"}]}

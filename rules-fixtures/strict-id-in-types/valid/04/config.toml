@@ -1,0 +1,8 @@
+schema = "type A { id: ID! } type AResult { key: String! }"
+
+[options]
+acceptedIdNames = ["id"]
+acceptedIdTypes = ["ID"]
+
+[options.exceptions]
+suffixes = ["Result"]

@@ -1,0 +1,10 @@
+        type Query {
+          me: User
+        }
+
+        # ObjectTypeDefinition
+        type User {
+          id: ID
+          name: String
+        }
+      

@@ -1,0 +1,1 @@
+query Foo { foo } query getBar { bar }

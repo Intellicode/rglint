@@ -1,0 +1,6 @@
+[options."FieldDefinition[gqlType.gqlType.name.value=Boolean]"]
+requiredSuffixes = ["Enabled", "Disabled"]
+style = "camelCase"
+
+[options."FieldDefinition[gqlType.gqlType.name.value=IpAddress]"]
+requiredSuffixes = ["IpAddress"]

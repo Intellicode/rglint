@@ -1,0 +1,1 @@
+type One { fieldA: String } enum Z { ENUM_VALUE_ONE ENUM_VALUE_TWO }

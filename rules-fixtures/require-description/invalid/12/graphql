@@ -1,0 +1,6 @@
+        # linesBefore !== 1
+
+        query {
+          foo
+        }
+      

@@ -1,0 +1,6 @@
+        mutation ($cc: [Cc!]!, $bb: [Bb!], $aa: Aa!) {
+          test(ccc: $cc, bbb: $bb, aaa: $aa) {
+            something
+          }
+        }
+      

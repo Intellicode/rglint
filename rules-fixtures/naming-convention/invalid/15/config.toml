@@ -1,0 +1,2 @@
+[options.OperationDefinition]
+forbiddenPatterns = ["/^(get|query)/"]

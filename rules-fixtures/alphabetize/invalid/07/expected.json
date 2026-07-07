@@ -1,0 +1,1 @@
+{"errors":[{"column":0,"line":1,"message":"enum value \"GOD\" should be before enum value \"SUPER_ADMIN\"","rule":"alphabetize"}]}

@@ -1,0 +1,23 @@
+        type Query {
+          node(id: ID!): AnotherNode!
+        }
+
+        interface Node {
+          id: ID!
+        }
+
+        interface AnotherNode {
+          createdAt: String
+        }
+
+        interface User implements Node {
+          id: ID!
+          name: String
+        }
+
+        type SuperUser implements User & Node {
+          id: ID!
+          name: String
+          address: String
+        }
+      

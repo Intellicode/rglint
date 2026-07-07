@@ -1,0 +1,4 @@
+[options]
+FieldDefinition = true
+ObjectTypeDefinition = false
+types = true

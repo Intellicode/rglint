@@ -1,0 +1,1 @@
+{"configOptions_raw":"{\n          query: 'kebab-case',\n          mutation: 'kebab-case',\n          subscription: 'kebab-case',\n          fragment: 'kebab-case',\n        }"}

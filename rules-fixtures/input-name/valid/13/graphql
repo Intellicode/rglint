@@ -1,0 +1,1 @@
+type Query { getMessage(input: NonConforming): String }

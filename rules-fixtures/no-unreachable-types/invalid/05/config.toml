@@ -1,0 +1,22 @@
+schema = """
+        type Query {
+          node(id: ID!): Node!
+        }
+
+        interface Node {
+          id: ID!
+        }
+
+        interface User implements Node {
+          id: ID!
+          name: String
+        }
+
+        type SuperUser implements User & Node {
+          id: ID!
+          name: String
+          address: String
+        }
+
+        scalar DateTime
+      """

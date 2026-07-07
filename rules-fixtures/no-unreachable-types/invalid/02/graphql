@@ -1,0 +1,30 @@
+        # ScalarTypeDefinition
+        scalar DateTime
+
+        # EnumTypeDefinition
+        enum Role {
+          ADMIN
+          USER
+        }
+
+        # DirectiveDefinition
+        directive @auth(role: [String!]!) on FIELD_DEFINITION
+
+        # UnionTypeDefinition
+        union Union = String | Boolean
+
+        # InputObjectTypeDefinition
+        input UsersFilter {
+          limit: Int
+        }
+
+        # InterfaceTypeDefinition
+        interface Address {
+          city: String
+        }
+
+        # ObjectTypeDefinition
+        type User implements Address {
+          city: String
+        }
+      

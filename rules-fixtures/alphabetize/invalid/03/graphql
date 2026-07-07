@@ -1,0 +1,6 @@
+        interface Test {
+          cc: Int
+          bb: Int
+          aa: Int
+        }
+      

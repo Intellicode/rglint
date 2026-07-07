@@ -1,0 +1,8 @@
+{
+  "source": "rules/unique-operation-name/index.test.ts",
+  "source_hash": "df5b8dd7deac7d11",
+  "rule": "unique-operation-name",
+  "valid_count": 0,
+  "invalid_count": 0,
+  "cases": []
+}

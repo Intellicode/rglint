@@ -1,0 +1,51 @@
+{
+  "source": "rules/selection-set-depth/index.test.ts",
+  "source_hash": "a525eb8faa4adb5a",
+  "rule": "selection-set-depth",
+  "valid_count": 3,
+  "invalid_count": 4,
+  "cases": [
+    {
+      "kind": "valid",
+      "id": "01",
+      "hash": "136af5e84d5c63b3",
+      "line": 14
+    },
+    {
+      "kind": "valid",
+      "id": "02",
+      "hash": "536120146778ed7f",
+      "line": 26
+    },
+    {
+      "kind": "valid",
+      "id": "03",
+      "hash": "4502d58b914a48c8",
+      "line": 39
+    },
+    {
+      "kind": "invalid",
+      "id": "01",
+      "hash": "86a7257a2f5a76b3",
+      "line": 54
+    },
+    {
+      "kind": "invalid",
+      "id": "02",
+      "hash": "97f8b1292f60804a",
+      "line": 67
+    },
+    {
+      "kind": "invalid",
+      "id": "03",
+      "hash": "9636f432b4800be7",
+      "line": 81
+    },
+    {
+      "kind": "invalid",
+      "id": "04",
+      "hash": "a78f71aaa0f1ff02",
+      "line": 98
+    }
+  ]
+}

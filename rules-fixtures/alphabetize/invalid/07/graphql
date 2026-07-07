@@ -1,0 +1,7 @@
+        extend enum Role {
+          ADMIN
+          SUPER_ADMIN
+          GOD
+          USER
+        }
+      

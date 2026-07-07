@@ -1,0 +1,15 @@
+schema = """
+        type PageInfo
+        type AEdge {
+          node: [PageInfo!]!
+          cursor: [PageInfo!]!
+        }
+        type AConnection {
+          edges: [AEdge]
+          pageInfo: PageInfo!
+        }
+      """
+
+[options]
+listTypeCanWrapOnlyEdgeType = false
+shouldImplementNode = false

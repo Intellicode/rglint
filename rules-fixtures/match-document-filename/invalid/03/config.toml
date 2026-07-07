@@ -1,0 +1,3 @@
+[options.query]
+style = "PascalCase"
+suffix = ".query"

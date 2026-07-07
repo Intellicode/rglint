@@ -1,0 +1,4 @@
+        fragment Foo on Bar {
+          id
+        }
+      

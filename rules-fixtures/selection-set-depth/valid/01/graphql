@@ -1,0 +1,8 @@
+        {
+          viewer { # Level 0
+            albums { # Level 1
+              title # Level 2
+            }
+          }
+        }
+      

@@ -1,0 +1,12 @@
+        scalar Secret
+
+        interface Snake {
+          value: String!
+        }
+
+        type Test {
+          isEnabled: Boolean!
+          SUPER_SECRET_secret: Secret!
+          hiss_snake: Snake
+        }
+      

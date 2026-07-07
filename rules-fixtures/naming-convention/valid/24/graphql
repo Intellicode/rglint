@@ -1,0 +1,7 @@
+        {
+          test {
+            bar: __foo
+            foo: bar__
+          }
+        }
+      

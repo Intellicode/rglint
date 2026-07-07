@@ -1,0 +1,6 @@
+        mutation Foo($name: String!) {
+          createFoo {
+            name
+          }
+        }
+      

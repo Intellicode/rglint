@@ -1,0 +1,11 @@
+        type User {
+          id: ID!
+        }
+        type AEdge {
+          node: User!
+          cursor: String!
+        }
+        type AConnection {
+          edges: [AEdge]
+        }
+      

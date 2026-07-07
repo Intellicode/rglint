@@ -1,0 +1,34 @@
+        type Query {
+          fieldQuery: ID
+          queryField: ID
+          getField: ID
+        }
+
+        type Mutation {
+          fieldMutation: ID
+          mutationField: ID
+        }
+
+        type Subscription {
+          fieldSubscription: ID
+          subscriptionField: ID
+        }
+
+        enum TestEnum
+        extend enum EnumTest {
+          A
+        }
+
+        interface TestInterface
+        extend interface InterfaceTest {
+          id: ID
+        }
+
+        union TestUnion
+        extend union UnionTest = TestInterface
+
+        type TestType
+        extend type TypeTest {
+          id: ID
+        }
+      

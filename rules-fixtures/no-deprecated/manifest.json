@@ -1,0 +1,57 @@
+{
+  "source": "rules/no-deprecated/index.test.ts",
+  "source_hash": "186ad9d727d95fb7",
+  "rule": "no-deprecated",
+  "valid_count": 2,
+  "invalid_count": 6,
+  "cases": [
+    {
+      "kind": "valid",
+      "id": "01",
+      "hash": "f758d67017aed893",
+      "line": 39
+    },
+    {
+      "kind": "valid",
+      "id": "02",
+      "hash": "6c5b09f82f4316e9",
+      "line": 40
+    },
+    {
+      "kind": "invalid",
+      "id": "01",
+      "hash": "af9c9fd155b1712e",
+      "line": 43
+    },
+    {
+      "kind": "invalid",
+      "id": "02",
+      "hash": "323b5e1f9d385065",
+      "line": 53
+    },
+    {
+      "kind": "invalid",
+      "id": "03",
+      "hash": "a4ffc607362d1e48",
+      "line": 63
+    },
+    {
+      "kind": "invalid",
+      "id": "04",
+      "hash": "da43eb8387bd0407",
+      "line": 73
+    },
+    {
+      "kind": "invalid",
+      "id": "05",
+      "hash": "c54894d36087f363",
+      "line": 83
+    },
+    {
+      "kind": "invalid",
+      "id": "06",
+      "hash": "81bb6ecfd726b4d6",
+      "line": 93
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+        fragment Bar on Bar {
+          id
+        }
+        query Foo {
+          id
+        }
+      

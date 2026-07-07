@@ -1,0 +1,6 @@
+      type Query {
+        # Good
+
+        foo: ID
+      }
+    

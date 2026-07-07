@@ -1,0 +1,12 @@
+  type User {
+    firstName: Int
+    createdAt: DateTime
+    author: Int
+    wagon: Int
+    id: ID
+    foo: Int
+    updatedAt: DateTime
+    bar: Int
+    nachos: Int
+    guild: Int
+  }

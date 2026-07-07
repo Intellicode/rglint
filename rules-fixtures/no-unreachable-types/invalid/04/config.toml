@@ -1,0 +1,22 @@
+schema = """
+        interface User {
+          id: String
+        }
+
+        interface AnotherUser {
+          createdAt: String
+        }
+
+        type SuperUser implements User {
+          id: String
+        }
+
+        # ObjectTypeExtension
+        extend type SuperUser {
+          detail: String
+        }
+
+        type Query {
+          user: AnotherUser!
+        }
+      """

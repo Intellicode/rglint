@@ -1,0 +1,3 @@
+[options]
+groups = ["...", "id", "*", "createdAt", "updatedAt"]
+selections = ["OperationDefinition"]

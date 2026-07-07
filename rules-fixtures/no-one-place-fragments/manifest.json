@@ -1,0 +1,8 @@
+{
+  "source": "rules/no-one-place-fragments/index.test.ts",
+  "source_hash": "c34e862e84e688a1",
+  "rule": "no-one-place-fragments",
+  "valid_count": 0,
+  "invalid_count": 0,
+  "cases": []
+}

@@ -1,0 +1,45 @@
+{
+  "source": "rules/no-anonymous-operations/index.test.ts",
+  "source_hash": "badf21c7edd055b5",
+  "rule": "no-anonymous-operations",
+  "valid_count": 3,
+  "invalid_count": 3,
+  "cases": [
+    {
+      "kind": "valid",
+      "id": "01",
+      "hash": "06e401a803189f51",
+      "line": 5
+    },
+    {
+      "kind": "valid",
+      "id": "02",
+      "hash": "f1874f2f1a2cc491",
+      "line": 5
+    },
+    {
+      "kind": "valid",
+      "id": "03",
+      "hash": "c331821d2894aea5",
+      "line": 5
+    },
+    {
+      "kind": "invalid",
+      "id": "01",
+      "hash": "22fe1b47421d990d",
+      "line": 7
+    },
+    {
+      "kind": "invalid",
+      "id": "02",
+      "hash": "203f37f8aad62c0b",
+      "line": 8
+    },
+    {
+      "kind": "invalid",
+      "id": "03",
+      "hash": "c3da44af261accef",
+      "line": 9
+    }
+  ]
+}

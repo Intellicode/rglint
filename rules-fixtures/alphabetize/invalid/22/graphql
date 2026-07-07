@@ -1,0 +1,9 @@
+        fragment foo on Foo {
+          zz
+          ...ChildFragment
+          updatedAt
+          createdAt
+          aa
+          id
+        }
+      

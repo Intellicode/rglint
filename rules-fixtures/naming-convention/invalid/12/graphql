@@ -1,0 +1,9 @@
+        {
+          test {
+            _badAlias: foo
+            badAlias_: bar
+            _ok
+            ok_
+          }
+        }
+      

@@ -1,0 +1,8 @@
+schema = "type A { id: ID! } type A1 { id: ID! }"
+
+[options]
+acceptedIdNames = ["id"]
+acceptedIdTypes = ["ID"]
+
+[options.exceptions]
+suffixes = [""]

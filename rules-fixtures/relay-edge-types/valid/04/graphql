@@ -1,0 +1,14 @@
+        interface Node {
+          id: ID!
+        }
+        type User implements Node {
+          id: ID!
+        }
+        type AEdge {
+          node: User!
+          cursor: String!
+        }
+        type AConnection {
+          edges: [AEdge]
+        }
+      

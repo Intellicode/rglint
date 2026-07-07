@@ -1,0 +1,21 @@
+{
+  "source": "rules/unique-enum-value-names/index.test.ts",
+  "source_hash": "d42674aed13011a8",
+  "rule": "unique-enum-value-names",
+  "valid_count": 0,
+  "invalid_count": 2,
+  "cases": [
+    {
+      "kind": "invalid",
+      "id": "01",
+      "hash": "ec72cdb7b9e69404",
+      "line": 7
+    },
+    {
+      "kind": "invalid",
+      "id": "02",
+      "hash": "75c45af802e0b03b",
+      "line": 11
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+        # START
+
+        # before1 extend union Data
+        # before2 extend union Data
+        extend union Data = Role # same extend union Data
+        # before extend input UserInput
+        extend input UserInput {
+          email: Email!
+        } # same extend input UserInput
+        # before fragment UserFields
+        fragment UserFields on User {
+          id
+        } # same fragment UserFields
+        # before type User
+        type User # same type User
+        # before extend enum Role
+        extend enum Role {
+          SUPERMAN
+        } # same extend enum Role
+        # before anonymous operation
+        query {
+          foo
+        } # same anonymous operation
+        # before mutation CreateUser
+        mutation CreateUser {
+          createUser
+        } # same mutation CreateUser
+        # before extend interface Node
+        extend interface Node {
+          createdAt: String!
+        } # same extend interface Node
+        # before extend interface Node
+        extend interface Node {
+          updatedAt: String!
+        } # same extend interface Node
+        # before type RootQuery
+        type RootQuery # same type RootQuery
+        # before interface Node
+        interface Node # same interface Node
+        # before enum Role
+        enum Role # same enum Role
+        # before scalar Email
+        scalar Email # same scalar Email
+        # before input UserInput
+        input UserInput # same input UserInput
+        # before extend type User
+        extend type User {
+          firstName: String!
+        } # same extend type User
+        # before schema definition
+        schema {
+          query: RootQuery
+        } # same schema definition
+        # before union Data
+        union Data = User | Node # same union Data
+        # before directive @auth
+        directive @auth(role: [Role!]!) on FIELD_DEFINITION # same directive @auth
+
+        # END
+      

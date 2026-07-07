@@ -1,0 +1,1 @@
+{"errors":[{"column":0,"line":1,"message":"Interface type `User` is unreachable.","rule":"no-unreachable-types"},{"column":0,"line":1,"message":"Object type `SuperUser` is unreachable.","rule":"no-unreachable-types"},{"column":0,"line":1,"message":"Object type `SuperUser` is unreachable.","rule":"no-unreachable-types"}]}

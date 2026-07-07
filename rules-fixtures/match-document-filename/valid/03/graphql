@@ -1,0 +1,1 @@
+mutation CREATE_USER { user { id } }

@@ -1,0 +1,5 @@
+        input Input @oneOf {
+          foo: String!
+          bar: [Int]!
+        }
+      

@@ -1,0 +1,5 @@
+schema = "type B { id: ID! _id: String! }"
+
+[options]
+acceptedIdNames = ["id", "_id"]
+acceptedIdTypes = ["ID", "String"]

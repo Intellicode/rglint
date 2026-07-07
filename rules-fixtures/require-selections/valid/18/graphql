@@ -1,0 +1,11 @@
+        {
+          noIdOrNoId2 {
+            ... on NoId {
+              name
+            }
+            ... on NoId2 {
+              name
+            }
+          }
+        }
+      

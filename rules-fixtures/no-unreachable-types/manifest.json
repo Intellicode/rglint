@@ -1,0 +1,117 @@
+{
+  "source": "rules/no-unreachable-types/index.test.ts",
+  "source_hash": "4aa624cfefce99ad",
+  "rule": "no-unreachable-types",
+  "valid_count": 13,
+  "invalid_count": 5,
+  "cases": [
+    {
+      "kind": "valid",
+      "id": "01",
+      "hash": "9607920daf145508",
+      "line": 6
+    },
+    {
+      "kind": "valid",
+      "id": "02",
+      "hash": "159071661bbf9d1a",
+      "line": 19
+    },
+    {
+      "kind": "valid",
+      "id": "03",
+      "hash": "76af56ade8ec26da",
+      "line": 32
+    },
+    {
+      "kind": "valid",
+      "id": "04",
+      "hash": "d6a2122f222871ec",
+      "line": 48
+    },
+    {
+      "kind": "valid",
+      "id": "05",
+      "hash": "7ce013deb4026097",
+      "line": 58
+    },
+    {
+      "kind": "valid",
+      "id": "06",
+      "hash": "dd8ad8373fbfadc7",
+      "line": 71
+    },
+    {
+      "kind": "valid",
+      "id": "07",
+      "hash": "2d78f6f9f37ee4fb",
+      "line": 83
+    },
+    {
+      "kind": "valid",
+      "id": "08",
+      "hash": "bd83b04f6a146d51",
+      "line": 99
+    },
+    {
+      "kind": "valid",
+      "id": "09",
+      "hash": "b98d67972c2b2b67",
+      "line": 112
+    },
+    {
+      "kind": "valid",
+      "id": "10",
+      "hash": "6e862cb79756f80d",
+      "line": 132
+    },
+    {
+      "kind": "valid",
+      "id": "11",
+      "hash": "d72841ca14a6e5ff",
+      "line": 144
+    },
+    {
+      "kind": "valid",
+      "id": "12",
+      "hash": "20dad7ff757df2f8",
+      "line": 158
+    },
+    {
+      "kind": "valid",
+      "id": "13",
+      "hash": "0d2a49eb5b37e5dd",
+      "line": 169
+    },
+    {
+      "kind": "invalid",
+      "id": "01",
+      "hash": "c1c61aa45ae70160",
+      "line": 188
+    },
+    {
+      "kind": "invalid",
+      "id": "02",
+      "hash": "10229b7ba5fdf835",
+      "line": 219
+    },
+    {
+      "kind": "invalid",
+      "id": "03",
+      "hash": "159c43e5911b689a",
+      "line": 261
+    },
+    {
+      "kind": "invalid",
+      "id": "04",
+      "hash": "bedb76f8409e5233",
+      "line": 284
+    },
+    {
+      "kind": "invalid",
+      "id": "05",
+      "hash": "07e11d523d04491c",
+      "line": 313
+    }
+  ]
+}

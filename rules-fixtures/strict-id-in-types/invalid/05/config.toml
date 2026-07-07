@@ -1,0 +1,8 @@
+schema = "type B { id: ID! } type BError { message: String! }"
+
+[options]
+acceptedIdNames = ["id"]
+acceptedIdTypes = ["ID"]
+
+[options.exceptions]
+types = ["GeneralError"]

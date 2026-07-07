@@ -1,0 +1,1 @@
+type Query { message(id: ID): Message }

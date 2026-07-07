@@ -1,0 +1,9 @@
+        fragment UserFields on User {
+          id
+        }
+        query getUsers {
+          users {
+            ...UserFields
+          }
+        }
+      

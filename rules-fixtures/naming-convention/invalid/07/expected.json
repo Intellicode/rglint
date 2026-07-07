@@ -1,0 +1,1 @@
+{"errors":[{"column":0,"line":1,"message":"Field \"aField\" should have \"Field\" prefix","rule":"naming-convention"},{"column":0,"line":1,"message":"Enum value \"A_ENUM_VALUE_ONE\" should have \"ENUM\" prefix","rule":"naming-convention"},{"column":0,"line":1,"message":"Enum value \"VALUE_TWO\" should have \"ENUM\" prefix","rule":"naming-convention"}]}

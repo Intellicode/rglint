@@ -1,0 +1,3 @@
+[options]
+InputValueDefinition = "camelCase"
+types = "PascalCase"

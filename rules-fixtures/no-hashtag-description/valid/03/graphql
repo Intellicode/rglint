@@ -1,0 +1,6 @@
+      #import t
+
+      type Query {
+        foo: String
+      }
+    

@@ -1,0 +1,7 @@
+        extend type User {
+          age: Int
+          firstName: String!
+          password: String
+          lastName: String!
+        }
+      

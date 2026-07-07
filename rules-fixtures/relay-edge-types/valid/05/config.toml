@@ -1,0 +1,9 @@
+schema = """
+        type AEdge {
+          node: Int!
+          cursor: String!
+        }
+        type AConnection {
+          edges: [AEdge]
+        }
+      """

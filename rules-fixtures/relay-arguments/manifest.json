@@ -1,0 +1,8 @@
+{
+  "source": "rules/relay-arguments/index.test.ts",
+  "source_hash": "54be195459b94e1c",
+  "rule": "relay-arguments",
+  "valid_count": 0,
+  "invalid_count": 0,
+  "cases": []
+}

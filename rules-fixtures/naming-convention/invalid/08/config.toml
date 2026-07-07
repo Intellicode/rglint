@@ -1,0 +1,12 @@
+[options.FieldDefinition]
+forbiddenPrefixes = ["foo", "bar"]
+forbiddenSuffixes = ["Foo"]
+style = "camelCase"
+
+[options."FieldDefinition[parent.name.value=Query]"]
+forbiddenPrefixes = ["get", "query"]
+style = "camelCase"
+
+[options.ObjectTypeDefinition]
+forbiddenPrefixes = ["On"]
+style = "PascalCase"

@@ -1,0 +1,10 @@
+schema = """
+        type Query {
+          foo: User
+          baz: [User]!
+          bar: [User!]!
+        }
+        type User {
+          id: ID!
+        }
+      """

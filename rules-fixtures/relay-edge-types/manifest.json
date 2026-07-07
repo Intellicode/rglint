@@ -1,0 +1,75 @@
+{
+  "source": "rules/relay-edge-types/index.test.ts",
+  "source_hash": "e3d4a97ae674b525",
+  "rule": "relay-edge-types",
+  "valid_count": 5,
+  "invalid_count": 6,
+  "cases": [
+    {
+      "kind": "valid",
+      "id": "01",
+      "hash": "dbd508417cada030",
+      "line": 6
+    },
+    {
+      "kind": "valid",
+      "id": "02",
+      "hash": "e980fc60020229d6",
+      "line": 19
+    },
+    {
+      "kind": "valid",
+      "id": "03",
+      "hash": "521ff7677915b955",
+      "line": 32
+    },
+    {
+      "kind": "valid",
+      "id": "04",
+      "hash": "c278fdcc77141945",
+      "line": 46
+    },
+    {
+      "kind": "valid",
+      "id": "05",
+      "hash": "e785a69e1cd36150",
+      "line": 65
+    },
+    {
+      "kind": "invalid",
+      "id": "01",
+      "hash": "6d6c844c739ef7ad",
+      "line": 79
+    },
+    {
+      "kind": "invalid",
+      "id": "02",
+      "hash": "943749e3ac02cee1",
+      "line": 109
+    },
+    {
+      "kind": "invalid",
+      "id": "03",
+      "hash": "055878b248fe219b",
+      "line": 121
+    },
+    {
+      "kind": "invalid",
+      "id": "04",
+      "hash": "008059d16d3e6e63",
+      "line": 137
+    },
+    {
+      "kind": "invalid",
+      "id": "05",
+      "hash": "cf3f9fe0f5769a5b",
+      "line": 152
+    },
+    {
+      "kind": "invalid",
+      "id": "06",
+      "hash": "750ac947d5e69ff6",
+      "line": 172
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+schema = """
+        scalar A
+        scalar B
+
+        # UnionTypeDefinition
+        union Response = A | B
+
+        type Query {
+          foo: Response
+        }
+      """

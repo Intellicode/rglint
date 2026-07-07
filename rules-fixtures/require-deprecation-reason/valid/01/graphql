@@ -1,0 +1,6 @@
+      query getUser {
+        f
+        a
+        b
+      }
+    
