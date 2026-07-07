@@ -1,0 +1,8 @@
+schema = """
+        # ScalarTypeDefinition
+        scalar DateTime
+
+        type Query {
+          now: DateTime
+        }
+      """

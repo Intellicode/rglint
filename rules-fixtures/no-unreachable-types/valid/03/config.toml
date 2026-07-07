@@ -1,0 +1,14 @@
+schema = """
+        type Query {
+          me: User
+        }
+
+        # InterfaceTypeDefinition
+        interface Address {
+          city: String
+        }
+
+        type User implements Address {
+          city: String
+        }
+      """

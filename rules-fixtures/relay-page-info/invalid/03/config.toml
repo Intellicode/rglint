@@ -1,0 +1,9 @@
+schema = """
+        input PageInfo
+        extend input PageInfo {
+          hasPreviousPage: Boolean!
+          hasNextPage: Boolean!
+          startCursor: String
+          endCursor: String
+        }
+      """

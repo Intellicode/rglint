@@ -1,0 +1,1 @@
+type One { fieldA: String } type Query { QUERY_A(id: ID!): String }

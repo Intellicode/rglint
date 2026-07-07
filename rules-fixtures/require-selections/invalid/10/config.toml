@@ -1,0 +1,28 @@
+documents = """
+            fragment UnionFragment on UserOrPost {
+              ...UserFields
+            }
+
+            fragment UserFields on User {
+              name
+            }
+          """
+schema = """
+  type User {
+    id: ID
+    name: String
+    posts: [Post]
+  }
+
+  type Post {
+    id: ID
+    title: String
+    author: [User!]!
+  }
+
+  type Query {
+    user: User
+    userOrPost: UserOrPost
+  }
+
+  union UserOrPost = User | Post"""

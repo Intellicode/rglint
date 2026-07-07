@@ -1,0 +1,8 @@
+{
+  "source": "rules/require-field-of-type-query-in-mutation-result/index.test.ts",
+  "source_hash": "2c4b1e8808fc6471",
+  "rule": "require-field-of-type-query-in-mutation-result",
+  "valid_count": 0,
+  "invalid_count": 0,
+  "cases": []
+}

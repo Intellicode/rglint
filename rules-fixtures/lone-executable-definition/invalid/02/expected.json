@@ -1,0 +1,1 @@
+{"errors":[{"column":0,"line":1,"message":"Fragment \"Bar\" should be in a separate file.","rule":"lone-executable-definition"}]}

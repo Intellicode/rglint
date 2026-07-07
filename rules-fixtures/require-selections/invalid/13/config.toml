@@ -1,0 +1,47 @@
+documents = "{ foo }"
+schema = """
+  type Query {
+    hasId: HasId!
+    noId: NoId!
+    vehicles: [Vehicle!]!
+    flying: [Flying!]!
+    noIdOrNoId2: NoIdOrNoId2!
+  }
+
+  type NoId {
+    name: String!
+  }
+
+  type NoId2 {
+    name: String!
+  }
+
+  union NoIdOrNoId2 = NoId | NoId2
+
+  interface Vehicle {
+    id: ID!
+  }
+
+  type Car implements Vehicle {
+    id: ID!
+    mileage: Int
+  }
+
+  interface Flying {
+    hasWings: Boolean!
+  }
+
+  type Bird implements Flying {
+    id: ID!
+    hasWings: Boolean!
+  }
+
+  type HasId {
+    id: ID!
+    _id: ID!
+    name: String!
+  }"""
+
+[options]
+fieldName = ["name", "_id"]
+requireAllFields = true

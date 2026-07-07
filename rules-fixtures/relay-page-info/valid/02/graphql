@@ -1,0 +1,7 @@
+        type PageInfo {
+          hasPreviousPage: Boolean!
+          hasNextPage: Boolean!
+          startCursor: Int
+          endCursor: Float
+        }
+      

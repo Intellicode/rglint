@@ -1,0 +1,1 @@
+subscription new_user { user { id } }

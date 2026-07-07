@@ -1,0 +1,33 @@
+{
+  "source": "rules/no-duplicate-fields/index.test.ts",
+  "source_hash": "b60e03b1c4f33912",
+  "rule": "no-duplicate-fields",
+  "valid_count": 0,
+  "invalid_count": 4,
+  "cases": [
+    {
+      "kind": "invalid",
+      "id": "01",
+      "hash": "af6434d6aaf15aee",
+      "line": 7
+    },
+    {
+      "kind": "invalid",
+      "id": "02",
+      "hash": "f6ac73bdfd2fc143",
+      "line": 15
+    },
+    {
+      "kind": "invalid",
+      "id": "03",
+      "hash": "506a2ad9e293ed92",
+      "line": 25
+    },
+    {
+      "kind": "invalid",
+      "id": "04",
+      "hash": "fdcbd4ec88c44421",
+      "line": 38
+    }
+  ]
+}

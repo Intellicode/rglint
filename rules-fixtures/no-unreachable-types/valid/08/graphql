@@ -1,0 +1,10 @@
+        type RootQuery
+        type RootMutation
+        type RootSubscription
+
+        schema {
+          query: RootQuery
+          mutation: RootMutation
+          subscription: RootSubscription
+        }
+      

@@ -1,0 +1,7 @@
+[options.mutation]
+style = "PascalCase"
+suffix = ".mutation"
+
+[options.query]
+style = "PascalCase"
+suffix = ".query"

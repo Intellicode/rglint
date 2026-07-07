@@ -1,0 +1,8 @@
+        {
+          userOrPost {
+            ... on User {
+              ...UserFields
+            }
+          }
+        }
+      

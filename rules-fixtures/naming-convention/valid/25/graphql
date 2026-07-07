@@ -1,0 +1,4 @@
+        type SomeType {
+          _someField_: Boolean!
+        }
+      

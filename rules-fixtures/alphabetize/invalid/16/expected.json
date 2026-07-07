@@ -1,0 +1,1 @@
+{"errors":[{"column":0,"line":1,"message":"field \"fullName\" should be before field \"lastName\"","rule":"alphabetize"},{"column":0,"line":1,"message":"field \"firsName\" should be before field \"fullName\"","rule":"alphabetize"}]}

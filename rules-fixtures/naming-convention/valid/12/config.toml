@@ -1,0 +1,10 @@
+[options.EnumValueDefinition]
+style = "UPPER_CASE"
+suffix = ""
+
+[options.FieldDefinition]
+style = "camelCase"
+suffix = "Field"
+
+[options.types]
+style = "PascalCase"

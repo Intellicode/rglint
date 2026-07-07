@@ -1,0 +1,19 @@
+schema = """
+        type User {
+          id: ID!
+        }
+        type MyQuery {
+          user: User
+        }
+        type MyMutation {
+          createUser: User
+        }
+        type MySubscription {
+          userAdded: User
+        }
+        schema {
+          query: MyQuery
+          mutation: MyMutation
+          subscription: MySubscription
+        }
+      """

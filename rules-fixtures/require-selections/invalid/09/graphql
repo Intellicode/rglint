@@ -1,0 +1,6 @@
+        {
+          userOrPost {
+            ...UnionFragment
+          }
+        }
+      

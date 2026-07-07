@@ -1,0 +1,1 @@
+{"errors":[{"column":0,"line":1,"message":"File extension \".graphql\" don't match extension \".gql\"","rule":"match-document-filename"}]}

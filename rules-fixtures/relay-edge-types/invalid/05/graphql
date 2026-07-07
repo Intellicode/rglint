@@ -1,0 +1,14 @@
+        type AEdge {
+          node: Int!
+          cursor: String!
+        }
+        type AConnection {
+          edges: [AEdge]
+        }
+        type User {
+          comments: [Int]
+          likes: [Int!]
+          messages: [Int]!
+          posts: [Int!]!
+        }
+      

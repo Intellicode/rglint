@@ -1,0 +1,6 @@
+schema = """
+        type PageInfo {
+          hasPreviousPage: [Boolean!]!
+          startCursor: [String]
+        }
+      """

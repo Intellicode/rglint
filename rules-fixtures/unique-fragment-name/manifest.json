@@ -1,0 +1,8 @@
+{
+  "source": "rules/unique-fragment-name/index.test.ts",
+  "source_hash": "e751c33fc44de8e1",
+  "rule": "unique-fragment-name",
+  "valid_count": 0,
+  "invalid_count": 0,
+  "cases": []
+}

@@ -1,0 +1,11 @@
+        # BAD
+        fragment UserFields on User {
+          id
+        }
+
+        query {
+          user {
+            ...UserFields
+          }
+        }
+      

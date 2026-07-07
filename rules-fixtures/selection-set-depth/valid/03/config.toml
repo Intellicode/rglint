@@ -1,0 +1,5 @@
+documents = "fragment AlbumFields on Album { id }"
+
+[options]
+ignore = ["albums"]
+maxDepth = 1

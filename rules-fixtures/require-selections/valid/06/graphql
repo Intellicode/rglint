@@ -1,0 +1,1 @@
+{ vehicles { ...on Car { id mileage } } }

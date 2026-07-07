@@ -1,0 +1,1 @@
+{"errors":[{"column":0,"line":1,"message":"Scalar \"BSONDecimal\" should be in snake_case format","rule":"naming-convention"}]}

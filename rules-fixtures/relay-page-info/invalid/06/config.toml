@@ -1,0 +1,9 @@
+schema = """
+        type PageInfo
+        extend type PageInfo {
+          hasPreviousPage: Boolean!
+          hasNextPage: Boolean!
+          startCursor: String
+          endCursor: String
+        }
+      """

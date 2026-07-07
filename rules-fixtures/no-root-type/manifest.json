@@ -1,0 +1,8 @@
+{
+  "source": "rules/no-root-type/index.test.ts",
+  "source_hash": "baa56447106448ed",
+  "rule": "no-root-type",
+  "valid_count": 0,
+  "invalid_count": 0,
+  "cases": []
+}

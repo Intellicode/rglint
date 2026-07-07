@@ -1,0 +1,1 @@
+options = "(rule.meta.docs!.configOptions as any)"

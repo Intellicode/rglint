@@ -1,0 +1,8 @@
+      type Query {
+        user(
+          # Good
+
+          id: Int
+        ): User
+      }
+    

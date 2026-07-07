@@ -1,0 +1,3 @@
+[options]
+InputValueDefinition = "snake_case"
+types = "PascalCase"

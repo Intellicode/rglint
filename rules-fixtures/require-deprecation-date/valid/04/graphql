@@ -1,0 +1,5 @@
+      type User {
+        firstname: String @deprecated(deletionDate: "22/08/2031")
+        firstName: String
+      }
+    

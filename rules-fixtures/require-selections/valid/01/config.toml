@@ -1,0 +1,2 @@
+documents = "{ foo }"
+schema = "type Query { id: ID }"

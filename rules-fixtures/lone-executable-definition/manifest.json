@@ -1,0 +1,87 @@
+{
+  "source": "rules/lone-executable-definition/index.test.ts",
+  "source_hash": "697602d59aaca287",
+  "rule": "lone-executable-definition",
+  "valid_count": 10,
+  "invalid_count": 3,
+  "cases": [
+    {
+      "kind": "valid",
+      "id": "01",
+      "hash": "d2bdebf84d189356",
+      "line": 6
+    },
+    {
+      "kind": "valid",
+      "id": "02",
+      "hash": "767c0caf5687eaf4",
+      "line": 14
+    },
+    {
+      "kind": "valid",
+      "id": "03",
+      "hash": "e0a5c6ee68c9eb76",
+      "line": 22
+    },
+    {
+      "kind": "valid",
+      "id": "04",
+      "hash": "04b81169f4b8171e",
+      "line": 30
+    },
+    {
+      "kind": "valid",
+      "id": "05",
+      "hash": "5699f3f9373f1088",
+      "line": 38
+    },
+    {
+      "kind": "valid",
+      "id": "06",
+      "hash": "c7434283d3ff1034",
+      "line": 48
+    },
+    {
+      "kind": "valid",
+      "id": "07",
+      "hash": "0c62086ebbcefd81",
+      "line": 58
+    },
+    {
+      "kind": "valid",
+      "id": "08",
+      "hash": "7f17d72b6fc11fd4",
+      "line": 66
+    },
+    {
+      "kind": "valid",
+      "id": "09",
+      "hash": "07376decb2e5def0",
+      "line": 74
+    },
+    {
+      "kind": "valid",
+      "id": "10",
+      "hash": "4b6542fa7a1db2e3",
+      "line": 86
+    },
+    {
+      "kind": "invalid",
+      "id": "01",
+      "hash": "a5fa95b8787813d9",
+      "line": 100
+    },
+    {
+      "kind": "invalid",
+      "id": "02",
+      "hash": "5a17499326cfe87f",
+      "line": 138
+    },
+    {
+      "kind": "invalid",
+      "id": "03",
+      "hash": "cca402a29b58bcfe",
+      "line": 150
+    }
+  ]
+}

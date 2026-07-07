@@ -1,0 +1,9 @@
+        query test {
+          users {
+            id
+            name
+            email
+            email: somethingElse
+          }
+        }
+      

@@ -1,0 +1,10 @@
+        {
+          viewer {
+            albums {
+              ... on Album {
+                id
+              }
+            }
+          }
+        }
+      

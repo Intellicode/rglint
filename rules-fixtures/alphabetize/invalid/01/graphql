@@ -1,0 +1,7 @@
+        type User {
+          password: String
+          firstName: String!
+          age: Int
+          lastName: String!
+        }
+      

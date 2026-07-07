@@ -1,0 +1,1 @@
+{"errors":[{"column":0,"line":1,"message":"enum value \"foo\" should be before enum value \"qux\"","rule":"alphabetize"},{"column":0,"line":1,"message":"enum value \"Bar\" should be before enum value \"foo\"","rule":"alphabetize"},{"column":0,"line":1,"message":"enum value \"bar\" should be before enum value \"Bar\"","rule":"alphabetize"}]}

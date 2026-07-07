@@ -1,0 +1,1 @@
+query USER_BY_ID { user { id } }

@@ -1,0 +1,8 @@
+{
+  "source": "rules/no-scalar-result-type-on-mutation/index.test.ts",
+  "source_hash": "767fae80829cc96f",
+  "rule": "no-scalar-result-type-on-mutation",
+  "valid_count": 0,
+  "invalid_count": 0,
+  "cases": []
+}

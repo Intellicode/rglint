@@ -1,0 +1,10 @@
+[options.EnumValueDefinition]
+prefix = "ENUM"
+style = "UPPER_CASE"
+
+[options.FieldDefinition]
+prefix = "Field"
+style = "camelCase"
+
+[options.ObjectTypeDefinition]
+style = "PascalCase"

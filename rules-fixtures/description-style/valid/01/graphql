@@ -1,0 +1,14 @@
+  enum EnumUserLanguagesSkill {
+    """
+    basic
+    """
+    basic
+    """
+    fluent
+    """
+    fluent
+    """
+    native
+    """
+    native
+  }

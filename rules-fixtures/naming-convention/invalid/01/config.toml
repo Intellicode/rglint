@@ -1,0 +1,3 @@
+[options]
+FieldDefinition = "PascalCase"
+types = "PascalCase"

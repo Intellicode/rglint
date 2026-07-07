@@ -1,0 +1,7 @@
+        {
+          id
+        }
+        fragment Bar on Bar {
+          id
+        }
+      

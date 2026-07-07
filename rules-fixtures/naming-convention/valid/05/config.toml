@@ -1,0 +1,3 @@
+[options]
+allowLeadingUnderscore = false
+allowTrailingUnderscore = false

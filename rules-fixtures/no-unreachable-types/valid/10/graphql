@@ -1,0 +1,8 @@
+        type Query
+
+        schema @good {
+          query: Query
+        }
+
+        directive @good on SCHEMA
+      

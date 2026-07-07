@@ -1,0 +1,6 @@
+        query test {
+          users(first: 100, after: 10, filter: "test", first: 50) {
+            id
+          }
+        }
+      

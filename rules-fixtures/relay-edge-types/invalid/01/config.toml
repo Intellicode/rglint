@@ -1,0 +1,29 @@
+schema = """
+        type PageInfo
+        type BConnection
+        type DConnection
+        scalar AEdge
+        union BEdge = PageInfo
+        enum CEdge
+        interface DEdge
+        type AConnection {
+          edges: [AEdge]
+          pageInfo: PageInfo!
+        }
+        extend type BConnection {
+          edges: [BEdge!]
+          pageInfo: PageInfo!
+        }
+        type CConnection {
+          edges: [CEdge]!
+          pageInfo: PageInfo!
+        }
+        extend type DConnection {
+          edges: [DEdge!]!
+          pageInfo: PageInfo!
+        }
+      """
+
+[options]
+listTypeCanWrapOnlyEdgeType = false
+shouldImplementNode = false

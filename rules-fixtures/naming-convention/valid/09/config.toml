@@ -1,0 +1,3 @@
+[options]
+EnumValueDefinition = "UPPER_CASE"
+types = "PascalCase"

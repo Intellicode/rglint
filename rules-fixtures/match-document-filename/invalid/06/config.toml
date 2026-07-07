@@ -1,0 +1,7 @@
+[options.fragment]
+style = "PascalCase"
+suffix = ".fragment"
+
+[options.query]
+style = "PascalCase"
+suffix = ".query"

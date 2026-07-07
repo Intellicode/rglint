@@ -1,0 +1,8 @@
+{
+  "source": "rules/require-import-fragment/index.test.ts",
+  "source_hash": "83f79bbca5c8df74",
+  "rule": "require-import-fragment",
+  "valid_count": 0,
+  "invalid_count": 0,
+  "cases": []
+}

@@ -1,0 +1,12 @@
+        enum Test {
+          "qux"
+          qux
+          foo
+          "Bar"
+          Bar
+          """
+          bar
+          """
+          bar
+        }
+      

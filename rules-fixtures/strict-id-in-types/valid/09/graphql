@@ -1,0 +1,1 @@
+type A { id: ID! } type AGeneralError { message: String! } type AForbiddenError { message: String! }

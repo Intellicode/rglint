@@ -1,0 +1,23 @@
+schema = """
+  input TestInput {
+    a: Int @deprecated(reason: "Use 'b' instead.")
+    b: Boolean
+  }
+
+  type Query {
+    oldField: String @deprecated
+    oldFieldWithReason: String @deprecated(reason: "test")
+    newField: String!
+    testArgument(a: Int @deprecated(reason: "Use 'b' instead."), b: Boolean): Boolean
+    testObjectField(input: TestInput): Boolean
+  }
+
+  type Mutation {
+    something(t: EnumType): Boolean!
+  }
+
+  enum EnumType {
+    OLD @deprecated
+    OLD_WITH_REASON @deprecated(reason: "test")
+    NEW
+  }"""

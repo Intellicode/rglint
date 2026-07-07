@@ -1,0 +1,1 @@
+type B { id: ID! } type BError { message: String! }

@@ -1,0 +1,6 @@
+        fragment TestFields on Test {
+          cc
+          bb
+          aa
+        }
+      

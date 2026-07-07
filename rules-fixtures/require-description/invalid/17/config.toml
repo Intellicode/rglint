@@ -1,0 +1,3 @@
+[options]
+ignoredSelectors = ["[type=ObjectTypeDefinition][name.value=PageInfo]", "[type=ObjectTypeDefinition][name.value=/(Connection|Edge)$/]"]
+types = true

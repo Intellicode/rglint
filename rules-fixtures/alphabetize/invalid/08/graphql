@@ -1,0 +1,2 @@
+        directive @test(cc: [Cc!]!, bb: [Bb!], aa: Aa!) on FIELD_DEFINITION
+      

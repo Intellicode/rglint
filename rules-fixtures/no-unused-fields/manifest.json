@@ -1,0 +1,27 @@
+{
+  "source": "rules/no-unused-fields/index.test.ts",
+  "source_hash": "6378db7dc9491b73",
+  "rule": "no-unused-fields",
+  "valid_count": 1,
+  "invalid_count": 2,
+  "cases": [
+    {
+      "kind": "valid",
+      "id": "01",
+      "hash": "16ab5e007d458ad0",
+      "line": 58
+    },
+    {
+      "kind": "invalid",
+      "id": "01",
+      "hash": "30c07007dca94a0d",
+      "line": 114
+    },
+    {
+      "kind": "invalid",
+      "id": "02",
+      "hash": "e8e1b915d2f98d5f",
+      "line": 134
+    }
+  ]
+}

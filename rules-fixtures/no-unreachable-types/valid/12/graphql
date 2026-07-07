@@ -1,0 +1,7 @@
+        enum Enum {
+          A
+          B
+        }
+        directive @q(arg: Enum = A) on QUERY
+        type Query
+      

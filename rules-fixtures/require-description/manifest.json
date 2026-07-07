@@ -1,0 +1,141 @@
+{
+  "source": "rules/require-description/index.test.ts",
+  "source_hash": "a1534d097c545450",
+  "rule": "require-description",
+  "valid_count": 5,
+  "invalid_count": 17,
+  "cases": [
+    {
+      "kind": "valid",
+      "id": "01",
+      "hash": "b57e05052c62ce23",
+      "line": 8
+    },
+    {
+      "kind": "valid",
+      "id": "02",
+      "hash": "a16d9bd5d8db88dd",
+      "line": 27
+    },
+    {
+      "kind": "valid",
+      "id": "03",
+      "hash": "75a9a0b54cd187a0",
+      "line": 44
+    },
+    {
+      "kind": "valid",
+      "id": "04",
+      "hash": "349c0bf41206bf62",
+      "line": 57
+    },
+    {
+      "kind": "valid",
+      "id": "05",
+      "hash": "0d0c2f035ea3936f",
+      "line": 66
+    },
+    {
+      "kind": "invalid",
+      "id": "01",
+      "hash": "40eef67d4bbdfe1d",
+      "line": 90
+    },
+    {
+      "kind": "invalid",
+      "id": "02",
+      "hash": "5e7e9c5d6d673d67",
+      "line": 95
+    },
+    {
+      "kind": "invalid",
+      "id": "03",
+      "hash": "8418e30a9578af9a",
+      "line": 100
+    },
+    {
+      "kind": "invalid",
+      "id": "04",
+      "hash": "4fe025667cd15e26",
+      "line": 105
+    },
+    {
+      "kind": "invalid",
+      "id": "05",
+      "hash": "9a431358d875bd3c",
+      "line": 110
+    },
+    {
+      "kind": "invalid",
+      "id": "06",
+      "hash": "afb1506f77a3a152",
+      "line": 115
+    },
+    {
+      "kind": "invalid",
+      "id": "07",
+      "hash": "ab19ef39a8beda7f",
+      "line": 120
+    },
+    {
+      "kind": "invalid",
+      "id": "08",
+      "hash": "b1b3d3daae10cc20",
+      "line": 125
+    },
+    {
+      "kind": "invalid",
+      "id": "09",
+      "hash": "a670249c018814cd",
+      "line": 130
+    },
+    {
+      "kind": "invalid",
+      "id": "10",
+      "hash": "1c2e3e5491ade688",
+      "line": 135
+    },
+    {
+      "kind": "invalid",
+      "id": "11",
+      "hash": "45aec81dee388bff",
+      "line": 140
+    },
+    {
+      "kind": "invalid",
+      "id": "12",
+      "hash": "cd60b91bcb89d072",
+      "line": 157
+    },
+    {
+      "kind": "invalid",
+      "id": "13",
+      "hash": "214c67eb9b5ebb64",
+      "line": 169
+    },
+    {
+      "kind": "invalid",
+      "id": "14",
+      "hash": "c408ea492c97b3d0",
+      "line": 175
+    },
+    {
+      "kind": "invalid",
+      "id": "15",
+      "hash": "0e4673238c77bb3a",
+      "line": 181
+    },
+    {
+      "kind": "invalid",
+      "id": "16",
+      "hash": "685d00e700edec05",
+      "line": 192
+    },
+    {
+      "kind": "invalid",
+      "id": "17",
+      "hash": "778edb7a30bad963",
+      "line": 231
+    }
+  ]
+}

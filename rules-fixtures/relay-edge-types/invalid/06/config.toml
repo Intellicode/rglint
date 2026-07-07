@@ -1,0 +1,15 @@
+schema = """
+        type User {
+          id: ID!
+        }
+        type AEdge {
+          node: User!
+          cursor: String!
+        }
+        type AConnection {
+          edges: [AEdge]
+        }
+      """
+
+[options]
+shouldImplementNode = true

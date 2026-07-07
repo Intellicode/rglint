@@ -1,0 +1,8 @@
+schema = """
+        type PageInfo
+        type AEdge
+        type AConnection {
+          edges: [AEdge]
+          pageInfo: PageInfo!
+        }
+      """

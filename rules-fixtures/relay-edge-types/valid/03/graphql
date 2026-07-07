@@ -1,0 +1,9 @@
+        scalar Email
+        type AEdge {
+          node: Email!
+          cursor: Email!
+        }
+        type AConnection {
+          edges: [AEdge]
+        }
+      

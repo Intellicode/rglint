@@ -1,0 +1,5 @@
+        # Bad
+        type Query {
+          foo: String
+        }
+      

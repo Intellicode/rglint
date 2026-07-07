@@ -1,0 +1,1 @@
+input CreateUserInput { email: Email! }

@@ -1,0 +1,7 @@
+        extend input UserInput {
+          age: Int
+          firstName: String!
+          password: String
+          lastName: String!
+        }
+      

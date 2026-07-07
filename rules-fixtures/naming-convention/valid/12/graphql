@@ -1,0 +1,1 @@
+type TypeOne { aField: String } enum Z { VALUE_ONE VALUE_TWO }

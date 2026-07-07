@@ -1,0 +1,1 @@
+{ testObjectField(input: { a: 2 }) }

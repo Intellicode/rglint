@@ -1,0 +1,1 @@
+type A { _id: String! }

@@ -1,0 +1,3 @@
+[options.mutation]
+style = "camelCase"
+suffix = "Query"

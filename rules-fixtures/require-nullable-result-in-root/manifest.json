@@ -1,0 +1,33 @@
+{
+  "source": "rules/require-nullable-result-in-root/index.test.ts",
+  "source_hash": "43df6a3bf38027ec",
+  "rule": "require-nullable-result-in-root",
+  "valid_count": 1,
+  "invalid_count": 3,
+  "cases": [
+    {
+      "kind": "valid",
+      "id": "01",
+      "hash": "e86e0422baf1767d",
+      "line": 6
+    },
+    {
+      "kind": "invalid",
+      "id": "01",
+      "hash": "d033396e2c3d03c6",
+      "line": 20
+    },
+    {
+      "kind": "invalid",
+      "id": "02",
+      "hash": "a518eaf4f84ddc72",
+      "line": 31
+    },
+    {
+      "kind": "invalid",
+      "id": "03",
+      "hash": "4fd69ba45a983437",
+      "line": 47
+    }
+  ]
+}

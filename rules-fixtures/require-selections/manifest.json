@@ -1,0 +1,195 @@
+{
+  "source": "rules/require-selections/index.test.ts",
+  "source_hash": "5cb876144fe6ef24",
+  "rule": "require-selections",
+  "valid_count": 18,
+  "invalid_count": 13,
+  "cases": [
+    {
+      "kind": "valid",
+      "id": "01",
+      "hash": "9e911473e7e4d1b7",
+      "line": 92
+    },
+    {
+      "kind": "valid",
+      "id": "02",
+      "hash": "a0a88b8935a02d35",
+      "line": 102
+    },
+    {
+      "kind": "valid",
+      "id": "03",
+      "hash": "f66a087b348f9f72",
+      "line": 103
+    },
+    {
+      "kind": "valid",
+      "id": "04",
+      "hash": "e7d81c33f2611ff4",
+      "line": 104
+    },
+    {
+      "kind": "valid",
+      "id": "05",
+      "hash": "0673445546d10c28",
+      "line": 114
+    },
+    {
+      "kind": "valid",
+      "id": "06",
+      "hash": "0c827db06b654d44",
+      "line": 115
+    },
+    {
+      "kind": "valid",
+      "id": "07",
+      "hash": "0a7eb8012762f30a",
+      "line": 116
+    },
+    {
+      "kind": "valid",
+      "id": "08",
+      "hash": "2b77d52a8c301e92",
+      "line": 117
+    },
+    {
+      "kind": "valid",
+      "id": "09",
+      "hash": "26b1c4dff13218ce",
+      "line": 122
+    },
+    {
+      "kind": "valid",
+      "id": "10",
+      "hash": "6593503d2651f139",
+      "line": 126
+    },
+    {
+      "kind": "valid",
+      "id": "11",
+      "hash": "a2262c728ef0c1ec",
+      "line": 132
+    },
+    {
+      "kind": "valid",
+      "id": "12",
+      "hash": "dbab558f466f78ac",
+      "line": 156
+    },
+    {
+      "kind": "valid",
+      "id": "13",
+      "hash": "26c1461a0b5dd7c3",
+      "line": 184
+    },
+    {
+      "kind": "valid",
+      "id": "14",
+      "hash": "d0b7bd70157b9918",
+      "line": 212
+    },
+    {
+      "kind": "valid",
+      "id": "15",
+      "hash": "a22cf0e0cdb4821c",
+      "line": 246
+    },
+    {
+      "kind": "valid",
+      "id": "16",
+      "hash": "3b4048680c7df73b",
+      "line": 272
+    },
+    {
+      "kind": "valid",
+      "id": "17",
+      "hash": "638300b5049d2c32",
+      "line": 298
+    },
+    {
+      "kind": "valid",
+      "id": "18",
+      "hash": "54f2091c57b5e802",
+      "line": 303
+    },
+    {
+      "kind": "invalid",
+      "id": "01",
+      "hash": "5474786ec22e6cda",
+      "line": 321
+    },
+    {
+      "kind": "invalid",
+      "id": "02",
+      "hash": "aefee10587acf535",
+      "line": 326
+    },
+    {
+      "kind": "invalid",
+      "id": "03",
+      "hash": "c7b1889132623245",
+      "line": 332
+    },
+    {
+      "kind": "invalid",
+      "id": "04",
+      "hash": "8173841a73033336",
+      "line": 339
+    },
+    {
+      "kind": "invalid",
+      "id": "05",
+      "hash": "42e879645ff501e6",
+      "line": 368
+    },
+    {
+      "kind": "invalid",
+      "id": "06",
+      "hash": "64a3ea5ff8b5cd6b",
+      "line": 379
+    },
+    {
+      "kind": "invalid",
+      "id": "07",
+      "hash": "954d4c20c120f64f",
+      "line": 404
+    },
+    {
+      "kind": "invalid",
+      "id": "08",
+      "hash": "8bfc72d7ccd65c50",
+      "line": 415
+    },
+    {
+      "kind": "invalid",
+      "id": "09",
+      "hash": "0ba18bf12739dbb3",
+      "line": 438
+    },
+    {
+      "kind": "invalid",
+      "id": "10",
+      "hash": "bee8851e37cee59c",
+      "line": 461
+    },
+    {
+      "kind": "invalid",
+      "id": "11",
+      "hash": "c245f87ccded1e23",
+      "line": 486
+    },
+    {
+      "kind": "invalid",
+      "id": "12",
+      "hash": "a8d40fb342f1cea4",
+      "line": 504
+    },
+    {
+      "kind": "invalid",
+      "id": "13",
+      "hash": "72bcc3b83df4466b",
+      "line": 516
+    }
+  ]
+}
