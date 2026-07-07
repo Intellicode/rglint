@@ -46,6 +46,7 @@
 #![allow(dead_code)]
 
 pub mod meta;
+pub mod operations;
 
 pub use rglint_core::{Category, Handler, Rule, RuleEntry, RuleMeta};
 

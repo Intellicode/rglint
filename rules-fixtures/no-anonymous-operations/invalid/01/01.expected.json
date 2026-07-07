@@ -1,0 +1,1 @@
+{"errors":[{"column":0,"line":1,"message":"Anonymous GraphQL operations are banned. Please give your operation a name","rule":"no-anonymous-operations"}]}

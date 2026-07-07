@@ -285,7 +285,7 @@ fn selected_names(m: &Matcher, nodes: &[&'static Node<'static>]) -> Vec<String> 
     let mut hits: Vec<String> = nodes
         .iter()
         .filter(|n| m(n, n.parent))
-        .map(|n| n.name.unwrap_or("<anon>").to_owned())
+        .map(|n| n.name.clone().unwrap_or_else(|| "<anon>".to_owned()))
         .collect();
     hits.sort();
     hits

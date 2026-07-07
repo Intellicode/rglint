@@ -13,3 +13,7 @@ serde.workspace = true
 serde_json.workspace = true
 regex.workspace = true
 thiserror.workspace = true
+
+[dev-dependencies]
+rglint-test-harness = { path = "../rglint-test-harness" }
+insta.workspace = true

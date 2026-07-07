@@ -24,6 +24,8 @@ use std::marker::PhantomData;
 
 use apollo_parser::SyntaxKind;
 
+use crate::location::Span;
+
 /// A borrowed AST node handed to rule handlers during the walk, and to the
 /// selector [`Matcher`](crate::selector::Matcher) when testing whether a
 /// compiled selector matches.
@@ -36,9 +38,16 @@ pub struct Node<'a> {
     pub kind: SyntaxKind,
     /// The node's name text, if it has one (e.g. `"Query"` for an
     /// `OBJECT_TYPE_DEFINITION` named `Query`). `None` for nodes without a
-    /// name (e.g. `SelectionSet`). Backed by the originating CST, hence the
-    /// `'a` lifetime.
-    pub name: Option<&'a str>,
+    /// name (e.g. anonymous `OperationDefinition`, `SelectionSet`).
+    ///
+    /// Owned (rather than `&'a str`) so the engine walk can extract the
+    /// identifier from `apollo-parser`'s rowan-backed CST — the textual data
+    /// lives in a reference-counted green tree whose borrow is awkward to
+    /// surface through `&'a str` across the `SyntaxToken` accessor. The
+    /// identifier is short, so the per-node `String` allocation is
+    /// negligible; `node_name` widens it again to an owned `String` for
+    /// caller convenience.
+    pub name: Option<String>,
     /// The node's description text (the string literal preceding it, without
     /// surrounding quotes / block-stripping), if any. Selector engine only
     /// needs *some* text to match `[description.value=...]` against; the
@@ -53,6 +62,11 @@ pub struct Node<'a> {
     /// [`Matcher`](crate::selector::Matcher) walks this for `Child` /
     /// `Descendant` combinators.
     pub parent: Option<&'a Node<'a>>,
+    /// The byte span of this node in its source file, set by the engine
+    /// (spec-011) for every visited node. `None` only on placeholder nodes
+    /// built outside the engine (tests, the selector matcher's synthetic
+    /// roots); the engine always sets it from the CST `SyntaxNode`.
+    pub span: Option<Span>,
     _phantom: PhantomData<&'a ()>,
 }
 
@@ -67,13 +81,14 @@ impl<'a> Node<'a> {
             description: None,
             value_raw: None,
             parent: None,
+            span: None,
             _phantom: PhantomData,
         }
     }
 
     /// Builder: attach a name text to this node.
-    pub const fn with_name(mut self, name: &'a str) -> Self {
-        self.name = Some(name);
+    pub fn with_name(mut self, name: impl Into<String>) -> Self {
+        self.name = Some(name.into());
         self
     }
 
@@ -101,6 +116,13 @@ impl<'a> Node<'a> {
     /// parent.
     pub const fn with_parent_opt(mut self, parent: Option<&'a Node<'a>>) -> Self {
         self.parent = parent;
+        self
+    }
+
+    /// Builder: attach a span. Set by the engine walk (spec-011) for every
+    /// visited node from its CST `SyntaxNode`.
+    pub const fn with_span(mut self, span: Span) -> Self {
+        self.span = Some(span);
         self
     }
 }
