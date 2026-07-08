@@ -1,1 +1,0 @@
-{"errors":[{"column":0,"line":1,"message":"Field `email` defined multiple times.","rule":"no-duplicate-fields"}]}
