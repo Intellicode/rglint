@@ -11,7 +11,7 @@
 
 ## Rule implementation template
 
-New rule file: `crates/rglint-rules/src/operations/<snake_case>.rs`
+New rule file: `crates/rglint-rules/src/<category>/<snake_case>.rs`
 
 ```rust
 //! `<rule-id>` (spec-NNN).
@@ -20,7 +20,7 @@ use rglint_core::{Handler, RuleContext};
 use rglint_derive::Rule;
 
 #[derive(Rule)]
-#[rule(id = "<rule-id>", category = "operations")]
+#[rule(id = "<rule-id>", category = "<category>")]
 pub struct PascalRule;
 
 impl PascalRule {
@@ -43,14 +43,80 @@ mod tests {
         let rule = PascalRule;
         let meta = rule.meta();
         assert_eq!(meta.id, "<rule-id>");
-        assert_eq!(meta.category, Category::Operations);
+        assert_eq!(meta.category, Category::Schema); // or Operations / Other
         assert_eq!(meta.severity, Severity::Warn);
         // add assertion for requires_schema / requires_siblings as needed
     }
 }
 ```
 
-Register in `crates/rglint-rules/src/operations/mod.rs`: add `pub mod <snake_case>;`
+Register in `crates/rglint-rules/src/<category>/mod.rs`: add `pub mod <snake_case>;`
+Create the `<category>/mod.rs` if it doesn't exist yet.
+Also add `pub mod <category>;` in `crates/rglint-rules/src/lib.rs`.
+
+## `on_node` rules subscribing to multiple kinds (spec-019 pattern)
+
+Use pipe-separated kind names in `kinds = "KIND1|KIND2|KIND3"`:
+
+```rust
+#[derive(Rule)]
+#[rule(
+    id = "some-rule",
+    category = "schema",
+    kinds = "FIELD_DEFINITION|INPUT_VALUE_DEFINITION|FIELD"
+)]
+pub struct SomeRule;
+```
+
+The derive macro splits on `|` or `,` and emits `rglint_core::SyntaxKind::KIND1, rglint_core::SyntaxKind::KIND2, ...`.
+
+### Parent-chain walking to find containers
+
+When a rule needs to find a containing node (e.g. which type definition a field belongs to), walk up the `Node.parent` chain from the `_parent` parameter:
+
+```rust
+fn find_container<'a>(parent: &'a Node<'a>) -> Option<&'a Node<'a>> {
+    let mut current = parent;
+    loop {
+        if matches!(current.kind,
+            SyntaxKind::OBJECT_TYPE_DEFINITION
+            | SyntaxKind::INTERFACE_TYPE_DEFINITION
+            | SyntaxKind::INPUT_OBJECT_TYPE_DEFINITION
+            | SyntaxKind::OBJECT_TYPE_EXTENSION
+            | SyntaxKind::INTERFACE_TYPE_EXTENSION
+            | SyntaxKind::INPUT_OBJECT_TYPE_EXTENSION
+            | SyntaxKind::SELECTION_SET
+        ) {
+            return Some(current);
+        }
+        current = current.parent?;
+    }
+}
+```
+
+### Tracking state per container
+
+Use `HashMap<usize, HashMap<String, Span>>` keyed by the container's span offset:
+
+```rust
+struct SomeHandler {
+    // container_offset → field_name → first_occurrence_span
+    seen: HashMap<usize, HashMap<String, Span>>,
+}
+```
+
+### Diagnostic message formatting
+
+`format!` requires a string literal — use inline format strings rather than const `&str` patterns:
+
+```rust
+// GOOD:
+format!("Field \"{name}\" is defined multiple times")
+
+// BAD (compile error):
+const MSG: &str = "Field \"{}\" is defined multiple times";
+format!(MSG, name)  // error: format argument must be a string literal
+```
 
 ## `requires_siblings` rules (spec-017 pattern)
 
@@ -92,6 +158,34 @@ fn extra_unit_test() {
 
 The `#[used]` force-link is required so the test binary includes the `#[derive(Rule)]` linkme registrations. Every rule test crate must have one.
 
+### Schema-only extra unit test pattern
+
+For schema rules, load the schema inline and construct empty documents manually:
+
+```rust
+use rglint_core::{
+    LintEngine, LoadedDocuments, Project, ProjectConfig, RuleConfig, RulesConfig,
+    SchemaLoader, SchemaSpec, Severity, Siblings,
+};
+
+let schema_loader = SchemaLoader::new();
+let schema = schema_loader
+    .load(&SchemaSpec::Inline("type Query { x: Int }".to_owned()), std::path::Path::new(""))
+    .expect("schema loads");
+
+let documents = LoadedDocuments {
+    docs: Vec::new(),
+    by_file: std::collections::HashMap::new(),
+};
+
+let siblings = Siblings::from_documents(&documents);
+let project = Project { config: ProjectConfig { .. }, schema: Some(schema), documents, siblings };
+let result = LintEngine::new(&RulesConfig { rules: vec![RuleConfig { id: "my-rule".to_owned(), severity: Severity::Error, options: serde_json::Value::Null }] })
+    .expect("rule resolves")
+    .lint(&project)
+    .expect("lint runs");
+```
+
 ## Fixture layout
 
 Each rule gets a tree under `rules-fixtures/<rule-id>/`:
@@ -113,6 +207,22 @@ rules-fixtures/<rule-id>/
 ```
 
 Config fields: `schema`, `schema_path`, `kind` (operations/schema), `loose_message`, `[options]`, `sibling_documents`.
+
+### `kind = "schema"` for schema-category fixtures
+
+Schema rules fire on SDL type definitions, not operation documents. Set `kind = "schema"` in the case's `config.toml`:
+
+```toml
+kind = "schema"
+```
+
+When `kind = "schema"`, the harness loads the `.graphql` source as the project's **schema** (via `SchemaSpec::Inline`) and loads **no** operation documents. The engine walks the schema sources and dispatches `on_node` for matching CST kinds (`FIELD_DEFINITION`, `INPUT_VALUE_DEFINITION`, etc.).
+
+Omit the config entirely (or set `kind = "operations"`, the default) for operation-side fixtures (selection set duplicates, etc.).
+
+### Computing expected columns
+
+`column` in `expected.json` is 0-based byte offset from the start of the line (graphql-eslint style, via `SourceFile::location_eslint`). Count bytes, not characters. For single-line sources, column = byte offset from file start.
 
 ## Branch / PR workflow
 
