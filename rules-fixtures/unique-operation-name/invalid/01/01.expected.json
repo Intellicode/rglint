@@ -1,0 +1,10 @@
+{
+  "errors": [
+    {
+      "rule": "unique-operation-name",
+      "message": "Operation \"Foo\" is defined multiple times",
+      "line": 1,
+      "column": 0
+    }
+  ]
+}

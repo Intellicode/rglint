@@ -1,0 +1,5 @@
+query Foo {
+  x
+  y
+  z
+}

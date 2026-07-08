@@ -9,3 +9,4 @@
 
 pub mod no_anonymous_operations;
 pub mod unique_fragment_name;
+pub mod unique_operation_name;
