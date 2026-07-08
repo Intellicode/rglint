@@ -1,0 +1,5 @@
+query Bar {
+  x
+  y
+  z
+}
