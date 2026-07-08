@@ -1386,6 +1386,7 @@ dependencies = [
 name = "rglint-rules"
 version = "0.1.0"
 dependencies = [
+ "apollo-parser",
  "insta",
  "linkme",
  "regex",
