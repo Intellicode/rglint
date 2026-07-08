@@ -1,0 +1,5 @@
+fragment Test on U {
+  a
+  b
+  c
+}

@@ -8,3 +8,4 @@
 //! state under `cfg(test)` without lint noise.
 
 pub mod no_anonymous_operations;
+pub mod unique_fragment_name;

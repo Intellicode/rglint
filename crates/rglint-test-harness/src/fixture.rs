@@ -113,6 +113,11 @@ pub struct FixtureConfig {
     /// Rule options, converted from the TOML `[options]` table to a JSON value.
     /// Defaults to `serde_json::Value::Null` when no `[options]` is present.
     pub options: serde_json::Value,
+    /// Additional sibling operation documents (relative paths in the case dir,
+    /// e.g. `["01.sibling.graphql"]`) loaded alongside the main `.graphql`
+    /// source so `requires_siblings` rules (spec-017 onwards) can be exercised
+    /// with multiple documents in one fixture case. Defaults to empty.
+    pub sibling_documents: Vec<String>,
 }
 
 /// One in-memory fixture case, ready to be passed to
@@ -127,14 +132,26 @@ pub struct FixtureCase {
     pub id: String,
     /// The absolute path to the case directory.
     pub dir: PathBuf,
+    /// The on-disk path of the main `.graphql` source under lint. Equivalent
+    /// to [`Self::source`] when no sibling documents are configured; always
+    /// present so the runner can hand it to [`DocumentSpec::Files`] when
+    /// `sibling_documents` is nonempty (see [`Self::sibling_documents`]).
+    pub source_path: PathBuf,
     /// The source under lint (the `.graphql` file's contents).
     pub source: String,
+    /// Additional sibling operation documents, as **absolute** paths
+    /// (resolved from [`FixtureConfig::sibling_documents`]). Empty unless
+    /// the case's `config.toml` declared `sibling_documents = [...]`. When
+    /// nonempty, the runner builds the project from these paths **plus**
+    /// [`Self::source_path`] via [`DocumentSpec::Files`] so a
+    /// `requires_siblings` rule sees a multi-document bundle.
+    pub sibling_documents: Vec<PathBuf>,
     /// Inline SDL schema, if `schema = "..."` was set in `config.toml`.
     pub schema: Option<String>,
     /// A path to a schema file relative to the case dir, if `schema_path` was
     /// set. Mutually exclusive with [`Self::schema`].
     pub schema_path: Option<PathBuf>,
-    /// What kind of source [`Self::source`] is.
+    /// What kind the `.graphql` source [`Self::source`] is.
     pub kind: DocKind,
     /// Rule options (JSON, from the `[options]` TOML table).
     pub options: serde_json::Value,
@@ -183,6 +200,18 @@ pub enum FixtureLoadError {
     /// `expected.json`'s top-level shape wasn't `{ "errors": [...] }`.
     #[error("expected `{path}`: top-level object missing an `errors` array")]
     ExpectedShape { path: PathBuf },
+    /// A sibling document declared in `sibling_documents = [...]` doesn't
+    /// exist on disk. Surfaces before source discovery so a typo in the
+    /// path is reported with the missing path rather than confused for the
+    /// "this is actually the main source" case.
+    #[error("sibling document `{path}` declared in config.toml does not exist")]
+    SiblingMissing { path: PathBuf },
+    /// Multiple `*.graphql` files remain after excluding the declared
+    /// sibling documents — the harness needs exactly one main source.
+    #[error(
+        "multiple main `*.graphql` files in fixture directory `{dir}` after excluding siblings: {files:?}"
+    )]
+    ManySourcesExcluding { dir: PathBuf, files: Vec<PathBuf> },
 }
 
 /// Parse the case directory at `dir` into a [`FixtureCase`].
@@ -202,16 +231,12 @@ pub fn load_fixture(dir: &Path) -> Result<FixtureCase, FixtureLoadError> {
         .map(|s| s.to_owned())
         .unwrap_or_else(|| dir.display().to_string());
 
-    // Find the source: exactly one `*.graphql` (but *not* `*.config.toml` or
-    // `*.expected.json`, which also contain ".graphql" as a substring? no —
-    // those end in `.toml` / `.json`).
-    let source_path = find_one_suffix(dir, ".graphql")?;
-    let source = fs::read_to_string(&source_path).map_err(|source| FixtureLoadError::Io {
-        path: source_path.clone(),
-        source,
-    })?;
-
-    // Optional config.toml.
+    // Parse config first so we can resolve `sibling_documents` to absolute
+    // paths *before* discovering the main source — sibling files (e.g.
+    // `01.sibling.graphql`) live in the same case dir and would otherwise
+    // trip the "exactly one `*.graphql`" rule in `find_one_suffix`. The
+    // `.config.toml` / `.expected.json` suffixes don't collide with `.graphql`
+    // so this reorder is safe.
     let config_path = find_opt_suffix(dir, ".config.toml");
     let config = match config_path {
         Some(path) => {
@@ -223,6 +248,23 @@ pub fn load_fixture(dir: &Path) -> Result<FixtureCase, FixtureLoadError> {
         }
         None => FixtureConfig::default(),
     };
+    let sibling_documents: Vec<PathBuf> = config
+        .sibling_documents
+        .iter()
+        .map(|s| dir.join(s))
+        .collect();
+    for p in &sibling_documents {
+        if !p.is_file() {
+            return Err(FixtureLoadError::SiblingMissing { path: p.clone() });
+        }
+    }
+
+    // Find the main source: exactly one `*.graphql` *excluding* sibling files.
+    let source_path = find_one_suffix_excluding(dir, ".graphql", &sibling_documents)?;
+    let source = fs::read_to_string(&source_path).map_err(|source| FixtureLoadError::Io {
+        path: source_path.clone(),
+        source,
+    })?;
 
     // Optional expected.json. Absent ⇒ valid case.
     let expected_path = find_opt_suffix(dir, ".expected.json");
@@ -269,7 +311,9 @@ pub fn load_fixture(dir: &Path) -> Result<FixtureCase, FixtureLoadError> {
     Ok(FixtureCase {
         id,
         dir: dir.to_path_buf(),
+        source_path,
         source,
+        sibling_documents,
         schema: config.schema,
         schema_path: config.schema_path,
         kind: config.kind,
@@ -290,6 +334,30 @@ fn find_one_suffix(dir: &Path, suffix: &str) -> Result<PathBuf, FixtureLoadError
         }),
         1 => Ok(hits[0].clone()),
         _ => Err(FixtureLoadError::ManySources {
+            dir: dir.to_path_buf(),
+            files: hits,
+        }),
+    }
+}
+
+/// Like [`find_one_suffix`] but excludes any path listed in `exclude` (used to
+/// keep sibling documents out of the "exactly one main source" check). Errors
+/// return a distinct [`FixtureLoadError::ManySourcesExcluding`] when more than
+/// one candidate remains after exclusion, so a fixture author can tell from
+/// the message that sibling exclusion was applied.
+fn find_one_suffix_excluding(
+    dir: &Path,
+    suffix: &str,
+    exclude: &[PathBuf],
+) -> Result<PathBuf, FixtureLoadError> {
+    let mut hits = list_suffix(dir, suffix);
+    hits.retain(|p| !exclude.contains(p));
+    match hits.len() {
+        0 => Err(FixtureLoadError::NoSource {
+            dir: dir.to_path_buf(),
+        }),
+        1 => Ok(hits[0].clone()),
+        _ => Err(FixtureLoadError::ManySourcesExcluding {
             dir: dir.to_path_buf(),
             files: hits,
         }),
@@ -376,12 +444,23 @@ fn parse_config(
         .map(toml_to_json)
         .unwrap_or(serde_json::Value::Null);
 
+    let sibling_documents = table
+        .get("sibling_documents")
+        .and_then(|v| v.as_array())
+        .map(|arr| {
+            arr.iter()
+                .filter_map(|e| e.as_str().map(|s| s.to_owned()))
+                .collect::<Vec<String>>()
+        })
+        .unwrap_or_default();
+
     Ok(FixtureConfig {
         schema,
         schema_path,
         kind,
         loose_message,
         options,
+        sibling_documents,
     })
 }
 
