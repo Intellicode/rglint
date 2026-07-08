@@ -8,6 +8,7 @@ repository.workspace = true
 [dependencies]
 rglint-core = { path = "../rglint-core" }
 rglint-derive = { path = "../rglint-derive" }
+apollo-parser.workspace = true
 linkme.workspace = true
 serde.workspace = true
 serde_json.workspace = true
