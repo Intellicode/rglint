@@ -1,0 +1,10 @@
+{
+  "errors": [
+    {
+      "rule": "no-duplicate-fields",
+      "message": "Field \"a\" is defined multiple times",
+      "line": 1,
+      "column": 20
+    }
+  ]
+}

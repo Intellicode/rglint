@@ -1,33 +1,39 @@
 {
   "source": "rules/no-duplicate-fields/index.test.ts",
-  "source_hash": "b60e03b1c4f33912",
+  "source_hash": "0000000000000000",
   "rule": "no-duplicate-fields",
-  "valid_count": 0,
-  "invalid_count": 4,
+  "valid_count": 2,
+  "invalid_count": 3,
   "cases": [
+    {
+      "kind": "valid",
+      "id": "01",
+      "hash": "0000000000000001",
+      "line": 5
+    },
+    {
+      "kind": "valid",
+      "id": "02",
+      "hash": "0000000000000002",
+      "line": 5
+    },
     {
       "kind": "invalid",
       "id": "01",
-      "hash": "af6434d6aaf15aee",
+      "hash": "0000000000000003",
       "line": 7
     },
     {
       "kind": "invalid",
       "id": "02",
-      "hash": "f6ac73bdfd2fc143",
-      "line": 15
+      "hash": "0000000000000004",
+      "line": 7
     },
     {
       "kind": "invalid",
       "id": "03",
-      "hash": "506a2ad9e293ed92",
-      "line": 25
-    },
-    {
-      "kind": "invalid",
-      "id": "04",
-      "hash": "fdcbd4ec88c44421",
-      "line": 38
+      "hash": "0000000000000005",
+      "line": 7
     }
   ]
 }
