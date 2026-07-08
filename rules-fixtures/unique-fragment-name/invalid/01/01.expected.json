@@ -1,0 +1,10 @@
+{
+  "errors": [
+    {
+      "rule": "unique-fragment-name",
+      "message": "Fragment \"HasIdFields\" is defined multiple times",
+      "line": 1,
+      "column": 0
+    }
+  ]
+}

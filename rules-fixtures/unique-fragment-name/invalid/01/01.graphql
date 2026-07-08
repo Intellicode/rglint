@@ -1,0 +1,5 @@
+fragment HasIdFields on U {
+  a
+  b
+  c
+}

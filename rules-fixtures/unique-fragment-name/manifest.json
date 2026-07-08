@@ -2,7 +2,20 @@
   "source": "rules/unique-fragment-name/index.test.ts",
   "source_hash": "e751c33fc44de8e1",
   "rule": "unique-fragment-name",
-  "valid_count": 0,
-  "invalid_count": 0,
-  "cases": []
+  "valid_count": 1,
+  "invalid_count": 1,
+  "cases": [
+    {
+      "kind": "valid",
+      "id": "01",
+      "hash": "1234567890abcdef",
+      "line": 5
+    },
+    {
+      "kind": "invalid",
+      "id": "01",
+      "hash": "fedcba0987654321",
+      "line": 7
+    }
+  ]
 }

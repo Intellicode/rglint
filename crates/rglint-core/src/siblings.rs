@@ -108,6 +108,14 @@ pub struct OperationDef {
 pub struct Siblings {
     operations: Vec<OperationDef>,
     fragments: HashMap<String, FragmentDef>,
+    /// Every fragment occurrence in document/iteration order, **including
+    /// duplicate names** across files. Unlike [`Self::fragments`] (a
+    /// last-wins `HashMap` keyed by name), this list preserves every
+    /// definition so a caller can enumerate all of them and detect
+    /// cross-file collisions (the substrate `unique-fragment-name`, spec-017,
+    /// relies on). Order matches the per-document fragment iteration in
+    /// [`Self::from_documents`].
+    fragments_all: Vec<FragmentDef>,
     /// `path -> index into [`Self::sources`]` for every resolved input file
     /// (before content-hash dedup; multiple paths may share one index when
     /// their content hashes collided during loading).
@@ -130,6 +138,7 @@ impl Siblings {
     pub fn from_documents(docs: &LoadedDocuments) -> Self {
         let mut operations: Vec<OperationDef> = Vec::new();
         let mut fragments: HashMap<String, FragmentDef> = HashMap::new();
+        let mut fragments_all: Vec<FragmentDef> = Vec::new();
         let mut sources: Vec<Arc<SourceFile>> = Vec::with_capacity(docs.docs.len());
 
         for LoadedDocument {
@@ -156,17 +165,18 @@ impl Siblings {
                     node: op.clone(),
                 });
             }
-            // Fragments: last-wins on name collision (see module docs).
+            // Fragments: last-wins on name collision into the `HashMap` (see
+            // module docs); also append every occurrence to `fragments_all`
+            // so callers can enumerate duplicates.
             for (_name, frag) in &document.fragments {
-                fragments.insert(
-                    frag.name.as_str().to_owned(),
-                    FragmentDef {
-                        name: frag.name.as_str().to_owned(),
-                        source: source.clone(),
-                        span: span_of(frag),
-                        node: frag.clone(),
-                    },
-                );
+                let def = FragmentDef {
+                    name: frag.name.as_str().to_owned(),
+                    source: source.clone(),
+                    span: span_of(frag),
+                    node: frag.clone(),
+                };
+                fragments.insert(frag.name.as_str().to_owned(), def.clone());
+                fragments_all.push(def);
             }
 
             sources.push(source);
@@ -180,6 +190,7 @@ impl Siblings {
         Self {
             operations,
             fragments,
+            fragments_all,
             doc_by_file,
             sources,
         }
@@ -273,6 +284,21 @@ impl Siblings {
     /// Iterate all indexed fragments as `(name, def)` pairs.
     pub fn fragments(&self) -> impl Iterator<Item = (&String, &FragmentDef)> {
         self.fragments.iter()
+    }
+
+    /// All fragment occurrences, including cross-file name collisions, in
+    /// document/iteration order (the order matches [`Self::from_documents`]'s
+    /// walk: per-document in [`LoadedDocuments::docs`] order, then per-doc
+    /// fragment insertion order). The [`Self::fragments`] `HashMap` keeps
+    /// only last-wins per name; this list preserves every definition so a
+    /// duplicate-detecting rule (spec-017 `unique-fragment-name`) can identify
+    /// the 2nd, 3rd, … occurrence of a name and attribute each to its own
+    /// source file.
+    ///
+    /// The first occurrence of a given name in this list is the canonical
+    /// definition — earlier documents win, matching the iteration order.
+    pub fn fragments_all(&self) -> &[FragmentDef] {
+        &self.fragments_all
     }
 
     /// Look up the [`SourceFile`] for a resolved input path. Returns `None`
