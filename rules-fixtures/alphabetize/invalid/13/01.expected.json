@@ -1,0 +1,1 @@
+{"errors": [{"column": 10, "line": 7, "message": "field \"c\" should be before field \"d\"", "rule": "alphabetize"}, {"column": 10, "line": 10, "message": "field \"b\" should be before field \"c\"", "rule": "alphabetize"}, {"column": 10, "line": 12, "message": "field \"a\" should be before field \"b\"", "rule": "alphabetize"}]}

@@ -5,4 +5,5 @@
 //! submission into `rglint_core::ALL_RULES` via `linkme`) and tests stay
 //! self-contained.
 
+pub mod alphabetize;
 pub mod no_duplicate_fields;

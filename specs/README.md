@@ -50,7 +50,7 @@ of work (a few hours to ~2 days) and declares its dependencies on prior specs.
 | [spec-018](implemented/spec-018.md) | unique-operation-name | `[x]` |
 | [spec-019](implemented/spec-019.md) | no-duplicate-fields | `[x]` |
 | [spec-020](implemented/spec-020.md) | lone-executable-definition | `[x]` |
-| [spec-021](spec-021.md) | alphabetize | `[ ]` |
+| [spec-021](implemented/spec-021.md) | alphabetize | `[x]` |
 
 ### Phase 2 — Schema-only rules
 
