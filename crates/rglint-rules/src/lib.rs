@@ -48,6 +48,7 @@
 pub mod meta;
 pub mod operations;
 pub mod schema;
+pub mod shared;
 
 pub use rglint_core::{Category, Handler, Rule, RuleEntry, RuleMeta};
 

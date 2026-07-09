@@ -18,3 +18,4 @@ thiserror.workspace = true
 [dev-dependencies]
 rglint-test-harness = { path = "../rglint-test-harness" }
 insta.workspace = true
+proptest.workspace = true
