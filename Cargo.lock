@@ -1389,6 +1389,7 @@ dependencies = [
  "apollo-parser",
  "insta",
  "linkme",
+ "proptest",
  "regex",
  "rglint-core",
  "rglint-derive",
