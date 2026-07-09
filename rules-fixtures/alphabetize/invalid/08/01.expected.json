@@ -1,0 +1,1 @@
+{"errors": [{"column": 36, "line": 1, "message": "input value \"bb\" should be before input value \"cc\"", "rule": "alphabetize"}, {"column": 47, "line": 1, "message": "input value \"aa\" should be before input value \"bb\"", "rule": "alphabetize"}]}

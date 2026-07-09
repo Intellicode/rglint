@@ -1,0 +1,4 @@
+kind = "schema"
+[options]
+fields = ["ObjectTypeDefinition"]
+groups = ["*", "updatedAt", "id", "createdAt"]
