@@ -6,4 +6,5 @@
 //! self-contained.
 
 pub mod alphabetize;
+pub mod description_style;
 pub mod no_duplicate_fields;

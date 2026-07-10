@@ -57,7 +57,7 @@ of work (a few hours to ~2 days) and declares its dependencies on prior specs.
 | Spec | Title | Status |
 |------|-------|--------|
 | [spec-022](implemented/spec-022.md) | shared/case.rs (case styles & convertCase) | `[x]` |
-| [spec-023](spec-023.md) | description-style | `[ ]` |
+| [spec-023](implemented/spec-023.md) | description-style | `[x]` |
 | [spec-024](spec-024.md) | no-hashtag-description (CST trivia spike) | `[ ]` |
 | [spec-025](spec-025.md) | require-description | `[ ]` |
 | [spec-026](spec-026.md) | require-deprecation-reason | `[ ]` |
