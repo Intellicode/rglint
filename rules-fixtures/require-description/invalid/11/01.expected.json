@@ -1,0 +1,1 @@
+{"errors":[{"column":10,"line":2,"message":"Description is required for field \"recordId\" in type \"CreateOneUserPayload\"","rule":"require-description"},{"column":10,"line":3,"message":"Description is required for field \"record\" in type \"CreateOneUserPayload\"","rule":"require-description"}]}

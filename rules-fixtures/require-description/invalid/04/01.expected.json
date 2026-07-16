@@ -1,0 +1,1 @@
+{"errors":[{"column":7,"line":1,"message":"Description is required for scalar \"Email\"","rule":"require-description"}]}

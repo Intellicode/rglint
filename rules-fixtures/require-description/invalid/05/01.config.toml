@@ -1,0 +1,4 @@
+kind = "schema"
+
+[options]
+InputObjectTypeDefinition = true

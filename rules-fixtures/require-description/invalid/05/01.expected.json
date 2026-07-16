@@ -1,0 +1,1 @@
+{"errors":[{"column":6,"line":1,"message":"Description is required for input \"CreateUserInput\"","rule":"require-description"}]}

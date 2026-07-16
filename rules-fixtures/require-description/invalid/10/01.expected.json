@@ -1,0 +1,1 @@
+{"errors":[{"column":12,"line":1,"message":"Description is required for enum value \"ADMIN\" in enum \"Role\"","rule":"require-description"}]}

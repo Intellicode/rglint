@@ -9,3 +9,4 @@ pub mod alphabetize;
 pub mod description_style;
 pub mod no_duplicate_fields;
 pub mod no_hashtag_description;
+pub mod require_description;

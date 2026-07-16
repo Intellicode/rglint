@@ -1,0 +1,1 @@
+{"errors":[{"column":10,"line":1,"message":"Description is required for interface \"Node\"","rule":"require-description"}]}
