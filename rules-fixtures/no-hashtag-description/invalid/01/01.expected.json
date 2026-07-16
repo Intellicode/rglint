@@ -1,0 +1,1 @@
+{"errors":[{"column":8,"line":1,"message":"Use \"\"\"description\"\"\" instead of #description","rule":"no-hashtag-description"}]}
