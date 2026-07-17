@@ -1,0 +1,9 @@
+{"errors":[
+  {"rule":"require-deprecation-reason","message":"@deprecated should have a reason","line":2,"column":42},
+  {"rule":"require-deprecation-reason","message":"@deprecated should have a reason","line":8,"column":16},
+  {"rule":"require-deprecation-reason","message":"@deprecated should have a reason","line":13,"column":24},
+  {"rule":"require-deprecation-reason","message":"@deprecated should have a reason","line":16,"column":24},
+  {"rule":"require-deprecation-reason","message":"@deprecated should have a reason","line":17,"column":24},
+  {"rule":"require-deprecation-reason","message":"@deprecated should have a reason","line":20,"column":21},
+  {"rule":"require-deprecation-reason","message":"@deprecated should have a reason","line":23,"column":23}
+]}

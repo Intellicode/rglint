@@ -60,7 +60,7 @@ of work (a few hours to ~2 days) and declares its dependencies on prior specs.
 | [spec-023](implemented/spec-023.md) | description-style | `[x]` |
 | [spec-024](implemented/spec-024.md) | no-hashtag-description (CST trivia spike) | `[x]` |
 | [spec-025](implemented/spec-025.md) | require-description | `[x]` |
-| [spec-026](spec-026.md) | require-deprecation-reason | `[ ]` |
+| [spec-026](implemented/spec-026.md) | require-deprecation-reason | `[x]` |
 | [spec-027](spec-027.md) | require-deprecation-date | `[ ]` |
 | [spec-028](spec-028.md) | naming-convention | `[ ]` |
 | [spec-029](spec-029.md) | unique-enum-value-names | `[ ]` |
