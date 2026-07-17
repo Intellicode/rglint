@@ -1,0 +1,1 @@
+{"errors":[{"column":37,"line":1,"message":"Invalid \"32/08/2021\" deletion date for scalar \"Old\"","rule":"require-deprecation-date"}]}
