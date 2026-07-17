@@ -1,0 +1,1 @@
+{"errors":[{"column":24,"line":1,"message":"Directive \"@deprecated\" must have a deletion date for field \"oldField\" in type \"Old\"","rule":"require-deprecation-date"}]}

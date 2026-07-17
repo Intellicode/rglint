@@ -1,0 +1,1 @@
+{"errors":[{"column":37,"line":1,"message":"Deletion date must be in format \"DD/MM/YYYY\" for scalar \"Old\"","rule":"require-deprecation-date"}]}

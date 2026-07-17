@@ -1,0 +1,1 @@
+{"errors":[{"column":7,"line":1,"message":"scalar \"Old\" сan be removed","rule":"require-deprecation-date"}]}
