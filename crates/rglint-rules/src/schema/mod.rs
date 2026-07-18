@@ -11,4 +11,5 @@ pub mod no_duplicate_fields;
 pub mod no_hashtag_description;
 pub mod require_deprecation_date;
 pub mod require_deprecation_reason;
+pub mod naming_convention;
 pub mod require_description;

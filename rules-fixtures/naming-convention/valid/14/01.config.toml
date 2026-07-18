@@ -1,0 +1,8 @@
+kind = "schema"
+[options."FieldDefinition[parent.name.value!=Query]"]
+prefix = "field"
+style = "camelCase"
+
+[options."FieldDefinition[parent.name.value=Query]"]
+prefix = "QUERY"
+style = "UPPER_CASE"

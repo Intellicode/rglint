@@ -1,0 +1,1 @@
+{"errors":[{"column":0,"line":1,"message":"Enum \"B\" should be in camelCase format","rule":"naming-convention"},{"column":9,"line":1,"message":"Enum value \"test\" should be in UPPER_CASE format","rule":"naming-convention"}]}

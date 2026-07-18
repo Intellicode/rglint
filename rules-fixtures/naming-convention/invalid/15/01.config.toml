@@ -1,0 +1,3 @@
+loose_message = true
+[options.OperationDefinition]
+forbiddenPatterns = ["/^(get|query)/"]

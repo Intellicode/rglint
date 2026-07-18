@@ -1,0 +1,1 @@
+{"errors":[{"column":10,"line":8,"message":"Field \"enabled\" should have \"is\" prefix","rule":"naming-convention"},{"column":10,"line":9,"message":"Field \"secret\" should have \"SUPER_SECRET_\" prefix","rule":"naming-convention"},{"column":10,"line":10,"message":"Field \"snake\" should be in snake_case format","rule":"naming-convention"}]}

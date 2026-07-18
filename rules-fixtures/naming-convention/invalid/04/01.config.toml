@@ -1,0 +1,4 @@
+kind = "schema"
+[options]
+EnumTypeDefinition = "camelCase"
+EnumValueDefinition = "UPPER_CASE"

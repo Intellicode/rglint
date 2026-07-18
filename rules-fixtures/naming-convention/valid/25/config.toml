@@ -1,2 +1,0 @@
-[options."FieldDefinition[parent.name.value=SomeType]"]
-ignorePattern = ".*someField.*"

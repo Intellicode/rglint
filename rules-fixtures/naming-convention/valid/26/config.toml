@@ -1,5 +1,0 @@
-schema = "type User"
-
-[options.FragmentDefinition]
-requiredPattern = "/^(?<camelCase>.+?"
-style = "PascalCase"
