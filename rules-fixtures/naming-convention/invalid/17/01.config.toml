@@ -1,0 +1,6 @@
+loose_message = true
+schema = "type User { id: ID }"
+
+[options.FragmentDefinition]
+requiredPattern = "/_(?<camelCase>.+?"
+style = "PascalCase"

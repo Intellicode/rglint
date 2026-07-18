@@ -1,0 +1,5 @@
+schema = "type User { id: ID }"
+
+[options.FragmentDefinition]
+requiredPattern = "/^(?<camelCase>.+?"
+style = "PascalCase"

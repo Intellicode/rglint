@@ -1,0 +1,5 @@
+kind = "operations"
+
+[options]
+allowLeadingUnderscore = false
+allowTrailingUnderscore = false

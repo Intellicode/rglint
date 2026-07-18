@@ -1,0 +1,1 @@
+{"errors":[{"column":0,"line":1,"message":"Query \"queryFoo\" should not match pattern \"^(get|query)\"","rule":"naming-convention"},{"column":23,"line":1,"message":"Query \"getBar\" should not match pattern \"^(get|query)\"","rule":"naming-convention"}]}

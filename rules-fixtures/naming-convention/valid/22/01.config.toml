@@ -1,0 +1,11 @@
+kind = "schema"
+[options."FieldDefinition[gqlType.gqlType.name.value=Boolean]"]
+requiredPrefixes = ["is", "has"]
+style = "camelCase"
+
+[options."FieldDefinition[gqlType.gqlType.name.value=Secret]"]
+requiredPrefixes = ["SUPER_SECRET_"]
+
+[options."FieldDefinition[gqlType.name.value=Snake]"]
+requiredPrefixes = ["hiss_"]
+style = "snake_case"

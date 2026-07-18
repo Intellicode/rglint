@@ -1,0 +1,4 @@
+kind = "schema"
+[options]
+allowLeadingUnderscore = false
+allowTrailingUnderscore = false

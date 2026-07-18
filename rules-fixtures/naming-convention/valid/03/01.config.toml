@@ -1,0 +1,3 @@
+kind = "schema"
+[options]
+types = "snake_case"

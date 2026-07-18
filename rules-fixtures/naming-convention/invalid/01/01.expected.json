@@ -1,0 +1,1 @@
+{"errors":[{"column":0,"line":1,"message":"Type \"b\" should be in PascalCase format","rule":"naming-convention"},{"column":9,"line":1,"message":"Field \"test\" should be in PascalCase format","rule":"naming-convention"}]}

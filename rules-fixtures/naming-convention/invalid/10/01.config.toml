@@ -1,0 +1,2 @@
+kind = "schema"
+options = "(rule.meta.docs!.configOptions as any)"
