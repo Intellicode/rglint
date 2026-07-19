@@ -13,3 +13,4 @@ pub mod require_deprecation_date;
 pub mod require_deprecation_reason;
 pub mod naming_convention;
 pub mod require_description;
+pub mod unique_enum_value_names;
