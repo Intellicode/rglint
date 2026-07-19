@@ -1,0 +1,10 @@
+{
+  "errors": [
+    {
+      "rule": "unique-enum-value-names",
+      "message": "Unexpected case-insensitive enum values duplicates for TesT",
+      "line": 1,
+      "column": 21
+    }
+  ]
+}

@@ -63,7 +63,7 @@ of work (a few hours to ~2 days) and declares its dependencies on prior specs.
 | [spec-026](implemented/spec-026.md) | require-deprecation-reason | `[x]` |
 | [spec-027](implemented/spec-027.md) | require-deprecation-date | `[x]` |
 | [spec-028](implemented/spec-028.md) | naming-convention | `[x]` |
-| [spec-029](spec-029.md) | unique-enum-value-names | `[ ]` |
+| [spec-029](implemented/spec-029.md) | unique-enum-value-names | `[x]` |
 | [spec-030](spec-030.md) | strict-id-in-types | `[ ]` |
 | [spec-031](spec-031.md) | no-typename-prefix | `[ ]` |
 | [spec-032](spec-032.md) | no-root-type | `[ ]` |
