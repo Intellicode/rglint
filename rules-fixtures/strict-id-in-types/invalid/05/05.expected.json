@@ -1,0 +1,1 @@
+{"errors":[{"column":19,"line":1,"message":"type \"BError\" must have exactly one non-nullable unique identifier.\nAccepted name: id.\nAccepted type: ID.","rule":"strict-id-in-types"}]}

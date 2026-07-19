@@ -1,3 +1,4 @@
+kind = "schema"
 schema = "type A { id: ID! } type AError { message: String! } type AResult { payload: A! }"
 
 [options]

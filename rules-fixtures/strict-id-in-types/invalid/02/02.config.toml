@@ -1,3 +1,4 @@
+kind = "schema"
 schema = "type B { id: ID! _id: String! }"
 
 [options]

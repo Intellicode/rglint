@@ -1,1 +1,2 @@
+kind = "schema"
 schema = "type A { id: ID! }"
