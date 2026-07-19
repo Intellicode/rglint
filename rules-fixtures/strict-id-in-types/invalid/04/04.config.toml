@@ -1,3 +1,4 @@
+kind = "schema"
 schema = "type B { id: ID! } type Bresult { key: String! } type BPayload { bool: Boolean! } type BPagination { num: Int! }"
 
 [options]
