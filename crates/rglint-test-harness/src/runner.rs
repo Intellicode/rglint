@@ -224,10 +224,46 @@ pub fn build_project_with(
             (schema, documents)
         }
         DocKind::Schema => {
-            // The source itself is the schema; no operation documents.
-            let schema = schema_loader.load(&SchemaSpec::Inline(case.source.clone()), base)?;
-            let documents = empty_documents();
-            (Some(schema), documents)
+            // The source itself is the schema; optionally load sibling
+            // operations from the inline `documents` field.
+            let schema = Some(
+                schema_loader.load(&SchemaSpec::Inline(case.source.clone()), base)?,
+            );
+            let documents = if let Some(doc_str) = &case.documents {
+                // Split the documents into individual operation documents so
+                // an anonymous query doesn't conflict with named operations.
+                let tmp_dir = std::env::temp_dir().join("rglint-documents");
+                let _ = std::fs::create_dir_all(&tmp_dir);
+                let parts: Vec<&str> = doc_str
+                    .split("\n\n")
+                    .map(|s| s.trim())
+                    .filter(|s| !s.is_empty())
+                    .collect();
+                let mut combined = empty_documents();
+                for (i, part) in parts.iter().enumerate() {
+                    let tmp_path = tmp_dir.join(format!("documents_{}_{}.graphql", case.id, i));
+                    std::fs::write(&tmp_path, part).map_err(|source| {
+                        BuildProjectError::SchemaPathIo {
+                            path: tmp_path.clone(),
+                            source,
+                        }
+                    })?;
+                    let loaded = doc_loader.load(
+                        &DocumentSpec::Files(vec![tmp_path]),
+                        base,
+                        schema.as_deref().map(|ls| &ls.compiler),
+                    )?;
+                    let offset = combined.docs.len();
+                    combined.docs.extend(loaded.docs);
+                    for (path, idx) in loaded.by_file {
+                        combined.by_file.insert(path, idx + offset);
+                    }
+                }
+                combined
+            } else {
+                empty_documents()
+            };
+            (schema, documents)
         }
     };
 

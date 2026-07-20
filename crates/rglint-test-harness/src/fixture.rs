@@ -118,6 +118,11 @@ pub struct FixtureConfig {
     /// source so `requires_siblings` rules (spec-017 onwards) can be exercised
     /// with multiple documents in one fixture case. Defaults to empty.
     pub sibling_documents: Vec<String>,
+    /// Inline operation document(s) as a single string, from `documents = "..."`.
+    /// When set (and `kind = "schema"`), the main `.graphql` source is loaded as
+    /// the schema and these inline documents become the sibling operations.
+    /// Defaults to `None`.
+    pub documents: Option<String>,
 }
 
 /// One in-memory fixture case, ready to be passed to
@@ -155,6 +160,10 @@ pub struct FixtureCase {
     pub kind: DocKind,
     /// Rule options (JSON, from the `[options]` TOML table).
     pub options: serde_json::Value,
+    /// Inline operation document(s) as a single string, from `documents = "..."`.
+    /// When set (and `kind = "schema"`), the main `.graphql` source is loaded as
+    /// the schema and these inline documents become the sibling operations.
+    pub documents: Option<String>,
     /// Compare rule + location only (spec-053 `loose_message`).
     pub loose_message: bool,
     /// The expected parity errors. Empty for `valid` cases.
@@ -322,6 +331,7 @@ pub fn load_fixture(dir: &Path) -> Result<FixtureCase, FixtureLoadError> {
         schema_path: config.schema_path,
         kind: config.kind,
         options: config.options,
+        documents: config.documents,
         loose_message: config.loose_message,
         expected,
         valid,
@@ -458,6 +468,11 @@ fn parse_config(
         })
         .unwrap_or_default();
 
+    let documents = table
+        .get("documents")
+        .and_then(|v| v.as_str())
+        .map(|s| s.to_owned());
+
     Ok(FixtureConfig {
         schema,
         schema_path,
@@ -465,6 +480,7 @@ fn parse_config(
         loose_message,
         options,
         sibling_documents,
+        documents,
     })
 }
 

@@ -314,7 +314,7 @@ Source files must use `.graphql` or `.gql` extension — the harness looks for f
 
 For rules that inspect the file path (e.g. `match-document-filename` which checks operation name vs filename), the harness now always uses `DocumentSpec::Files` so `SourceFile::path()` preserves the real on-disk path. The file's stem and extension are available via `source_path.file_stem()` / `source_path.extension()`. Name fixture source files with meaningful names matching each case's expected messages.
 
-Config fields: `schema`, `schema_path`, `kind` (operations/schema), `loose_message`, `[options]`, `sibling_documents`.
+Config fields: `schema`, `schema_path`, `kind` (operations/schema), `loose_message`, `[options]`, `sibling_documents`, `documents`.
 
 ### `kind = "schema"` for schema-category fixtures
 
@@ -324,9 +324,74 @@ Schema rules fire on SDL type definitions, not operation documents. Set `kind = 
 kind = "schema"
 ```
 
-When `kind = "schema"`, the harness loads the `.graphql` source as the project's **schema** (via `SchemaSpec::Inline`) and loads **no** operation documents. The engine walks the schema sources and dispatches `on_node` for matching CST kinds (`FIELD_DEFINITION`, `INPUT_VALUE_DEFINITION`, etc.).
+When `kind = "schema"`, the harness loads the `.graphql` source as the project's **schema** (via `SchemaSpec::Inline`) and loads **no** operation documents by default. The engine walks the schema sources and dispatches `on_node` for matching CST kinds (`FIELD_DEFINITION`, `INPUT_VALUE_DEFINITION`, etc.).
 
 Omit the config entirely (or set `kind = "operations"`, the default) for operation-side fixtures (selection set duplicates, etc.).
+
+### `documents` field for inline sibling operations
+
+When `kind = "schema"`, set `documents = """..."""` to provide inline sibling operation documents:
+
+```toml
+kind = "schema"
+documents = """
+  { user(id: 1) { id } }
+"""
+```
+
+The harness splits the content on blank lines, writes each segment to a temp file, and loads them via `DocumentSpec::Files`. This enables schema rules that also need `requires_siblings` (e.g. `no-unused-fields`) to check which schema fields are selected across sibling operations.
+
+Config fields: `schema`, `schema_path`, `kind` (operations/schema), `loose_message`, `[options]`, `sibling_documents`, `documents`.
+
+## `requires_schema` + `requires_siblings` combined (spec-035 pattern)
+
+When a rule needs both the compiled schema AND sibling operations, set both attributes:
+
+```rust
+#[derive(Rule)]
+#[rule(
+    id = "no-unused-fields",
+    category = "schema",
+    requires_schema = true,
+    requires_siblings = true,
+    kinds = "FIELD_DEFINITION"
+)]
+pub struct SomeRule;
+```
+
+Subscribe to `kinds = "FIELD_DEFINITION"` (or another schema-only CST kind) so `on_node` fires only for schema source files. Use a flag to gate `finalize` — this prevents duplicate reporting when the engine calls `finalize` on every source file:
+
+```rust
+struct SomeHandler { is_schema_source: bool }
+
+impl Handler for SomeHandler {
+    fn on_node(&mut self, node: &Node<'_>, _parent: Option<&Node<'_>>) {
+        if node.kind == SyntaxKind::FIELD_DEFINITION {
+            self.is_schema_source = true;
+        }
+    }
+
+    fn finalize(&mut self, ctx: &mut RuleContext) {
+        if !self.is_schema_source { return; }
+        let Some(schema) = ctx.schema else { return; };
+        let Some(siblings) = ctx.siblings else { return; };
+        // Walk siblings.operations() selection sets, cross-reference against schema types
+    }
+}
+```
+
+The work is done in `finalize` by iterating `siblings.operations()` and walking each operation's typed `SelectionSet`. The `apollo_compiler::executable::SelectionSet` has a `ty: NamedType` field that tells you which type the selection is on, so type resolution is built in.
+
+### Skipping introspection types in schema scans
+
+When iterating `schema.types` to check fields, skip built-in introspection types (names starting with `__`):
+
+```rust
+for (type_name, ext_type) in &schema.types {
+    if type_name.as_str().starts_with("__") { continue; }
+    // check fields...
+}
+```
 
 ### Computing expected columns
 
