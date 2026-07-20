@@ -4,7 +4,8 @@
 
 1. Next unimplemented spec = lowest-numbered `spec-NNN.md` still in `specs/` (not in `specs/implemented/`). Check `specs/README.md` for the status index.
 2. Read the spec, understand dependencies (they state which prior specs must be done).
-3. Implement per the spec's Deliverables.
+3. Check `rules-fixtures/<rule-id>/` — if fixtures already exist, they are the ground truth. The spec text may be stale or simplified; always match the fixture `expected.json` messages and the original graphql-eslint source linked in `manifest.json`.
+3. Implement per the spec's Deliverables (amended by fixture reality if applicable).
 4. Move `specs/spec-NNN.md` → `specs/implemented/spec-NNN.md`.
 5. Update `specs/README.md`: fix the link path (add `implemented/` prefix) and change status to `[x]`.
 6. Build + test before committing.
@@ -195,7 +196,7 @@ rules-fixtures/<rule-id>/
   manifest.json          # metadata (update valid_count / invalid_count / cases)
   valid/
     01/
-      01.graphql         # source under lint
+      01.graphql         # source under lint (use .graphql or .gql extension)
       01.sibling.graphql # sibling document (for requires_siblings rules)
       01.config.toml     # sibling_documents = ["01.sibling.graphql"]
   invalid/
@@ -205,6 +206,10 @@ rules-fixtures/<rule-id>/
       01.config.toml
       01.expected.json   # { "errors": [{ "rule": "...", "message": "...", "line": 1, "column": 0 }] }
 ```
+
+Source files must use `.graphql` or `.gql` extension — the harness looks for filenames ending with these suffixes. Avoid extensionless filenames (e.g. bare `graphql`), which won't be found.
+
+For rules that inspect the file path (e.g. `match-document-filename` which checks operation name vs filename), the harness now always uses `DocumentSpec::Files` so `SourceFile::path()` preserves the real on-disk path. The file's stem and extension are available via `source_path.file_stem()` / `source_path.extension()`. Name fixture source files with meaningful names matching each case's expected messages.
 
 Config fields: `schema`, `schema_path`, `kind` (operations/schema), `loose_message`, `[options]`, `sibling_documents`.
 
