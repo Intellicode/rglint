@@ -1,3 +1,5 @@
+kind = "schema"
+
 schema = """
         scalar A
         scalar B

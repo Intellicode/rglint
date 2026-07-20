@@ -1,3 +1,5 @@
+kind = "schema"
+
 schema = """
         type RootQuery
         type RootMutation

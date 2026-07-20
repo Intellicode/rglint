@@ -1,3 +1,5 @@
+kind = "schema"
+
 schema = """
         # DirectiveDefinition
         directive @auth(role: [Role!]!) on FIELD_DEFINITION

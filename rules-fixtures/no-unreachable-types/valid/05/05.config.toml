@@ -1,3 +1,5 @@
+kind = "schema"
+
 schema = """
         # EnumTypeDefinition
         enum Role {

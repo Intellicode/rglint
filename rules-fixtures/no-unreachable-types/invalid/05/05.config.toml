@@ -1,3 +1,5 @@
+kind = "schema"
+
 schema = """
         type Query {
           node(id: ID!): Node!
