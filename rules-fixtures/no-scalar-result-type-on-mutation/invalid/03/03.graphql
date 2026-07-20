@@ -1,0 +1,7 @@
+type RootMutation {
+  createUser: [Boolean]
+}
+
+schema {
+  mutation: RootMutation
+}

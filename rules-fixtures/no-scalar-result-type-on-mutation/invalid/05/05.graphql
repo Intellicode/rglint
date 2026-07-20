@@ -1,0 +1,9 @@
+type User {
+  id: ID!
+}
+
+type Mutation {
+  createUser: User!
+  updateUser: Int
+  deleteUser: [Boolean!]!
+}

@@ -76,7 +76,7 @@ of work (a few hours to ~2 days) and declares its dependencies on prior specs.
 | [spec-034](implemented/spec-034.md) | no-deprecated | `[x]` |
 | [spec-035](implemented/spec-035.md) | no-unused-fields | `[x]` |
 | [spec-036](implemented/spec-036.md) | no-unreachable-types | `[x]` |
-| [spec-037](spec-037.md) | no-scalar-result-type-on-mutation | `[ ]` |
+| [spec-037](implemented/spec-037.md) | no-scalar-result-type-on-mutation | `[x]` |
 | [spec-038](spec-038.md) | require-nullable-result-in-root | `[ ]` |
 | [spec-039](spec-039.md) | require-field-of-type-query-in-mutation-result | `[ ]` |
 
