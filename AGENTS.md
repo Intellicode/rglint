@@ -4,11 +4,11 @@
 
 1. Next unimplemented spec = lowest-numbered `spec-NNN.md` still in `specs/` (not in `specs/implemented/`). Check `specs/README.md` for the status index.
 2. Read the spec, understand dependencies (they state which prior specs must be done).
-3. Check `rules-fixtures/<rule-id>/` — if fixtures already exist, they are the ground truth. The spec text may be stale or simplified; always match the fixture `expected.json` messages and the original graphql-eslint source linked in `manifest.json`.
-3. Implement per the spec's Deliverables (amended by fixture reality if applicable).
-4. Move `specs/spec-NNN.md` → `specs/implemented/spec-NNN.md`.
-5. Update `specs/README.md`: fix the link path (add `implemented/` prefix) and change status to `[x]`.
-6. Build + test before committing.
+3. Check `rules-fixtures/<rule-id>/` — if fixtures already exist, they are the ground truth. The spec text may be stale or simplified; always match the fixture `expected.json` messages and the original graphql-eslint source linked in `manifest.json`. If fixture source files lack a `.graphql`/`.gql` extension, rename them (extensionless files won't be found by the harness).
+4. Implement per the spec's Deliverables (amended by fixture reality if applicable).
+5. Move `specs/spec-NNN.md` → `specs/implemented/spec-NNN.md`.
+6. Update `specs/README.md`: fix the link path (add `implemented/` prefix) and change status to `[x]`.
+7. Build + test before committing.
 
 ## Rule implementation template
 
@@ -132,6 +132,109 @@ fn finalize(&mut self, ctx: &mut RuleContext) {
 ```
 
 Report via `ctx.report(DiagnosticBuilder::new(ctx.rule_id(), …, span, message))`.
+
+## `requires_schema` rules (spec-034 pattern)
+
+Schema-aware operation rules collect context during `on_node` and resolve against the compiled schema in `finalize`:
+
+```rust
+#[derive(Rule)]
+#[rule(
+    id = "no-deprecated",
+    category = "operations",
+    requires_schema = true,
+    kinds = "FIELD|ARGUMENT|ENUM_VALUE|OBJECT_FIELD"
+)]
+pub struct SomeRule;
+
+struct Candidate { name: String, span: Span, field_chain: Vec<String> }
+
+struct SomeHandler { candidates: Vec<Candidate> }
+
+impl Handler for SomeHandler {
+    fn on_node(&mut self, node: &Node<'_>, _parent: Option<&Node<'_>>) {
+        // Walk parent chain to collect field names for context
+        let mut field_chain: Vec<String> = Vec::new();
+        let mut current = node.parent;
+        while let Some(p) = current {
+            if let Some(ref n) = p.name { field_chain.push(n.clone()); }
+            current = p.parent;
+        }
+        field_chain.reverse();
+        self.candidates.push(Candidate { name: ..., span: ..., field_chain });
+    }
+
+    fn finalize(&mut self, ctx: &mut RuleContext) {
+        let schema = match ctx.schema { Some(s) => s, None => return };
+        // Resolve types against schema using field_chain + root types
+    }
+}
+```
+
+### Resolving root types from schema
+
+```rust
+fn root_type_names(schema: &apollo_compiler::Schema) -> Vec<String> {
+    let def = &schema.schema_definition;
+    vec![
+        def.query.as_ref().map(|n| n.to_string()).unwrap_or_else(|| "Query".into()),
+        def.mutation.as_ref().map(|n| n.to_string()).unwrap_or_else(|| "Mutation".into()),
+        def.subscription.as_ref().map(|n| n.to_string()).unwrap_or_else(|| "Subscription".into()),
+    ]
+}
+```
+
+### Looking up fields from root types
+
+The compiled schema's `ObjectType` and `InterfaceType` have `fields: IndexMap<Name, Component<FieldDefinition>>`. Use `indexmap`'s `.get()` with a `&str`, then deref through `Component` → `Node` → `FieldDefinition`:
+
+```rust
+use std::ops::Deref;
+
+let field_def: &apollo_compiler::ast::FieldDefinition =
+    obj.fields.get(field_name)?.deref().deref();
+// Component<FieldDefinition> -> Deref -> Node<FieldDefinition> -> Deref -> FieldDefinition
+```
+
+### Checking deprecation via DirectiveList
+
+The `ast::DirectiveList::get(name)` returns `Option<&Node<Directive>>`. Use auto-deref to call methods on `Directive`:
+
+```rust
+fn is_deprecated(directives: &apollo_compiler::ast::DirectiveList) -> bool {
+    directives.get("deprecated").is_some()
+}
+
+fn deprecation_reason(directives: &apollo_compiler::ast::DirectiveList, schema: &apollo_compiler::Schema) -> String {
+    directives
+        .get("deprecated")
+        .and_then(|dir| dir.argument_by_name("reason", schema).ok())
+        .and_then(|v| v.as_str().map(|s| s.to_owned()))
+        .unwrap_or_else(|| "No longer supported".to_owned())
+}
+```
+
+### Resolving type names from Type enum
+
+Strip NonNull/List wrappers to get the base named type:
+
+```rust
+fn resolve_base_type_name(ty: &apollo_compiler::ast::Type) -> Option<&str> {
+    match ty {
+        apollo_compiler::ast::Type::Named(name)
+        | apollo_compiler::ast::Type::NonNullNamed(name) => Some(name.as_str()),
+        apollo_compiler::ast::Type::List(inner)
+        | apollo_compiler::ast::Type::NonNullList(inner) => resolve_base_type_name(inner),
+    }
+}
+```
+
+Then look up the resolved name in the schema:
+
+```rust
+schema.get_enum("EnumTypeName")     // -> Option<&Node<EnumType>>
+schema.get_input_object("InputName") // -> Option<&Node<InputObjectType>>
+```
 
 ## Test file template
 
