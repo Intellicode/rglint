@@ -8,7 +8,7 @@
 4. Implement per the spec's Deliverables (amended by fixture reality if applicable).
 5. Move `specs/spec-NNN.md` → `specs/implemented/spec-NNN.md`.
 6. Update `specs/README.md`: fix the link path (add `implemented/` prefix) and change status to `[x]`.
-7. Build + test before committing.
+7. Build, clippy, and test before committing: `cargo build && cargo clippy && cargo test`.
 
 ## Rule implementation template
 
@@ -54,6 +54,28 @@ mod tests {
 Register in `crates/rglint-rules/src/<category>/mod.rs`: add `pub mod <snake_case>;`
 Create the `<category>/mod.rs` if it doesn't exist yet.
 Also add `pub mod <category>;` in `crates/rglint-rules/src/lib.rs`.
+
+## Options struct convention
+
+Use `#[serde(rename_all = "camelCase")]` on options structs so JSON keys like `"maxDepth"` map to `max_depth`:
+
+```rust
+#[derive(Debug, Default, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct Opts {
+    #[serde(default)]
+    allowed: Vec<String>,
+}
+```
+
+Read options in the `handler` method or in `finalize`:
+
+```rust
+fn handler(&self, ctx: &mut RuleContext) -> Box<dyn Handler> {
+    let opts: Opts = ctx.option().unwrap_or_default();
+    Box::new(Handler { opts })
+}
+```
 
 ## `on_node` rules subscribing to multiple kinds (spec-019 pattern)
 
@@ -236,14 +258,67 @@ schema.get_enum("EnumTypeName")     // -> Option<&Node<EnumType>>
 schema.get_input_object("InputName") // -> Option<&Node<InputObjectType>>
 ```
 
+### Checking if a type is a scalar (built-in or custom)
+
+Built-in scalars (`String`, `Int`, `Float`, `Boolean`, `ID`) are implicit in the GraphQL spec and may not appear in `schema.types`. Check them explicitly before falling back to the schema:
+
+```rust
+fn is_scalar_type(type_name: &str, schema: &apollo_compiler::Schema) -> bool {
+    match type_name {
+        "String" | "Int" | "Float" | "Boolean" | "ID" => return true,
+        _ => {}
+    }
+    match schema.types.get(type_name) {
+        Some(ext_type) => matches!(ext_type, apollo_compiler::schema::ExtendedType::Scalar(_)),
+        None => false,
+    }
+}
+```
+
+## `NAMED_TYPE` subscription pattern (spec-037 pattern)
+
+When a rule needs to inspect type **references** (not definitions), subscribe to `kinds = "NAMED_TYPE"`. The `on_node` fires for every named type reference (return types, argument types, etc.), with `node.name` giving the type name and `node.span` pointing at the type identifier.
+
+### Walking up from NAMED_TYPE to find the containing field definition
+
+To distinguish return-type references from argument-type references, walk the parent chain and return `None` if you encounter `INPUT_VALUE_DEFINITION` (argument):
+
+```rust
+fn find_field_def<'a>(node: &'a Node<'a>) -> Option<&'a Node<'a>> {
+    let mut current = node.parent?;
+    loop {
+        if current.kind == SyntaxKind::INPUT_VALUE_DEFINITION {
+            return None; // skip argument type references
+        }
+        if current.kind == SyntaxKind::FIELD_DEFINITION {
+            return Some(current);
+        }
+        current = current.parent?;
+    }
+}
+```
+
+Then from the `FIELD_DEFINITION`, walk further up to find the containing type definition:
+
+```rust
+fn find_type_def<'a>(field_def: &'a Node<'a>) -> Option<&'a Node<'a>> {
+    let mut current = field_def.parent?;
+    loop {
+        if matches!(current.kind,
+            SyntaxKind::OBJECT_TYPE_DEFINITION | SyntaxKind::OBJECT_TYPE_EXTENSION
+        ) {
+            return Some(current);
+        }
+        current = current.parent?;
+    }
+}
+```
+
 ## Test file template
 
 New file: `crates/rglint-rules/tests/rule_<snake_case>.rs`
 
 ```rust
-use std::fs;
-use std::path::Path;
-
 use rglint_test_harness::rglint_test_suite;
 
 #[used]

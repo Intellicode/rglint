@@ -1,0 +1,1 @@
+{"errors":[{"column":64,"line":1,"message":"Unexpected scalar result type `Boolean` for field \"createUser\" in type \"Mutation\"","rule":"no-scalar-result-type-on-mutation"}]}

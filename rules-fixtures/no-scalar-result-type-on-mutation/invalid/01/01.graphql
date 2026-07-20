@@ -1,0 +1,1 @@
+type Mutation { createUser(a: ID, b: ID!, c: [ID]!, d: [ID!]!): Boolean }

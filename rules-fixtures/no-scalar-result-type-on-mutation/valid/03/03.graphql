@@ -1,0 +1,11 @@
+type User {
+  id: ID!
+}
+
+type RootMutation {
+  createUser: User!
+}
+
+schema {
+  mutation: RootMutation
+}
