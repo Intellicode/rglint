@@ -170,8 +170,8 @@ pub enum FixtureLoadError {
     /// The case directory does not exist or is not a directory.
     #[error("fixture directory `{dir}` does not exist or is not a directory")]
     MissingDir { dir: PathBuf },
-    /// No `.graphql` source file was found in the case directory.
-    #[error("no `*.graphql` source file found in fixture directory `{dir}`")]
+    /// No `.graphql` or `.gql` source file was found in the case directory.
+    #[error("no `*.graphql` or `*.gql` source file found in fixture directory `{dir}`")]
     NoSource { dir: PathBuf },
     /// Multiple `.graphql` source files were found; the harness expects one.
     #[error("multiple `*.graphql` files in fixture directory `{dir}`: {files:?}")]
@@ -259,8 +259,12 @@ pub fn load_fixture(dir: &Path) -> Result<FixtureCase, FixtureLoadError> {
         }
     }
 
-    // Find the main source: exactly one `*.graphql` *excluding* sibling files.
-    let source_path = find_one_suffix_excluding(dir, ".graphql", &sibling_documents)?;
+    // Find the main source: exactly one `*.graphql` or `*.gql` *excluding*
+    // sibling files. Try `.graphql` first (the conventional extension), then
+    // `.gql` (used by `match-document-filename` fixtures and the original
+    // graphql-eslint tests).
+    let source_path = find_one_suffix_excluding(dir, ".graphql", &sibling_documents)
+        .or_else(|_| find_one_suffix_excluding(dir, ".gql", &sibling_documents))?;
     let source = fs::read_to_string(&source_path).map_err(|source| FixtureLoadError::Io {
         path: source_path.clone(),
         source,

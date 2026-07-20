@@ -7,7 +7,8 @@
 //! top-level `lib.rs` allow so per-rule tests can keep their private handler
 //! state under `cfg(test)` without lint noise.
 
+pub mod lone_executable_definition;
+pub mod match_document_filename;
 pub mod no_anonymous_operations;
 pub mod unique_fragment_name;
-pub mod lone_executable_definition;
 pub mod unique_operation_name;
