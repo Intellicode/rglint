@@ -65,7 +65,7 @@ of work (a few hours to ~2 days) and declares its dependencies on prior specs.
 | [spec-028](implemented/spec-028.md) | naming-convention | `[x]` |
 | [spec-029](implemented/spec-029.md) | unique-enum-value-names | `[x]` |
 | [spec-030](implemented/spec-030.md) | strict-id-in-types | `[x]` |
-| [spec-031](spec-031.md) | no-typename-prefix | `[ ]` |
+| [spec-031](implemented/spec-031.md) | no-typename-prefix | `[x]` |
 | [spec-032](spec-032.md) | no-root-type | `[ ]` |
 | [spec-033](spec-033.md) | match-document-filename | `[ ]` |
 

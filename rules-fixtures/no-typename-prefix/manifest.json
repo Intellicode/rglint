@@ -2,7 +2,7 @@
   "source": "rules/no-typename-prefix/index.test.ts",
   "source_hash": "0c62ffcebf06d14a",
   "rule": "no-typename-prefix",
-  "valid_count": 3,
+  "valid_count": 2,
   "invalid_count": 3,
   "cases": [
     {
@@ -16,12 +16,6 @@
       "id": "02",
       "hash": "0a5996c6b3edd558",
       "line": 11
-    },
-    {
-      "kind": "valid",
-      "id": "03",
-      "hash": "b557fca0060f149c",
-      "line": 16
     },
     {
       "kind": "invalid",

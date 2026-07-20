@@ -1,5 +1,0 @@
-      type User {
-        # eslint-disable-next-line
-        userId: ID!
-      }
-    

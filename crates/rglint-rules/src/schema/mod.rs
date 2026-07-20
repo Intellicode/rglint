@@ -10,6 +10,7 @@ pub mod description_style;
 pub mod naming_convention;
 pub mod no_duplicate_fields;
 pub mod no_hashtag_description;
+pub mod no_typename_prefix;
 pub mod require_deprecation_date;
 pub mod require_deprecation_reason;
 pub mod require_description;
