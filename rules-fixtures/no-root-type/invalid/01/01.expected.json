@@ -1,0 +1,1 @@
+{"errors":[{"column":0,"line":1,"message":"Root type \"Query\" is forbidden","rule":"no-root-type"}]}

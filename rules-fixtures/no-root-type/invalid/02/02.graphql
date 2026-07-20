@@ -1,0 +1,7 @@
+schema {
+  query: MyQuery
+}
+
+type MyQuery {
+  x: Int
+}

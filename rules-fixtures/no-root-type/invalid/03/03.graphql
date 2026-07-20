@@ -1,0 +1,7 @@
+type Mutation {
+  x: Int
+}
+
+type Subscription {
+  x: Int
+}

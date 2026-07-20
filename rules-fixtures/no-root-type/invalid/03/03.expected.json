@@ -1,0 +1,1 @@
+{"errors":[{"column":0,"line":1,"message":"Root type \"Mutation\" is forbidden","rule":"no-root-type"}]}
