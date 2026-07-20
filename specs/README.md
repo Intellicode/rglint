@@ -73,7 +73,7 @@ of work (a few hours to ~2 days) and declares its dependencies on prior specs.
 
 | Spec | Title | Status |
 |------|-------|--------|
-| [spec-034](spec-034.md) | no-deprecated | `[ ]` |
+| [spec-034](implemented/spec-034.md) | no-deprecated | `[x]` |
 | [spec-035](spec-035.md) | no-unused-fields | `[ ]` |
 | [spec-036](spec-036.md) | no-unreachable-types | `[ ]` |
 | [spec-037](spec-037.md) | no-scalar-result-type-on-mutation | `[ ]` |

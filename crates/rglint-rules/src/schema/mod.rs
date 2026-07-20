@@ -8,6 +8,7 @@
 pub mod alphabetize;
 pub mod description_style;
 pub mod naming_convention;
+pub mod no_deprecated;
 pub mod no_duplicate_fields;
 pub mod no_hashtag_description;
 pub mod no_root_type;
