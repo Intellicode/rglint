@@ -1,3 +1,5 @@
+kind = "schema"
+
 schema = """
         interface User {
           id: ID!

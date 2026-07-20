@@ -1,3 +1,5 @@
+kind = "schema"
+
 schema = """
         # ScalarTypeDefinition
         scalar DateTime

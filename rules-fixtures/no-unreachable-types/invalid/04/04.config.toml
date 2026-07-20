@@ -1,20 +1,24 @@
+kind = "schema"
+
 schema = """
         interface User {
           id: String
         }
 
-        type SuperUser implements User {
-          id: String
-          superDetail: SuperDetail
+        interface AnotherUser {
+          createdAt: String
         }
 
-        type SuperDetail {
+        type SuperUser implements User {
+          id: String
+        }
+
+        # ObjectTypeExtension
+        extend type SuperUser {
           detail: String
         }
 
         type Query {
-          user: User!
+          user: AnotherUser!
         }
-
-        scalar DateTime
       """

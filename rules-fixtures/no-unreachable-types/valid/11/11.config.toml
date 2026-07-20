@@ -1,3 +1,5 @@
+kind = "schema"
+
 schema = """
         directive @q on QUERY
         directive @w on MUTATION

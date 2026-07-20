@@ -310,7 +310,7 @@ rules-fixtures/<rule-id>/
       01.expected.json   # { "errors": [{ "rule": "...", "message": "...", "line": 1, "column": 0 }] }
 ```
 
-Source files must use `.graphql` or `.gql` extension — the harness looks for filenames ending with these suffixes. Avoid extensionless filenames (e.g. bare `graphql`), which won't be found.
+All fixture files must use the **full suffix** — the harness matches via `name.ends_with(suffix)`, so `config.toml` does NOT match `.config.toml`, and `expected.json` does NOT match `.expected.json`. Always use the `NN.`-prefixed form: `01.config.toml`, `01.expected.json`, `01.graphql`. Avoid bare filenames like `config.toml`, `expected.json`, or `graphql`.
 
 For rules that inspect the file path (e.g. `match-document-filename` which checks operation name vs filename), the harness now always uses `DocumentSpec::Files` so `SourceFile::path()` preserves the real on-disk path. The file's stem and extension are available via `source_path.file_stem()` / `source_path.extension()`. Name fixture source files with meaningful names matching each case's expected messages.
 
@@ -381,6 +381,80 @@ impl Handler for SomeHandler {
 ```
 
 The work is done in `finalize` by iterating `siblings.operations()` and walking each operation's typed `SelectionSet`. The `apollo_compiler::executable::SelectionSet` has a `ty: NamedType` field that tells you which type the selection is on, so type resolution is built in.
+
+### BFS reachability for schema rules (spec-036 pattern)
+
+When computing type reachability via BFS/DFS over the compiled schema, follow ALL edges:
+
+```rust
+match ext_type {
+    ExtendedType::Object(obj) => {
+        // Follow interface implementations
+        for iface in &obj.implements_interfaces { /* add to queue */ }
+        for field in obj.fields.values() {
+            // Follow field return types
+            if let Some(base) = resolve_base_type_name(&field.ty) { /* add */ }
+            // Follow field argument types (input objects, enums, scalars)
+            for arg in &field.arguments {
+                if let Some(base) = resolve_base_type_name(&arg.ty) { /* add */ }
+            }
+        }
+    }
+    ExtendedType::Interface(iface) => {
+        // Follow interface-to-interface implementations
+        for iface_name in &iface.implements_interfaces { /* add */ }
+        for field in iface.fields.values() {
+            if let Some(base) = resolve_base_type_name(&field.ty) { /* add */ }
+            for arg in &field.arguments { /* add arg types */ }
+        }
+        // Follow implementers: objects AND interfaces implementing this interface
+        for (_name, other_type) in &schema.types {
+            let implements = match other_type {
+                ExtendedType::Object(obj) => Some(&obj.implements_interfaces),
+                ExtendedType::Interface(iface2) => Some(&iface2.implements_interfaces),
+                _ => None,
+            };
+            if let Some(impls) = implements {
+                if impls.iter().any(|i| i.as_str() == type_name) { /* add */ }
+            }
+        }
+    }
+    ExtendedType::Union(union) => {
+        for member in &union.members { /* add */ }
+    }
+    // Scalar, Enum, InputObject are terminal
+}
+```
+
+Also follow directive definition argument types to find referenced types:
+
+```rust
+for (_dir_name, dir_def) in &schema.directive_definitions {
+    for arg in &dir_def.arguments {
+        if let Some(base) = resolve_base_type_name(&arg.ty) { /* add */ }
+    }
+}
+```
+
+### Directive unreachable reporting logic
+
+Directives are only reported as unreachable when the reachable set is empty (no root types found). When at least one user-defined type is reachable, skip directive reporting:
+
+```rust
+fn has_user_reachable_types(reachable: &HashSet<String>, schema: &apollo_compiler::Schema) -> bool {
+    for type_name in reachable {
+        if type_name.starts_with("__") { continue; }
+        match type_name.as_str() {
+            "String" | "Int" | "Float" | "Boolean" | "ID" => continue,
+            _ => {}
+        }
+        if schema.types.contains_key(type_name.as_str()) { return true; }
+    }
+    false
+}
+```
+
+Directive messages use `"Directive \`X\` is unreachable."` (no "type" in the message), while type messages use `"Scalar type \`X\` is unreachable."`, etc.
 
 ### Skipping introspection types in schema scans
 

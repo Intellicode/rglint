@@ -1,3 +1,5 @@
+kind = "schema"
+
 schema = """
         input UserInput {
           id: ID
