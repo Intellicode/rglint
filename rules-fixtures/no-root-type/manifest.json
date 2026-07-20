@@ -1,8 +1,14 @@
 {
   "source": "rules/no-root-type/index.test.ts",
-  "source_hash": "baa56447106448ed",
+  "source_hash": "placeholder",
   "rule": "no-root-type",
-  "valid_count": 0,
-  "invalid_count": 0,
-  "cases": []
+  "valid_count": 2,
+  "invalid_count": 3,
+  "cases": [
+    { "kind": "valid", "id": "01", "hash": "placeholder", "line": 0 },
+    { "kind": "valid", "id": "02", "hash": "placeholder", "line": 0 },
+    { "kind": "invalid", "id": "01", "hash": "placeholder", "line": 0 },
+    { "kind": "invalid", "id": "02", "hash": "placeholder", "line": 0 },
+    { "kind": "invalid", "id": "03", "hash": "placeholder", "line": 0 }
+  ]
 }

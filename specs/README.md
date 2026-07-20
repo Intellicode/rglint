@@ -66,7 +66,7 @@ of work (a few hours to ~2 days) and declares its dependencies on prior specs.
 | [spec-029](implemented/spec-029.md) | unique-enum-value-names | `[x]` |
 | [spec-030](implemented/spec-030.md) | strict-id-in-types | `[x]` |
 | [spec-031](implemented/spec-031.md) | no-typename-prefix | `[x]` |
-| [spec-032](spec-032.md) | no-root-type | `[ ]` |
+| [spec-032](implemented/spec-032.md) | no-root-type | `[x]` |
 | [spec-033](spec-033.md) | match-document-filename | `[ ]` |
 
 ### Phase 3 — Schema-aware operations
