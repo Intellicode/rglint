@@ -209,28 +209,18 @@ pub fn build_project_with(
                 }
                 (None, None) => None,
             };
-            let documents = if case.sibling_documents.is_empty() {
-                doc_loader.load(
-                    &DocumentSpec::Inline(case.source.clone()),
-                    base,
-                    schema.as_deref().map(|ls| &ls.compiler),
-                )?
-            } else {
-                // Load the main source + every declared sibling as separate
-                // on-disk files (the loader sorts + content-hash-dedups them
-                // and stitches `by_file` so multiple sibling docs feed the
-                // project's `Siblings` index in one go). This is the path
-                // `requires_siblings` rules' fixtures use to provide more
-                // than one operation document per case.
-                let mut paths = Vec::with_capacity(1 + case.sibling_documents.len());
-                paths.push(case.source_path.clone());
-                paths.extend(case.sibling_documents.iter().cloned());
-                doc_loader.load(
-                    &DocumentSpec::Files(paths),
-                    base,
-                    schema.as_deref().map(|ls| &ls.compiler),
-                )?
-            };
+            // Always load via DocumentSpec::Files so the SourceFile retains the
+            // real path on disk (needed for rules like match-document-filename
+            // that inspect the file name/extension). DocumentSpec::Inline
+            // assigns the synthetic path <inline> which loses that information.
+            let mut paths = Vec::with_capacity(1 + case.sibling_documents.len());
+            paths.push(case.source_path.clone());
+            paths.extend(case.sibling_documents.iter().cloned());
+            let documents = doc_loader.load(
+                &DocumentSpec::Files(paths),
+                base,
+                schema.as_deref().map(|ls| &ls.compiler),
+            )?;
             (schema, documents)
         }
         DocKind::Schema => {

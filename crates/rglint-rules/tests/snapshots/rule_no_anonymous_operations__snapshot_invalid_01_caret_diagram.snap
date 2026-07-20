@@ -1,7 +1,6 @@
 ---
 source: crates/rglint-rules/tests/rule_no_anonymous_operations.rs
+assertion_line: 79
 expression: rendered
 ---
-query { a }
-^
-> no-anonymous-operations: Anonymous GraphQL operations are banned. Please give your operation a name
+> no-anonymous-operations (in /Users/x/projects/graphql-eslint/rglint/crates/rglint-rules/../../rules-fixtures/no-anonymous-operations/invalid/01/01.graphql): Anonymous GraphQL operations are banned. Please give your operation a name
