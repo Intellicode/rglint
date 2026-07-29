@@ -1,0 +1,13 @@
+type Query
+type CreateUserPayload {
+  user: User!
+  query: Query!
+}
+
+type Mutation {
+  createUser: CreateUserPayload!
+}
+
+type User {
+  id: ID!
+}

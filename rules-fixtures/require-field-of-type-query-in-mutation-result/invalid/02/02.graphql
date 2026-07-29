@@ -1,0 +1,10 @@
+type Query
+type Mutation
+
+extend type Mutation {
+  createUser: User!
+}
+
+type User {
+  id: ID!
+}

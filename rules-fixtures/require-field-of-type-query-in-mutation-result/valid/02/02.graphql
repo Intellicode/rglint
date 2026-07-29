@@ -1,0 +1,8 @@
+# type Query is not defined and no error is reported
+type Mutation {
+  createUser: User!
+}
+
+type User {
+  id: ID!
+}

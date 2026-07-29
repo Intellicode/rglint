@@ -1,0 +1,13 @@
+type RootQuery
+type Payload {
+  query: RootQuery
+}
+
+type RootMutation {
+  createUser: Payload
+}
+
+schema {
+  mutation: RootMutation
+  query: RootQuery
+}
