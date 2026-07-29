@@ -84,7 +84,7 @@ of work (a few hours to ~2 days) and declares its dependencies on prior specs.
 
 | Spec | Title | Status |
 |------|-------|--------|
-| [spec-040](spec-040.md) | selection-set-depth | `[ ]` |
+| [spec-040](implemented/spec-040.md) | selection-set-depth | `[x]` |
 | [spec-041](spec-041.md) | require-import-fragment | `[ ]` |
 | [spec-042](spec-042.md) | require-selections | `[ ]` |
 | [spec-043](spec-043.md) | no-one-place-fragments | `[ ]` |

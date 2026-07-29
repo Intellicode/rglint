@@ -5,4 +5,5 @@
             }
           }
         }
-      
+        fragment AlbumFields on Album { id }
+

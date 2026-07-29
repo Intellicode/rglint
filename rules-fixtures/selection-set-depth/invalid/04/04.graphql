@@ -1,0 +1,14 @@
+        {
+          viewer {
+            albums {
+              ...AlbumFields
+            }
+          }
+        }
+        fragment AlbumFields on Album {
+          id
+          modifier {
+            date
+          }
+        }
+

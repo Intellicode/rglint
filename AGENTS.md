@@ -3,13 +3,21 @@
 ## Spec lifecycle
 
 1. Next unimplemented spec = lowest-numbered `spec-NNN.md` still in `specs/` (not in `specs/implemented/`). Check `specs/README.md` for the status index.
-2. Read the spec, understand dependencies (they state which prior specs must be done).
-3. Check `rules-fixtures/<rule-id>/` — if fixtures already exist, they are the ground truth. The spec text may be stale or simplified; always match the fixture `expected.json` messages and the original graphql-eslint source linked in `manifest.json`. If a fixture has placeholder messages like `"<unknown>"`, verify the upstream graphql-eslint snapshot/source and replace the placeholders with exact messages before treating the fixture as parity-complete. If fixture source files lack a `.graphql`/`.gql` extension, rename them (extensionless files won't be found by the harness).
+2. Before creating the implementation branch, switch to `main` and fast-forward it from `origin/main`; do not branch from a stale local default branch.
+3. Read the spec, understand dependencies (they state which prior specs must be done).
+4. Check `rules-fixtures/<rule-id>/` — if fixtures already exist, they are the ground truth. The spec text may be stale or simplified; always match the fixture `expected.json` messages and the original graphql-eslint source linked in `manifest.json`. If a fixture has placeholder messages like `"<unknown>"`, verify the upstream graphql-eslint snapshot/source and replace the placeholders with exact messages before treating the fixture as parity-complete. If fixture source files lack a `.graphql`/`.gql` extension, rename them (extensionless files won't be found by the harness).
    - When upstream injects helper schema through parser options, keep local fixtures self-contained by appending helper SDL after the upstream snippet whenever possible. That preserves upstream line/column offsets for diagnostics that point inside the snippet.
-4. Implement per the spec's Deliverables (amended by fixture reality if applicable).
-5. Move `specs/spec-NNN.md` → `specs/implemented/spec-NNN.md`.
-6. Update `specs/README.md`: fix the link path (add `implemented/` prefix) and change status to `[x]`.
-7. Build, clippy, and test before committing: `cargo build && cargo clippy && cargo test`.
+5. Implement per the spec's Deliverables (amended by fixture reality if applicable).
+6. Move `specs/spec-NNN.md` → `specs/implemented/spec-NNN.md`.
+7. Update `specs/README.md`: fix the link path (add `implemented/` prefix) and change status to `[x]`.
+8. Build, clippy, and test before committing: `cargo build && cargo clippy && cargo test`.
+
+### Fixture validation checklist
+
+- Use the full suffixes `NN.graphql`/`NN.gql`, `NN.config.toml`, and `NN.expected.json`; extensionless legacy names are not discovered by the current harness.
+- A rule declaring `requires_schema = true` must have `schema = ...` or `schema_path = ...` in every operation fixture, or use `kind = "schema"` for schema fixtures. Otherwise the engine intentionally skips the rule and a passing fixture can be false confidence.
+- For operation fixtures, put fragments in the main source or declare them through `sibling_documents`. The `documents = ...` helper is only consumed for `kind = "schema"` fixtures.
+- Run the new rule's focused parity test before the workspace checks so fixture, message, and location mismatches are isolated from unrelated failures.
 
 ## Rule implementation template
 
