@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rust Development"
+  short_description: "Build and maintain Rust projects"
+  default_prompt: "Use $rust-development to implement this Rust change and verify it with Cargo."
