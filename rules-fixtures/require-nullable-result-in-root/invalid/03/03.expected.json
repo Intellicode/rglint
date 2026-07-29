@@ -1,0 +1,1 @@
+{"errors":[{"column":21,"line":1,"message":"Unexpected non-null result scalar \"Boolean\" in type \"Mutation\"","rule":"require-nullable-result-in-root"}]}

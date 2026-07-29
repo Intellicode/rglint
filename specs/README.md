@@ -77,7 +77,7 @@ of work (a few hours to ~2 days) and declares its dependencies on prior specs.
 | [spec-035](implemented/spec-035.md) | no-unused-fields | `[x]` |
 | [spec-036](implemented/spec-036.md) | no-unreachable-types | `[x]` |
 | [spec-037](implemented/spec-037.md) | no-scalar-result-type-on-mutation | `[x]` |
-| [spec-038](spec-038.md) | require-nullable-result-in-root | `[ ]` |
+| [spec-038](implemented/spec-038.md) | require-nullable-result-in-root | `[x]` |
 | [spec-039](spec-039.md) | require-field-of-type-query-in-mutation-result | `[ ]` |
 
 ### Phase 4 — Siblings + cross-document

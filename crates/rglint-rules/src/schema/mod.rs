@@ -19,5 +19,6 @@ pub mod no_typename_prefix;
 pub mod require_deprecation_date;
 pub mod require_deprecation_reason;
 pub mod require_description;
+pub mod require_nullable_result_in_root;
 pub mod strict_id_in_types;
 pub mod unique_enum_value_names;
