@@ -1,0 +1,6 @@
+#import "02.fragment.graphql"
+query GetUser {
+  user {
+    ...FooFields
+  }
+}

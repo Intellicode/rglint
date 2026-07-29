@@ -1,0 +1,6 @@
+# import FooFields from './01.fragment.graphql'
+query GetUser {
+  user {
+    ...FooFields
+  }
+}

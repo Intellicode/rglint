@@ -1,0 +1,9 @@
+query GetUser {
+  user {
+    ...FooFields
+  }
+}
+
+fragment FooFields on User {
+  id
+}

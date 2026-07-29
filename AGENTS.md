@@ -12,6 +12,22 @@
 7. Update `specs/README.md`: fix the link path (add `implemented/` prefix) and change status to `[x]`.
 8. Build, clippy, and test before committing: `cargo build && cargo clippy && cargo test`.
 
+### Upstream parity and handoff checklist
+
+- Inspect the upstream graphql-eslint rule **and its tests** before implementing
+  a port. Copy exact diagnostic wording, report-node location, rule metadata
+  (`requires_schema`, `requires_siblings`, `has_suggestions`), and suggestion
+  behavior into the Rust design; if a capability is not supported by the
+  current engine, document the deliberate scope difference in the spec/PR.
+- Add at least one fixture for every meaningful branch in the upstream tests,
+  including valid cases that exercise accepted syntax. Keep fixture manifests,
+  valid/invalid counts, and case lists synchronized; run the focused rule test
+  before the workspace-wide checks.
+- Before staging, run `git diff --check` and inspect `git status --short` plus
+  the complete diff. Stage only files belonging to the spec, including the
+  spec move and this index update; do not silently include generated artifacts,
+  nested worktrees, or unrelated edits.
+
 ### Fixture validation checklist
 
 - Use the full suffixes `NN.graphql`/`NN.gql`, `NN.config.toml`, and `NN.expected.json`; extensionless legacy names are not discovered by the current harness.
