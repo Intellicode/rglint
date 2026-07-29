@@ -75,6 +75,7 @@ fn snapshot_invalid_01_caret_diagram() {
     // tree, which would collide every caller's snapshot file. Calling
     // `assert_snapshot!` here keeps the `.snap` under
     // `crates/rglint-rules/tests/snapshots/`.
-    let rendered = render_snapshot(&result.all, &source);
+    let rendered = render_snapshot(&result.all, &source)
+        .replace(env!("CARGO_MANIFEST_DIR"), "$CARGO_MANIFEST_DIR");
     insta::assert_snapshot!(rendered);
 }

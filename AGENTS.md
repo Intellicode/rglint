@@ -5,6 +5,7 @@
 1. Next unimplemented spec = lowest-numbered `spec-NNN.md` still in `specs/` (not in `specs/implemented/`). Check `specs/README.md` for the status index.
 2. Read the spec, understand dependencies (they state which prior specs must be done).
 3. Check `rules-fixtures/<rule-id>/` — if fixtures already exist, they are the ground truth. The spec text may be stale or simplified; always match the fixture `expected.json` messages and the original graphql-eslint source linked in `manifest.json`. If a fixture has placeholder messages like `"<unknown>"`, verify the upstream graphql-eslint snapshot/source and replace the placeholders with exact messages before treating the fixture as parity-complete. If fixture source files lack a `.graphql`/`.gql` extension, rename them (extensionless files won't be found by the harness).
+   - When upstream injects helper schema through parser options, keep local fixtures self-contained by appending helper SDL after the upstream snippet whenever possible. That preserves upstream line/column offsets for diagnostics that point inside the snippet.
 4. Implement per the spec's Deliverables (amended by fixture reality if applicable).
 5. Move `specs/spec-NNN.md` → `specs/implemented/spec-NNN.md`.
 6. Update `specs/README.md`: fix the link path (add `implemented/` prefix) and change status to `[x]`.

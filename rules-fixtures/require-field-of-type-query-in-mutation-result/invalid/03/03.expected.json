@@ -1,0 +1,1 @@
+{"errors":[{"column":15,"line":3,"message":"Mutation result type \"User\" must contain field of type \"RootQuery\"","rule":"require-field-of-type-query-in-mutation-result"}]}

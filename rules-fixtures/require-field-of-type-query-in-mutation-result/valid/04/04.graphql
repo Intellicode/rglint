@@ -1,0 +1,20 @@
+# No errors are reported for type union, interface and scalar
+type Admin {
+  id: ID!
+}
+union Union = User | Admin
+
+interface Interface {
+  id: ID!
+}
+
+type Query
+type Mutation {
+  foo: Boolean
+  bar: Union
+  baz: Interface
+}
+
+type User {
+  id: ID!
+}

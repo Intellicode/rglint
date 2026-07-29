@@ -1,0 +1,14 @@
+type RootQuery
+type RootMutation
+extend type RootMutation {
+  createUser: [User!]!
+}
+
+schema {
+  mutation: RootMutation
+  query: RootQuery
+}
+
+type User {
+  id: ID!
+}
