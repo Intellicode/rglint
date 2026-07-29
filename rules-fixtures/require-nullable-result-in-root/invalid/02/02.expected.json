@@ -1,0 +1,1 @@
+{"errors":[{"column":16,"line":3,"message":"Unexpected non-null result interface \"User\" in type \"MyMutation\"","rule":"require-nullable-result-in-root"}]}

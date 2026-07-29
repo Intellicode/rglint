@@ -1,0 +1,1 @@
+{"errors":[{"column":16,"line":2,"message":"Unexpected non-null result type \"User\" in type \"Query\"","rule":"require-nullable-result-in-root"}]}
