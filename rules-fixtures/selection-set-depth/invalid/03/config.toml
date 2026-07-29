@@ -1,4 +1,0 @@
-documents = "fragment AlbumFields on Album { id }"
-
-[options]
-maxDepth = 1

@@ -10,5 +10,6 @@
 pub mod lone_executable_definition;
 pub mod match_document_filename;
 pub mod no_anonymous_operations;
+pub mod selection_set_depth;
 pub mod unique_fragment_name;
 pub mod unique_operation_name;

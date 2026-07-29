@@ -1,0 +1,4 @@
+schema = "type Query { viewer: User } type User { albums: Album } type Album { id: ID modifier: Modifier } type Modifier { date: String }"
+
+[options]
+maxDepth = 2

@@ -1,8 +1,0 @@
-        query deep2 {
-          viewer {
-            albums {
-              ...AlbumFields
-            }
-          }
-        }
-      

@@ -1,8 +1,9 @@
-        {
+        query deep2 {
           viewer {
             albums {
               ...AlbumFields
             }
           }
         }
-      
+        fragment AlbumFields on Album { id }
+
