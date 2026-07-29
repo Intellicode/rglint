@@ -1,0 +1,5 @@
+fragment UnionFragment on UserOrPost {
+  ... on User {
+    name
+  }
+}

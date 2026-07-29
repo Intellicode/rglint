@@ -1,0 +1,10 @@
+fragment UserFields on User {
+  name
+  id
+}
+fragment UserFullFields on User {
+  ... on User {
+    ...UserFields
+  }
+  id
+}

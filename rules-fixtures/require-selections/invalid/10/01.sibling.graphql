@@ -1,0 +1,7 @@
+fragment UnionFragment on UserOrPost {
+  ...UserFields
+}
+
+fragment UserFields on User {
+  name
+}

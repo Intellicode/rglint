@@ -180,6 +180,31 @@ fn finalize(&mut self, ctx: &mut RuleContext) {
 
 Report via `ctx.report(DiagnosticBuilder::new(ctx.rule_id(), …, span, message))`.
 
+### Operation-side schema + sibling rules
+
+For rules that inspect typed executable ASTs (especially rules with both
+`requires_schema` and `requires_siblings`), do the semantic walk in
+`Handler::finalize` and keep source ownership explicit:
+
+- Iterate `siblings.operations()` and `siblings.fragments_all()`, filtering each
+  definition by `definition.source.path() == ctx.file.path()` before reporting.
+  This prevents every per-file handler from duplicating diagnostics.
+- Use fragment spreads only to answer whether a field is selected; walk each
+  fragment definition independently when it is the current source so nested
+  violations have a stable owner.
+- `apollo_compiler::executable::SelectionSet` has no source span. Preserve the
+  owning field/fragment node location and map it to the selection-set opening
+  brace when parity requires the GraphQL AST selection-set location.
+- In operation fixtures, use `sibling_documents = [...]` for helper fragments.
+  The `documents` config field is reserved for inline operation documents in
+  `kind = "schema"` fixtures. Sibling files are real lint inputs, so expected
+  diagnostics must include their source-owned reports.
+
+This pattern also applies when an upstream rule is implemented as an ESLint
+visitor over one primary file: make the Rust engine's per-source behavior
+explicit in the spec and expected fixtures instead of silently relying on
+cross-file traversal side effects.
+
 ## `requires_schema` rules (spec-034 pattern)
 
 Schema-aware operation rules collect context during `on_node` and resolve against the compiled schema in `finalize`:

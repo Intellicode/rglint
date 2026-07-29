@@ -1,0 +1,7 @@
+fragment UserLightFields on User {
+  id
+}
+fragment UserFullFields on User {
+  ...UserLightFields
+  name
+}

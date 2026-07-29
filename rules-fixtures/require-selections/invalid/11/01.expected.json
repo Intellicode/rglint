@@ -1,0 +1,1 @@
+{"errors":[{"column":36,"line":1,"message":"Field `UserFields.id` must be selected when it's available on a type.\nInclude it in your selection set.","rule":"require-selections"},{"column":16,"line":3,"message":"Field `posts.id` must be selected when it's available on a type.\nInclude it in your selection set.","rule":"require-selections"}]}
