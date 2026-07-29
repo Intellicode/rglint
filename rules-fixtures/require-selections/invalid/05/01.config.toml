@@ -1,0 +1,20 @@
+sibling_documents = ["01.sibling.graphql"]
+schema = """
+  type User {
+    id: ID
+    name: String
+    posts: [Post]
+  }
+
+  type Post {
+    id: ID
+    title: String
+    author: [User!]!
+  }
+
+  type Query {
+    user: User
+    userOrPost: UserOrPost
+  }
+
+  union UserOrPost = User | Post"""

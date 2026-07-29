@@ -1,0 +1,39 @@
+sibling_documents = ["01.sibling.graphql"]
+documents = """
+            fragment UserFields on User {
+              id
+            }
+            fragment UserLightFields on User {
+              ... on User {
+                ...UserFields
+                name
+              }
+            }
+            fragment UserMediumFields on User {
+              name
+              ...UserLightFields
+            }
+            fragment UserFullFields on User {
+              name
+              ...UserMediumFields
+            }
+          """
+schema = """
+  type User {
+    id: ID
+    name: String
+    posts: [Post]
+  }
+
+  type Post {
+    id: ID
+    title: String
+    author: [User!]!
+  }
+
+  type Query {
+    user: User
+    userOrPost: UserOrPost
+  }
+
+  union UserOrPost = User | Post"""

@@ -1,0 +1,13 @@
+fragment UserFullFields on User {
+  posts {
+    author {
+      ...UserFields
+      authorPosts: posts {
+        title
+      }
+    }
+  }
+}
+fragment UserFields on User {
+  name
+}
