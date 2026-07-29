@@ -1,0 +1,6 @@
+# import FooFields from './missing.graphql'
+query GetUser {
+  user {
+    ...FooFields
+  }
+}

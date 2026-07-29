@@ -1,0 +1,1 @@
+{"errors":[{"rule":"require-import-fragment","message":"Expected \"FooFields\" fragment to be imported.","line":4,"column":7}]}
