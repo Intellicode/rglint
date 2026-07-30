@@ -1,0 +1,12 @@
+fragment UserFields on User {
+  id
+}
+
+query GetUser {
+  user {
+    ...UserFields
+    friend {
+      ...UserFields
+    }
+  }
+}

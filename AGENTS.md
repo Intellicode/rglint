@@ -1,5 +1,26 @@
 # AGENTS.md — conventions for implementing specs
 
+## Repository and branch hygiene
+
+Before touching a spec, run `git status -sb` and confirm the checkout is clean.
+If it is not clean, preserve the existing work and ask which files belong in
+the spec change; never hide, reset, or overwrite unrelated edits. The required
+branch sequence is:
+
+1. `git switch main`.
+2. `git pull --ff-only origin main`.
+3. Confirm `main` is up to date and create `spec-NNN` from that commit.
+
+If the pull is not a fast-forward, stop and resolve the repository state before
+creating the implementation branch. Keep the branch focused on one spec and
+do not mix generated files, nested worktrees, or unrelated cleanup into it.
+
+If `spec-NNN` already exists locally or on the remote, inspect it before
+reusing it: verify that it is based on the current `main`, that its worktree
+is clean, and that its diff contains only that spec. Never delete or force-
+rewrite an existing implementation branch to make the naming sequence fit;
+stop and ask for direction if it contains unrelated or unreviewed work.
+
 ## Spec lifecycle
 
 1. Next unimplemented spec = lowest-numbered `spec-NNN.md` still in `specs/` (not in `specs/implemented/`). Check `specs/README.md` for the status index.
@@ -19,6 +40,12 @@
   (`requires_schema`, `requires_siblings`, `has_suggestions`), and suggestion
   behavior into the Rust design; if a capability is not supported by the
   current engine, document the deliberate scope difference in the spec/PR.
+- Record the upstream source and test revision or URL used for the parity
+  decision. When the spec is stale, update the spec to the verified upstream
+  behavior rather than implementing an unconfirmed option or message.
+- Pin the parity record to an immutable upstream commit, tag, or snapshot date;
+  a `master`/`main` URL alone is not sufficient because rule wording and tests
+  can change after implementation.
 - Add at least one fixture for every meaningful branch in the upstream tests,
   including valid cases that exercise accepted syntax. Keep fixture manifests,
   valid/invalid counts, and case lists synchronized; run the focused rule test
@@ -31,9 +58,30 @@
 ### Fixture validation checklist
 
 - Use the full suffixes `NN.graphql`/`NN.gql`, `NN.config.toml`, and `NN.expected.json`; extensionless legacy names are not discovered by the current harness.
+- Do not leave a placeholder manifest with zero cases for an implemented rule:
+  every manifest case must have a matching directory, and its counts must
+  equal the discovered valid/invalid directories.
 - A rule declaring `requires_schema = true` must have `schema = ...` or `schema_path = ...` in every operation fixture, or use `kind = "schema"` for schema fixtures. Otherwise the engine intentionally skips the rule and a passing fixture can be false confidence.
 - For operation fixtures, put fragments in the main source or declare them through `sibling_documents`. The `documents = ...` helper is only consumed for `kind = "schema"` fixtures.
+- Give sibling files stable, case-specific names when a diagnostic includes a
+  path; expected messages must use the same rendered path as the upstream
+  rule, not an absolute temporary path.
 - Run the new rule's focused parity test before the workspace checks so fixture, message, and location mismatches are isolated from unrelated failures.
+
+## Completion and merge handoff
+
+Before staging, run `git diff --check`, `git status --short`, and inspect the
+complete diff including the moved spec and README index. Stage only the files
+belonging to the spec. After the PR is merged, return the checkout to the
+default branch and refresh it with `git switch main` followed by
+`git pull --ff-only origin main`; verify the final status and report any
+pre-existing changes rather than deleting them.
+
+When opening the PR, include the implementation branch, spec/rule scope,
+upstream parity source and pinned revision, focused test, full validation
+commands, and any deliberate scope difference. After merging, refresh `main`
+and verify `git status -sb`; report any remaining changes instead of cleaning
+them up implicitly.
 
 ## Rule implementation template
 

@@ -87,7 +87,7 @@ of work (a few hours to ~2 days) and declares its dependencies on prior specs.
 | [spec-040](implemented/spec-040.md) | selection-set-depth | `[x]` |
 | [spec-041](implemented/spec-041.md) | require-import-fragment | `[x]` |
 | [spec-042](implemented/spec-042.md) | require-selections | `[x]` |
-| [spec-043](spec-043.md) | no-one-place-fragments | `[ ]` |
+| [spec-043](implemented/spec-043.md) | no-one-place-fragments | `[x]` |
 
 ### Phase 5 — Relay suite
 
