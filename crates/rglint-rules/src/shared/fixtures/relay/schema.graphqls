@@ -1,0 +1,56 @@
+type UserConnection {
+  edges: [UserEdge]
+  pageInfo: PageInfo!
+}
+
+type BadConnection {
+  edges: [BadEdge]
+}
+
+type UserEdge {
+  node: User!
+  cursor: String!
+}
+
+type BadEdge {
+  node: User!
+}
+
+type User {
+  id: ID!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+type IncompletePageInfo {
+  hasNextPage: Boolean!
+}
+
+type PagingInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+type UserConnectionType {
+  edges: [UserEdgeType]
+  pageInfo: PagingInfo!
+}
+
+type UserEdgeType {
+  node: User!
+  cursor: String!
+}
+
+type Query {
+  users: UserConnection
+  forwardUsers(first: Int, after: String): UserConnection
+  backwardUsers(last: Int, before: String): UserConnection
+  health: String
+}

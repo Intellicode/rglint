@@ -21,6 +21,12 @@ is clean, and that its diff contains only that spec. Never delete or force-
 rewrite an existing implementation branch to make the naming sequence fit;
 stop and ask for direction if it contains unrelated or unreviewed work.
 
+For this check, inspect both namespaces before branching:
+`git branch --list spec-NNN` and `git ls-remote --heads origin spec-NNN`.
+If the remote cannot be reached, do not infer that the branch is absent from a
+failed lookup; verify connectivity or stop before creating a potentially
+colliding branch.
+
 ## Spec lifecycle
 
 1. Next unimplemented spec = lowest-numbered `spec-NNN.md` still in `specs/` (not in `specs/implemented/`). Check `specs/README.md` for the status index.
@@ -46,6 +52,11 @@ stop and ask for direction if it contains unrelated or unreviewed work.
 - Pin the parity record to an immutable upstream commit, tag, or snapshot date;
   a `master`/`main` URL alone is not sufficient because rule wording and tests
   can change after implementation.
+- When porting shared helpers, prefer the engine's canonical semantic model
+  over a source-language AST type that cannot represent merged schema
+  extensions. Keep the public Rust API borrow-based, document the adaptation in
+  the spec, and add tests for both the default options and at least one custom
+  option set.
 - Add at least one fixture for every meaningful branch in the upstream tests,
   including valid cases that exercise accepted syntax. Keep fixture manifests,
   valid/invalid counts, and case lists synchronized; run the focused rule test
@@ -67,6 +78,12 @@ stop and ask for direction if it contains unrelated or unreviewed work.
   path; expected messages must use the same rendered path as the upstream
   rule, not an absolute temporary path.
 - Run the new rule's focused parity test before the workspace checks so fixture, message, and location mismatches are isolated from unrelated failures.
+
+For shared helper specs without a rule harness, use a checked-in SDL fixture
+loaded with `include_str!` and unit-test the public helpers directly. Cover
+valid and structurally incomplete types, cross-type resolution, and the
+option-driven naming behavior; do not rely on an empty rule fixture manifest as
+evidence that a helper is tested.
 
 ## Completion and merge handoff
 
