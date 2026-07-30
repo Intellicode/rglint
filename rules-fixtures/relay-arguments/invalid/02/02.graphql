@@ -1,0 +1,5 @@
+type User {
+  posts(after: String, first: Int): PostConnection
+}
+type PostConnection { marker: String }
+type Query { marker: String }

@@ -1,8 +1,15 @@
 {
-  "source": "rules/relay-arguments/index.test.ts",
-  "source_hash": "54be195459b94e1c",
+  "source": "packages/plugin/src/rules/relay-arguments/index.test.ts",
+  "source_revision": "f0f200ef0b030cb8a905bbcb32fe346b87cc2e24",
   "rule": "relay-arguments",
-  "valid_count": 0,
-  "invalid_count": 0,
-  "cases": []
+  "valid_count": 3,
+  "invalid_count": 3,
+  "cases": [
+    "valid/01",
+    "valid/02",
+    "valid/03",
+    "invalid/01",
+    "invalid/02",
+    "invalid/03"
+  ]
 }
