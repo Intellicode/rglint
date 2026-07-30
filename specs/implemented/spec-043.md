@@ -14,10 +14,11 @@ Rule: `packages/plugin/src/rules/no-one-place-fragments/index.ts`
 
 Test: `packages/plugin/src/rules/no-one-place-fragments/index.test.ts`
 
-Verified against the upstream `master` sources at:
+Verified against the upstream `master` sources at these immutable revisions
+(fetched 2026-07-30):
 
-- https://github.com/dimaMachina/graphql-eslint/blob/master/packages/plugin/src/rules/no-one-place-fragments/index.ts
-- https://github.com/dimaMachina/graphql-eslint/blob/master/packages/plugin/src/rules/no-one-place-fragments/index.test.ts
+- Rule: https://github.com/graphql-hive/graphql-eslint/blob/e94f813ae4180b5908855989e1243e5b958581c1/packages/plugin/src/rules/no-one-place-fragments/index.ts
+- Tests: https://github.com/graphql-hive/graphql-eslint/blob/01ace44e07d330ac98369b318d175b67ab5c5605/packages/plugin/src/rules/no-one-place-fragments/index.test.ts
 
 ## Scope
 

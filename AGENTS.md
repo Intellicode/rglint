@@ -15,6 +15,12 @@ If the pull is not a fast-forward, stop and resolve the repository state before
 creating the implementation branch. Keep the branch focused on one spec and
 do not mix generated files, nested worktrees, or unrelated cleanup into it.
 
+If `spec-NNN` already exists locally or on the remote, inspect it before
+reusing it: verify that it is based on the current `main`, that its worktree
+is clean, and that its diff contains only that spec. Never delete or force-
+rewrite an existing implementation branch to make the naming sequence fit;
+stop and ask for direction if it contains unrelated or unreviewed work.
+
 ## Spec lifecycle
 
 1. Next unimplemented spec = lowest-numbered `spec-NNN.md` still in `specs/` (not in `specs/implemented/`). Check `specs/README.md` for the status index.
@@ -37,6 +43,9 @@ do not mix generated files, nested worktrees, or unrelated cleanup into it.
 - Record the upstream source and test revision or URL used for the parity
   decision. When the spec is stale, update the spec to the verified upstream
   behavior rather than implementing an unconfirmed option or message.
+- Pin the parity record to an immutable upstream commit, tag, or snapshot date;
+  a `master`/`main` URL alone is not sufficient because rule wording and tests
+  can change after implementation.
 - Add at least one fixture for every meaningful branch in the upstream tests,
   including valid cases that exercise accepted syntax. Keep fixture manifests,
   valid/invalid counts, and case lists synchronized; run the focused rule test
@@ -67,6 +76,12 @@ belonging to the spec. After the PR is merged, return the checkout to the
 default branch and refresh it with `git switch main` followed by
 `git pull --ff-only origin main`; verify the final status and report any
 pre-existing changes rather than deleting them.
+
+When opening the PR, include the implementation branch, spec/rule scope,
+upstream parity source and pinned revision, focused test, full validation
+commands, and any deliberate scope difference. After merging, refresh `main`
+and verify `git status -sb`; report any remaining changes instead of cleaning
+them up implicitly.
 
 ## Rule implementation template
 
