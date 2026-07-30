@@ -2,7 +2,12 @@
   "source": "rules/no-one-place-fragments/index.test.ts",
   "source_hash": "c34e862e84e688a1",
   "rule": "no-one-place-fragments",
-  "valid_count": 0,
-  "invalid_count": 0,
-  "cases": []
+  "valid_count": 2,
+  "invalid_count": 2,
+  "cases": [
+    "valid/01",
+    "valid/02",
+    "invalid/01",
+    "invalid/02"
+  ]
 }

@@ -1,0 +1,13 @@
+query GetUser {
+  user {
+    ...UserFields
+  }
+}
+
+query GetFriend {
+  user {
+    friend {
+      ...UserFields
+    }
+  }
+}
