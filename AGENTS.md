@@ -143,6 +143,16 @@ valid and structurally incomplete types, cross-type resolution, and the
 option-driven naming behavior; do not rely on an empty rule fixture manifest as
 evidence that a helper is tested.
 
+For shared helpers that inspect a local schema definition, make the source
+ownership decision explicit in the helper's module documentation and tests:
+use the source AST when the helper must distinguish a definition from an
+extension, and use the merged schema only when extension-contributed members
+are intentionally part of the contract. Return borrowed AST members where
+possible; do not clone fields or expose compiler-owned nodes through owned
+facades. If the helper has no rule harness, its checked-in fixture should
+exercise both the positive and negative predicate paths and any future-proof
+accessor promised by the public API.
+
 ## Completion and merge handoff
 
 Before staging, run `git diff --check`, `git status --short`, and inspect the
