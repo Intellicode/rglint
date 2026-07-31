@@ -1,0 +1,1 @@
+{"errors":[{"column":5,"line":1,"message":"Connection type must have `Connection` suffix.","rule":"relay-connection-types"},{"column":9,"line":2,"message":"`edges` field must return a list type.","rule":"relay-connection-types"},{"column":12,"line":3,"message":"`pageInfo` field must return a non-null `PageInfo` Object type.","rule":"relay-connection-types"}]}

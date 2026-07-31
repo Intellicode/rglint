@@ -1,0 +1,1 @@
+{"errors":[{"column":5,"line":1,"message":"Connection type must contain a field `edges` that return a list type.","rule":"relay-connection-types"}]}

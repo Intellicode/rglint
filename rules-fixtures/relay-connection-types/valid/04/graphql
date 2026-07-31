@@ -1,5 +1,0 @@
-      extend type UserConnection {
-        edges: [UserEdge]
-        pageInfo: PageInfo!
-      }
-    

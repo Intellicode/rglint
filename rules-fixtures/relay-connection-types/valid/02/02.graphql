@@ -1,0 +1,16 @@
+type UserConnection {
+  edges: [UserEdge]
+  pageInfo: PageInfo!
+}
+type PostConnection {
+  edges: [PostEdge!]
+  pageInfo: PageInfo!
+}
+type CommentConnection {
+  edges: [CommentEdge]!
+  pageInfo: PageInfo!
+}
+type AddressConnection {
+  edges: [AddressEdge!]!
+  pageInfo: PageInfo!
+}

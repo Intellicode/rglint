@@ -27,6 +27,33 @@ If the remote cannot be reached, do not infer that the branch is absent from a
 failed lookup; verify connectivity or stop before creating a potentially
 colliding branch.
 
+## GitHub CLI PR and merge workflow
+
+Use the GitHub CLI for the complete handoff once implementation and local
+validation are complete:
+
+1. Confirm the CLI identity and repository before publishing:
+   `gh auth status` and `gh repo view --json nameWithOwner,defaultBranchRef`.
+2. Push only the focused implementation branch with
+   `git push --set-upstream origin spec-NNN`.
+3. Create the PR with `gh pr create --base main --head spec-NNN`, using a
+   body that names the spec/rule, pinned upstream parity revision, focused
+   test, full validation commands, and any deliberate scope difference.
+4. Inspect the created PR with `gh pr view --json number,url,state,headRefName,baseRefName`
+   and wait for required checks with `gh pr checks --watch`. If the repository
+   has no checks, record that fact in the handoff; never treat an unobserved
+   check state as a passing result.
+5. Merge only the reviewed PR with `gh pr merge --squash` after checks pass.
+   Do not use `--admin`, force-push, or bypass branch protection unless the
+   user explicitly authorizes it. Verify the result with
+   `gh pr view --json state,mergedAt,mergeCommit`.
+6. Refresh the checkout after the merge using `git switch main` followed by
+   `git pull --ff-only origin main`, then run `git status -sb`. Report any
+   remaining changes; do not delete or hide them to manufacture a clean state.
+
+When a PR is required, do not stop after pushing a branch: the PR URL, check
+result, merge result, and refreshed `main` status are all part of completion.
+
 ## Spec lifecycle
 
 1. Next unimplemented spec = lowest-numbered `spec-NNN.md` still in `specs/` (not in `specs/implemented/`). Check `specs/README.md` for the status index.
