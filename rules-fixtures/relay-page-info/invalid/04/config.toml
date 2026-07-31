@@ -1,9 +1,0 @@
-schema = """
-        enum PageInfo
-        extend enum PageInfo {
-          hasPreviousPage
-          hasNextPage
-          startCursor
-          endCursor
-        }
-      """
