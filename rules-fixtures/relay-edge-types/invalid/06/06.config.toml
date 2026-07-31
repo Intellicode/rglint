@@ -1,8 +1,6 @@
+kind = "schema"
 schema = """
-        interface Node {
-          id: ID!
-        }
-        type User implements Node {
+        type User {
           id: ID!
         }
         type AEdge {

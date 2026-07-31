@@ -1,3 +1,4 @@
+kind = "schema"
 schema = """
         type PageInfo
         type BConnection

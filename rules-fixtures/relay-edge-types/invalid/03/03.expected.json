@@ -1,0 +1,1 @@
+{"errors":[{"column":10,"line":3,"message":"Field `node` must return either a Scalar, Enum, Object, Interface, Union, or a non-null wrapper around one of those types.","rule":"relay-edge-types"},{"column":10,"line":4,"message":"Field `cursor` must return either a String, Scalar, or a non-null wrapper wrapper around one of those types.","rule":"relay-edge-types"}]}
