@@ -1,0 +1,10 @@
+directive @oneOf(label: String) on INPUT_OBJECT
+
+input Foo @oneOf(label: "fixture") {
+  a: String
+  b: Int
+}
+
+input Bar {
+  a: String
+}
