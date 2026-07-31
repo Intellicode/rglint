@@ -1,0 +1,10 @@
+type User {
+  posts(
+    after: String!
+    first: Int!
+    before: Float
+    last: Int
+  ): PostConnection
+}
+type PostConnection { marker: String }
+type Query { marker: String }

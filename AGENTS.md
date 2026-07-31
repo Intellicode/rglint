@@ -32,12 +32,16 @@ colliding branch.
 1. Next unimplemented spec = lowest-numbered `spec-NNN.md` still in `specs/` (not in `specs/implemented/`). Check `specs/README.md` for the status index.
 2. Before creating the implementation branch, switch to `main` and fast-forward it from `origin/main`; do not branch from a stale local default branch.
 3. Read the spec, understand dependencies (they state which prior specs must be done).
-4. Check `rules-fixtures/<rule-id>/` — if fixtures already exist, they are the ground truth. The spec text may be stale or simplified; always match the fixture `expected.json` messages and the original graphql-eslint source linked in `manifest.json`. If a fixture has placeholder messages like `"<unknown>"`, verify the upstream graphql-eslint snapshot/source and replace the placeholders with exact messages before treating the fixture as parity-complete. If fixture source files lack a `.graphql`/`.gql` extension, rename them (extensionless files won't be found by the harness).
+4. Check `rules-fixtures/<rule-id>/` — if fixtures already exist, they are the ground truth. The spec text may be stale or simplified; always match the fixture `expected.json` messages and the original graphql-eslint source linked in `manifest.json`. If a fixture has placeholder messages like `"<unknown>"`, verify the upstream graphql-eslint snapshot/source and replace the placeholders with exact messages before treating the fixture as parity-complete. New fixtures must use the canonical `NN.graphql`/`NN.gql` names; the harness still accepts legacy extensionless names for compatibility, so do not use that compatibility path for new work.
    - When upstream injects helper schema through parser options, keep local fixtures self-contained by appending helper SDL after the upstream snippet whenever possible. That preserves upstream line/column offsets for diagnostics that point inside the snippet.
 5. Implement per the spec's Deliverables (amended by fixture reality if applicable).
 6. Move `specs/spec-NNN.md` → `specs/implemented/spec-NNN.md`.
 7. Update `specs/README.md`: fix the link path (add `implemented/` prefix) and change status to `[x]`.
-8. Build, clippy, and test before committing: `cargo build && cargo clippy && cargo test`.
+8. Run formatting, build, clippy, and tests before committing. Start with
+   `cargo fmt --check`; if the clean baseline is not formatter-clean, run
+   `rustfmt --check` only on touched Rust files and record that baseline
+   limitation, then run `cargo build`, `cargo clippy`, and `cargo test` as
+   separate commands so the first failure is unambiguous.
 
 ### Upstream parity and handoff checklist
 
@@ -68,16 +72,22 @@ colliding branch.
 
 ### Fixture validation checklist
 
-- Use the full suffixes `NN.graphql`/`NN.gql`, `NN.config.toml`, and `NN.expected.json`; extensionless legacy names are not discovered by the current harness.
+- Use the full suffixes `NN.graphql`/`NN.gql`, `NN.config.toml`, and `NN.expected.json`. Extensionless legacy names remain readable for old fixtures, but are not an acceptable format for new or modified cases.
 - Do not leave a placeholder manifest with zero cases for an implemented rule:
   every manifest case must have a matching directory, and its counts must
   equal the discovered valid/invalid directories.
+- Keep `manifest.json` reviewable: record the immutable upstream revision used
+  for parity, list every case, and update counts in the same change as fixture
+  additions or removals. Do not use `loose_message` to avoid resolving a
+  message mismatch.
 - A rule declaring `requires_schema = true` must have `schema = ...` or `schema_path = ...` in every operation fixture, or use `kind = "schema"` for schema fixtures. Otherwise the engine intentionally skips the rule and a passing fixture can be false confidence.
 - For operation fixtures, put fragments in the main source or declare them through `sibling_documents`. The `documents = ...` helper is only consumed for `kind = "schema"` fixtures.
 - Give sibling files stable, case-specific names when a diagnostic includes a
   path; expected messages must use the same rendered path as the upstream
   rule, not an absolute temporary path.
-- Run the new rule's focused parity test before the workspace checks so fixture, message, and location mismatches are isolated from unrelated failures.
+- Run the applicable formatting check and the new rule's focused parity test
+  before the workspace checks so formatting, fixture, message, and location
+  mismatches are isolated from unrelated failures.
 
 For shared helper specs without a rule harness, use a checked-in SDL fixture
 loaded with `include_str!` and unit-test the public helpers directly. Cover

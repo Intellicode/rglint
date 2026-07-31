@@ -1,0 +1,6 @@
+scalar Cursor
+type User {
+  posts(after: Cursor, first: Int, before: ID, last: Int): PostConnection
+}
+type PostConnection { marker: String }
+type Query { marker: String }

@@ -1,0 +1,11 @@
+type User {
+  posts: PostConnection
+  comments(
+    after: [String!]!
+    first: Float
+    before: Query
+    last: [PostConnection]
+  ): PostConnection
+}
+type PostConnection { marker: String }
+type Query { marker: String }

@@ -1,0 +1,1 @@
+{"errors":[{"column":2,"line":2,"message":"Field `posts` must contain an argument `last`, that return Int.","rule":"relay-arguments"}]}
