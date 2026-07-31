@@ -1,0 +1,8 @@
+type AConnection {
+  edges: AEdge
+  pageInfo: PageInfo!
+}
+type BConnection {
+  edges: BEdge!
+  pageInfo: PageInfo!
+}

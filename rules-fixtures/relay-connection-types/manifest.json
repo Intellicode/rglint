@@ -1,69 +1,19 @@
 {
   "source": "rules/relay-connection-types/index.test.ts",
-  "source_hash": "b95bd638f7f7fbe2",
+  "source_revision": "f0f200ef0b030cb8a905bbcb32fe346b87cc2e24",
   "rule": "relay-connection-types",
   "valid_count": 4,
   "invalid_count": 6,
   "cases": [
-    {
-      "kind": "valid",
-      "id": "01",
-      "hash": "0752c6d30c60241c",
-      "line": 6
-    },
-    {
-      "kind": "valid",
-      "id": "02",
-      "hash": "ef678ff09ee54e32",
-      "line": 15
-    },
-    {
-      "kind": "valid",
-      "id": "03",
-      "hash": "138b0c21e4413fb2",
-      "line": 36
-    },
-    {
-      "kind": "valid",
-      "id": "04",
-      "hash": "0c4fb1bbf2a80f2a",
-      "line": 42
-    },
-    {
-      "kind": "invalid",
-      "id": "01",
-      "hash": "17d4511ec7473886",
-      "line": 50
-    },
-    {
-      "kind": "invalid",
-      "id": "02",
-      "hash": "51d74022b729079d",
-      "line": 73
-    },
-    {
-      "kind": "invalid",
-      "id": "03",
-      "hash": "f198ea7ff0142f9b",
-      "line": 83
-    },
-    {
-      "kind": "invalid",
-      "id": "04",
-      "hash": "0b2af37853e045bb",
-      "line": 88
-    },
-    {
-      "kind": "invalid",
-      "id": "05",
-      "hash": "f1677c9cea18b4fe",
-      "line": 93
-    },
-    {
-      "kind": "invalid",
-      "id": "06",
-      "hash": "8fdfbec892ecd3e5",
-      "line": 107
-    }
+    "valid/01",
+    "valid/02",
+    "valid/03",
+    "valid/04",
+    "invalid/01",
+    "invalid/02",
+    "invalid/03",
+    "invalid/04",
+    "invalid/05",
+    "invalid/06"
   ]
 }

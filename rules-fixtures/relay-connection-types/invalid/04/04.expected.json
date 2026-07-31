@@ -1,0 +1,1 @@
+{"errors":[{"column":5,"line":1,"message":"Connection type must contain a field `pageInfo` that return a non-null `PageInfo` Object type.","rule":"relay-connection-types"}]}
