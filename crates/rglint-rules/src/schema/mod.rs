@@ -24,5 +24,6 @@ pub mod require_nullable_result_in_root;
 pub mod require_selections;
 pub mod relay_arguments;
 pub mod relay_connection_types;
+pub mod relay_edge_types;
 pub mod strict_id_in_types;
 pub mod unique_enum_value_names;

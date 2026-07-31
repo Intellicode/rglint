@@ -96,7 +96,7 @@ of work (a few hours to ~2 days) and declares its dependencies on prior specs.
 | [spec-044](implemented/spec-044.md) | shared/relay.rs predicates | `[x]` |
 | [spec-045](implemented/spec-045.md) | relay-arguments | `[x]` |
 | [spec-046](implemented/spec-046.md) | relay-connection-types | `[x]` |
-| [spec-047](spec-047.md) | relay-edge-types | `[ ]` |
+| [spec-047](implemented/spec-047.md) | relay-edge-types | `[x]` |
 | [spec-048](spec-048.md) | relay-page-info | `[ ]` |
 
 ### Phase 6 — oneOf + remaining

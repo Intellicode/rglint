@@ -1,0 +1,1 @@
+{"errors":[{"column":13,"line":2,"message":"Edge type must have \"Edge\" suffix.","rule":"relay-edge-types"}]}

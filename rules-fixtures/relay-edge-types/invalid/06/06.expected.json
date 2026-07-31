@@ -1,0 +1,1 @@
+{"errors":[{"column":13,"line":4,"message":"Edge type's field `node` must implement `Node` interface.","rule":"relay-edge-types"}]}

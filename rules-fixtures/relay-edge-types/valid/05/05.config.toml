@@ -1,8 +1,8 @@
+kind = "schema"
 schema = """
-        scalar Email
         type AEdge {
-          node: Email!
-          cursor: Email!
+          node: Int!
+          cursor: String!
         }
         type AConnection {
           edges: [AEdge]

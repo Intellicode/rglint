@@ -83,6 +83,12 @@ result, merge result, and refreshed `main` status are all part of completion.
 - Pin the parity record to an immutable upstream commit, tag, or snapshot date;
   a `master`/`main` URL alone is not sufficient because rule wording and tests
   can change after implementation.
+- When the upstream repository is the parity authority, fetch the pinned
+  source and tests through `gh api` (or an equivalent immutable raw endpoint)
+  when possible, and record the same revision in the fixture manifest. If the
+  pinned revision cannot be reached, stop before implementing guessed
+  diagnostics; do not silently substitute a moving branch or leave fixture
+  messages as placeholders.
 - When porting shared helpers, prefer the engine's canonical semantic model
   over a source-language AST type that cannot represent merged schema
   extensions. Keep the public Rust API borrow-based, document the adaptation in
