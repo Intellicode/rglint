@@ -1,0 +1,1 @@
+{"errors":[{"column":0,"line":1,"message":"The server must provide a `PageInfo` object.","rule":"relay-page-info"}]}

@@ -1,0 +1,1 @@
+{"errors":[{"column":14,"line":1,"message":"`PageInfo` must be an Object type.","rule":"relay-page-info"},{"column":21,"line":2,"message":"`PageInfo` must be an Object type.","rule":"relay-page-info"}]}

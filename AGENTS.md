@@ -122,6 +122,21 @@ result, merge result, and refreshed `main` status are all part of completion.
   before the workspace checks so formatting, fixture, message, and location
   mismatches are isolated from unrelated failures.
 
+### Fixture source ownership and false-confidence guard
+
+- Schema-rule fixtures must set `kind = "schema"`; this makes the fixture's
+  `.graphql`/`.gql` source the schema input and avoids executable-document
+  parse errors or duplicate diagnostics caused by loading the same SDL through
+  both `schema = ...` and an operation document.
+- Operation-rule fixtures must keep executable source in the main document and
+  declare the SDL separately with `schema = ...` or `schema_path = ...`.
+- When a rule intentionally compares a local definition against a merged
+  schema (especially type extensions), document that source-ownership decision
+  in the spec and add a fixture that would fail if the implementation only
+  inspected the merged schema. This prevents a green fixture from masking a
+  mismatch between upstream AST visitor behavior and the engine's semantic
+  model.
+
 For shared helper specs without a rule harness, use a checked-in SDL fixture
 loaded with `include_str!` and unit-test the public helpers directly. Cover
 valid and structurally incomplete types, cross-type resolution, and the

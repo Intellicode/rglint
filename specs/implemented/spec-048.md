@@ -9,9 +9,14 @@ fields with correct types: `hasNextPage: Boolean!`, `hasPreviousPage:
 Boolean!`, `startCursor: String`, `endCursor: String` (cursors nullable per
 spec).
 
-## Source
+## Pinned parity source
 
-`packages/plugin/src/rules/relay-page-info/index.ts`
+Parity was checked against graphql-eslint commit
+`f0f200ef0b030cb8a905bbcb32fe346b87cc2e24` (2026-07-30):
+
+- [Rule source](https://github.com/graphql-hive/graphql-eslint/blob/f0f200ef0b030cb8a905bbcb32fe346b87cc2e24/packages/plugin/src/rules/relay-page-info/index.ts)
+- [Rule tests](https://github.com/graphql-hive/graphql-eslint/blob/f0f200ef0b030cb8a905bbcb32fe346b87cc2e24/packages/plugin/src/rules/relay-page-info/index.test.ts)
+- [Parity snapshot](https://github.com/graphql-hive/graphql-eslint/blob/f0f200ef0b030cb8a905bbcb32fe346b87cc2e24/packages/plugin/src/rules/relay-page-info/snapshot.md)
 
 ## Scope
 
@@ -22,6 +27,10 @@ spec).
   with the exact type (nullable/non-null per graphql-eslint's spec).
 - Report missing/mistyped fields.
 - `requires_schema: true`.
+- The Rust port accepts the shared Relay `pageInfoName` option; the pinned
+  upstream rule currently hardcodes `PageInfo`, so the default behavior and
+  diagnostics remain byte-identical while custom naming is a deliberate Rust
+  extension.
 
 **Out of scope:**
 
@@ -50,6 +59,18 @@ struct Opts { /* RelayOpts passthrough (pageInfoName) */ }
 - `startCursor` / `endCursor` must be `String` (nullable per Relay spec —
   confirm graphql-eslint enforces nullable, not non-null).
 - Reports at the PageInfo type's span (or the field's — confirm).
+
+Exact default diagnostics:
+
+- `The server must provide a \`PageInfo\` object.`
+- `\`PageInfo\` must be an Object type.`
+- `\`PageInfo\` must contain a field \`FIELD\`, that return TYPE.`
+- `Field \`FIELD\` must return TYPE.`
+
+The base `type PageInfo` definition is checked using fields declared in that
+definition. Schema extensions remain visible for type resolution but do not
+silently make a base definition satisfy fields that the upstream AST visitor
+reports as missing.
 
 ## Testing
 
