@@ -1,0 +1,1 @@
+{"errors":[{"column":27,"line":1,"message":"Input \"hello\" should be named \"input\" for \"Mutation.SetMessage\"","rule":"input-name"}]}

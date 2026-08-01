@@ -1,0 +1,1 @@
+{"errors":[{"column":27,"line":1,"message":"Input \"record\" should be named \"input\" for \"Mutation.userCreate\"","rule":"input-name"},{"column":35,"line":1,"message":"Input type `CreateOneUserInput` name should be `userCreateInput`.","rule":"input-name"}]}
