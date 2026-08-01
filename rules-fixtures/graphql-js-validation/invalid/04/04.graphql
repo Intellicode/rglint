@@ -1,0 +1,2 @@
+{ user { id } }
+query Named { user { id } }

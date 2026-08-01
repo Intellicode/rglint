@@ -152,6 +152,25 @@ result, merge result, and refreshed `main` status are all part of completion.
   mismatch between upstream AST visitor behavior and the engine's semantic
   model.
 
+### Validation bridges and multi-entry runners
+
+- When a dependency reports both syntax/build and semantic validation errors
+  through one collection, classify them before translating diagnostics. Syntax
+  errors belong to the engine's parse-error channel; stable semantic error
+  codes belong to the mapped rule bridge. Do not emit both for one underlying
+  failure, and do not infer a rule id from localized message text.
+- Pin the dependency version and record every deliberate mapping gap. If the
+  dependency exposes a rule id but no stable diagnostic code, keep the public
+  entry only when configuration compatibility is required and document that it
+  is inactive until a structured adapter exists.
+- For a family of rule entries backed by one runner, register one entry per
+  configured id and run focused fixtures with the specific id enabled. Avoid a
+  synthetic umbrella rule: the engine must stamp the actual rule id so
+  enable/disable filtering and fixture ownership are exercised.
+- A shared runner that appends sibling sources must preserve the current
+  source's original byte range and report only diagnostics owned by that
+  source. Add a cross-file fixture when sibling context affects validation.
+
 ### Schema category versus schema precondition
 
 - Keep `category = "schema"` and `requires_schema` metadata separate: the

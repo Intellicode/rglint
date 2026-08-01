@@ -1,0 +1,2 @@
+fragment AdminFields on Admin { id }
+query GetUser { user { ...AdminFields } }

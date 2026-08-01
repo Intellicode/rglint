@@ -1,0 +1,1 @@
+{"errors":[{"rule":"known-argument-names","message":"Unknown argument \"unknown\" on field \"Query.user\".","line":1,"column":21}]}

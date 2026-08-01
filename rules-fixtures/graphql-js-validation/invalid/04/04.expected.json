@@ -1,0 +1,1 @@
+{"errors":[{"rule":"lone-anonymous-operation","message":"This anonymous operation must be the only defined operation.","line":1,"column":0}]}

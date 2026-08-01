@@ -1,0 +1,1 @@
+{"errors":[{"rule":"possible-fragment-spread","message":"Fragment \"AdminFields\" cannot be spread here as objects of type \"User\" can never be of type \"Admin\".","line":2,"column":23}]}

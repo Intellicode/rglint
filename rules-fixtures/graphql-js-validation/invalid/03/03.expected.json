@@ -1,0 +1,1 @@
+{"errors":[{"rule":"no-unused-variables","message":"Variable \"$unused\" is never used.","line":1,"column":14}]}

@@ -1,0 +1,1 @@
+{"errors":[{"rule":"scalar-leafs","message":"Field \"user\" of type \"User\" must have a selection of subfields.","line":1,"column":16}]}

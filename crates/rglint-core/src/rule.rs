@@ -210,6 +210,7 @@ impl std::fmt::Debug for RuleMeta {
 /// A static registry record describing how to instantiate a rule and which AST
 /// kinds it wants to be visited for. Aggregated into [`ALL_RULES`] by the
 /// `linkme` distributed slice on every `#[derive(Rule)]` submission.
+#[derive(Copy, Clone)]
 pub struct RuleEntry {
     /// The rule's static metadata.
     pub meta: &'static RuleMeta,

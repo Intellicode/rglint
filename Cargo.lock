@@ -1379,7 +1379,11 @@ name = "rglint-graphql-spec"
 version = "0.1.0"
 dependencies = [
  "apollo-compiler",
+ "linkme",
  "rglint-core",
+ "rglint-test-harness",
+ "serde_json",
+ "tracing",
 ]
 
 [[package]]

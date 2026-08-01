@@ -1,0 +1,1 @@
+query GetUser($unused: ID) { user { id } }

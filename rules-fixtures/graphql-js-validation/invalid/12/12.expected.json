@@ -1,0 +1,1 @@
+{"errors":[{"rule":"unique-variable-names","message":"There can be only one variable named \"$id\".","line":1,"column":23}]}

@@ -1,0 +1,23 @@
+{
+  "source": "packages/plugin/src/rules/graphql-js-validation.ts",
+  "upstream_revision": "241936acfebef3e6201703e483776d3f952a6f0f",
+  "rule": "graphql-js-validation",
+  "valid_count": 2,
+  "invalid_count": 12,
+  "cases": [
+    { "kind": "valid", "id": "01" },
+    { "kind": "valid", "id": "02" },
+    { "kind": "invalid", "id": "01", "rule": "fields-on-correct-type" },
+    { "kind": "invalid", "id": "02", "rule": "known-argument-names" },
+    { "kind": "invalid", "id": "03", "rule": "no-unused-variables" },
+    { "kind": "invalid", "id": "04", "rule": "lone-anonymous-operation" },
+    { "kind": "invalid", "id": "05", "rule": "no-fragment-cycles" },
+    { "kind": "invalid", "id": "06", "rule": "scalar-leafs" },
+    { "kind": "invalid", "id": "07", "rule": "variables-in-allowed-position" },
+    { "kind": "invalid", "id": "08", "rule": "value-literals-of-correct-type" },
+    { "kind": "invalid", "id": "09", "rule": "known-fragment-names" },
+    { "kind": "invalid", "id": "10", "rule": "possible-fragment-spread" },
+    { "kind": "invalid", "id": "11", "rule": "provided-required-arguments" },
+    { "kind": "invalid", "id": "12", "rule": "unique-variable-names" }
+  ]
+}
