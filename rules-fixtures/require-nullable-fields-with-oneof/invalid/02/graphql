@@ -1,5 +1,0 @@
-        type Type @oneOf {
-          foo: String!
-          bar: Int
-        }
-      

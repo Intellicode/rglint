@@ -114,6 +114,11 @@ result, merge result, and refreshed `main` status are all part of completion.
   additions or removals. Do not use `loose_message` to avoid resolving a
   message mismatch.
 - A rule declaring `requires_schema = true` must have `schema = ...` or `schema_path = ...` in every operation fixture, or use `kind = "schema"` for schema fixtures. Otherwise the engine intentionally skips the rule and a passing fixture can be false confidence.
+- Schema fixtures that use custom directives must declare those directives in the
+  fixture SDL, including every directive location exercised by the case. The
+  schema loader validates the complete SDL before the rule runs, so relying on
+  an unknown-directive parser fallback can turn an intended diagnostic into a
+  schema-load failure (or make a valid case appear to pass without dispatch).
 - For operation fixtures, put fragments in the main source or declare them through `sibling_documents`. The `documents = ...` helper is only consumed for `kind = "schema"` fixtures.
 - Give sibling files stable, case-specific names when a diagnostic includes a
   path; expected messages must use the same rendered path as the upstream
