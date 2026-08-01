@@ -72,6 +72,16 @@ result, merge result, and refreshed `main` status are all part of completion.
 
 ### Upstream parity and handoff checklist
 
+- **Spec correction protocol.** Treat the pinned upstream source and tests as
+  the behavioral authority when they disagree with a draft spec. Before
+  coding, update the spec's Goal/Scope/Behavior sections to describe the
+  verified behavior, preserve the immutable revision and source/test links,
+  and call out any deliberate scope difference. Keep the fixture manifest's
+  `source`, `upstream_revision`, case list, and counts aligned with that
+  corrected contract. The PR body must summarize the correction so reviewers
+  do not have to infer why the implementation differs from the original
+  wording.
+
 - Inspect the upstream graphql-eslint rule **and its tests** before implementing
   a port. Copy exact diagnostic wording, report-node location, rule metadata
   (`requires_schema`, `requires_siblings`, `has_suggestions`), and suggestion

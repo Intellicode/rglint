@@ -1,0 +1,9 @@
+directive @oneOf on OBJECT
+
+input I {
+  notok: Ok
+  err: Error
+}
+
+type Ok
+type Error

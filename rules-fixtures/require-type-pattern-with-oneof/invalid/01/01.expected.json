@@ -1,0 +1,1 @@
+{"errors":[{"column":5,"line":3,"message":"type \"T\" is defined as output with \"@oneOf\" and must be defined with \"ok\" field","rule":"require-type-pattern-with-oneof"}]}
