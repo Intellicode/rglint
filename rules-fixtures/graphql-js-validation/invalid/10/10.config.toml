@@ -1,0 +1,2 @@
+schema = "type Query { user: User } type User { id: ID } type Admin { id: ID }"
+loose_message = true

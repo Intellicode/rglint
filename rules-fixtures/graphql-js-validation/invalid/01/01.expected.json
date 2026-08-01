@@ -1,0 +1,1 @@
+{"errors":[{"rule":"fields-on-correct-type","message":"Cannot query field \"missing\" on type \"User\".","line":1,"column":23}]}

@@ -35,18 +35,18 @@
 //! *spec validation* is **not** run here (spec-053 owns that), matching the
 //! spec-004 contract that a `LoadedSchema::compiler` is parsed but not
 //! validated. If the schema happens to be spec-valid (the common case), nothing
-//! changes; if it is not, only the build-time checks apollo-compiler runs *with*
-//! the schema fire (e.g. `UndefinedField`), which we route as `parse-error`.
+//! changes; named semantic diagnostics such as `UndefinedField` are left for
+//! spec-053 rather than being duplicated as `parse-error`.
 //!
 //! ## Parse-error routing
 //!
-//! apollo-compiler's executable builder collects every parse-time /
-//! build-time diagnostic (SyntaxError, ParserLimit, BuildError) into a
-//! [`DiagnosticList`], which we translate to engine [`Diagnostic`]s with
-//! `rule_id = "parse-error"` (reusing the constant defined by spec-004 in
-//! [`schema`][crate::schema]). Spec validation is **not** run here (spec-053
-//! owns that). A per-file document with parse errors is *still* returned
-//! (partial document), mirroring the error-resilience mandate of PLAN §1.
+//! apollo-compiler's executable builder collects syntax and semantic
+//! diagnostics into a [`DiagnosticList`]. Diagnostics with Apollo's stable
+//! `unstable_error_name` are intentionally excluded here and translated by
+//! spec-053 into their configured graphql-eslint rule id. Syntax and unnamed
+//! diagnostics become `parse-error` (reusing the constant defined by spec-004
+//! in [`schema`][crate::schema]). A per-file document with parse errors is
+//! still returned (partial document), mirroring PLAN §1.
 
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -250,6 +250,13 @@ fn translate_parse_errors(
     let fallback_span = Span::new(0, 0);
     let mut out = Vec::new();
     for diag in errors.iter() {
+        // Apollo's executable builder reports semantic validation failures
+        // (for example UndefinedField) through the same DiagnosticList as
+        // syntax errors. Leave those to spec-053 so enabling a GraphQL spec
+        // rule does not produce a duplicate `parse-error` diagnostic.
+        if diag.error.unstable_error_name().is_some() {
+            continue;
+        }
         let message = diag.error.to_string();
         let span = match diag.error.location() {
             Some(loc) => {
@@ -641,9 +648,9 @@ mod tests {
     }
 
     #[test]
-    fn schema_aware_parse_reports_undefined_field_as_parse_error() {
+    fn schema_aware_parse_leaves_undefined_field_to_spec_bridge() {
         // An operation selecting a non-existent field with a schema present
-        // produces a build diagnostic that we route under `parse-error`.
+        // produces a semantic diagnostic that spec-053 owns.
         let schema_src = "type Query { user: User } type User { id: ID! }";
         let schema = Schema::parse_and_validate(schema_src, "schema.graphql").unwrap();
 
@@ -657,10 +664,9 @@ mod tests {
             .expect("schema-aware load still succeeds");
         let doc = &loaded.docs[0];
         assert!(
-            !doc.parse_errors.is_empty(),
-            "an undefined field against a provided schema must surface a parsed/build error"
+            doc.parse_errors.is_empty(),
+            "semantic validation is owned by the graphql-spec bridge"
         );
-        assert_eq!(doc.parse_errors[0].rule_id, PARSE_ERROR_RULE_ID);
     }
 
     #[test]

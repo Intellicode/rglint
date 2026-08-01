@@ -1,0 +1,1 @@
+{"errors":[{"rule":"variables-in-allowed-position","message":"Variable \"$id\" of type \"String\" used in position expecting type \"ID!\".","line":1,"column":34}]}

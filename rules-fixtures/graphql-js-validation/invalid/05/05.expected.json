@@ -1,0 +1,1 @@
+{"errors":[{"rule":"no-fragment-cycles","message":"Cannot spread fragment \"A\" within itself.","line":1,"column":0}]}

@@ -1,0 +1,1 @@
+{"errors":[{"rule":"value-literals-of-correct-type","message":"Int cannot represent non-integer value: \"wrong\"","line":1,"column":25}]}

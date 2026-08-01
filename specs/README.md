@@ -112,7 +112,7 @@ of work (a few hours to ~2 days) and declares its dependencies on prior specs.
 
 | Spec | Title | Status |
 |------|-------|--------|
-| [spec-053](spec-053.md) | rglint-graphql-spec bridge | `[ ]` |
+| [spec-053](implemented/spec-053.md) | rglint-graphql-spec bridge | `[x]` |
 
 ### Phase 8 — Config + CLI
 

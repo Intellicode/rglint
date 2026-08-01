@@ -8,3 +8,9 @@ repository.workspace = true
 [dependencies]
 rglint-core = { path = "../rglint-core" }
 apollo-compiler.workspace = true
+linkme.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+rglint-test-harness = { path = "../rglint-test-harness" }
+serde_json.workspace = true
