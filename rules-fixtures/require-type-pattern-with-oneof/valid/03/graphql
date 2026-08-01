@@ -1,5 +1,0 @@
-        input I {
-          notok: Ok
-          err: Error
-        }
-      

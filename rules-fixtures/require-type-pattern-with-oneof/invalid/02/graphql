@@ -1,5 +1,0 @@
-        type T @oneOf {
-          ok: Ok
-          err: Error
-        }
-      

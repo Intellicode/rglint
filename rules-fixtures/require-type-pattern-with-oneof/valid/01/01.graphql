@@ -1,0 +1,9 @@
+directive @oneOf on OBJECT
+
+type T @oneOf {
+  ok: Ok
+  error: Error
+}
+
+type Ok
+type Error

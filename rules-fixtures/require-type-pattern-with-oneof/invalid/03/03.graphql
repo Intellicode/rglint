@@ -1,0 +1,12 @@
+directive @oneOf on OBJECT
+
+type T @oneOf {
+  ok: Ok
+}
+
+extend type T {
+  error: Error
+}
+
+type Ok
+type Error

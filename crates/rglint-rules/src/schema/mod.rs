@@ -22,6 +22,7 @@ pub mod require_description;
 pub mod require_field_of_type_query_in_mutation_result;
 pub mod require_nullable_result_in_root;
 pub mod require_nullable_fields_with_oneof;
+pub mod require_type_pattern_with_oneof;
 pub mod require_selections;
 pub mod relay_arguments;
 pub mod relay_connection_types;

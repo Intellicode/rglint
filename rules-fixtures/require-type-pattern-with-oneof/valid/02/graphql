@@ -1,5 +1,0 @@
-        type T {
-          notok: Ok
-          err: Error
-        }
-      
