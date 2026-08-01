@@ -1,33 +1,14 @@
 {
   "source": "rules/require-nullable-fields-with-oneof/index.test.ts",
   "source_hash": "eff6c9b6b1c43746",
+  "upstream_revision": "f0f200ef0b030cb8a905bbcb32fe346b87cc2e24",
   "rule": "require-nullable-fields-with-oneof",
   "valid_count": 2,
   "invalid_count": 2,
   "cases": [
-    {
-      "kind": "valid",
-      "id": "01",
-      "hash": "8836f4ed3e2d58ba",
-      "line": 6
-    },
-    {
-      "kind": "valid",
-      "id": "02",
-      "hash": "52deda1c066771d8",
-      "line": 12
-    },
-    {
-      "kind": "invalid",
-      "id": "01",
-      "hash": "4950844c0ead8ce6",
-      "line": 20
-    },
-    {
-      "kind": "invalid",
-      "id": "02",
-      "hash": "fd6affb5c27a94b5",
-      "line": 30
-    }
+    {"kind": "valid", "id": "01", "hash": "8836f4ed3e2d58ba", "line": 6},
+    {"kind": "valid", "id": "02", "hash": "52deda1c066771d8", "line": 12},
+    {"kind": "invalid", "id": "01", "hash": "4950844c0ead8ce6", "line": 20},
+    {"kind": "invalid", "id": "02", "hash": "fd6affb5c27a94b5", "line": 30}
   ]
 }

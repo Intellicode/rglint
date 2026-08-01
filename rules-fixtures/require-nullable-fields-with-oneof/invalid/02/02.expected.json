@@ -1,0 +1,1 @@
+{"errors":[{"column":2,"line":4,"message":"field \"foo\" in type \"Type\" must be nullable when \"@oneOf\" is in use","rule":"require-nullable-fields-with-oneof"}]}

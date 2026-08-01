@@ -1,0 +1,6 @@
+directive @oneOf on INPUT_OBJECT | OBJECT
+
+type User @oneOf {
+  foo: String
+  bar: [Int!]
+}
