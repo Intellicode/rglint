@@ -1,6 +1,7 @@
 {
   "source": "rules/input-name/index.test.ts",
   "source_hash": "6f9a3b0f530c9ef2",
+  "upstream_revision": "89ec798db4b78fb872078b1ce7e6046856b704fe",
   "rule": "input-name",
   "valid_count": 14,
   "invalid_count": 12,

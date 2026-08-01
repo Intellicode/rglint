@@ -1,0 +1,1 @@
+{"errors":[{"column":28,"line":1,"message":"Input type `GetUserInput` name should be `getUserInput`.","rule":"input-name"}]}

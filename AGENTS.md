@@ -152,6 +152,22 @@ result, merge result, and refreshed `main` status are all part of completion.
   mismatch between upstream AST visitor behavior and the engine's semantic
   model.
 
+### Schema category versus schema precondition
+
+- Keep `category = "schema"` and `requires_schema` metadata separate: the
+  category controls which SDL/CST inputs the rule visits, while
+  `requires_schema` controls whether the engine skips it when no compiled
+  schema is available. A schema-category rule with `requires_schema = false`
+  still needs `kind = "schema"` fixtures so its SDL source is dispatched, but
+  its fixtures must not add a redundant `schema = ...` merely to force
+  execution.
+- When a schema fixture needs helper SDL to satisfy the loader (for example,
+  because the upstream snippet references a type that is irrelevant to the
+  rule), append the smallest self-contained helper definitions after the
+  upstream snippet. Do not prepend or interleave helpers, because that changes
+  the line/column offsets used for parity. Record this source-ownership
+  decision in the spec when it is material to the rule's behavior.
+
 For shared helper specs without a rule harness, use a checked-in SDL fixture
 loaded with `include_str!` and unit-test the public helpers directly. Cover
 valid and structurally incomplete types, cross-type resolution, and the

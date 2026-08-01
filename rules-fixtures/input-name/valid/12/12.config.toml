@@ -1,0 +1,5 @@
+kind = "schema"
+
+[options]
+checkInputType = false
+checkMutations = true

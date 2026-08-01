@@ -106,7 +106,7 @@ of work (a few hours to ~2 days) and declares its dependencies on prior specs.
 | [spec-049](implemented/spec-049.md) | shared/oneof.rs helpers | `[x]` |
 | [spec-050](implemented/spec-050.md) | require-nullable-fields-with-oneof | `[x]` |
 | [spec-051](implemented/spec-051.md) | require-type-pattern-with-oneof | `[x]` |
-| [spec-052](spec-052.md) | input-name | `[ ]` |
+| [spec-052](implemented/spec-052.md) | input-name | `[x]` |
 
 ### Phase 7 — Spec rules
 

@@ -7,6 +7,7 @@
 
 pub mod alphabetize;
 pub mod description_style;
+pub mod input_name;
 pub mod naming_convention;
 pub mod no_deprecated;
 pub mod no_duplicate_fields;
