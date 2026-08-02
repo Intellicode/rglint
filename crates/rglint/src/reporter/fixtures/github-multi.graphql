@@ -1,0 +1,4 @@
+query Example {
+  hero
+  villain
+}
