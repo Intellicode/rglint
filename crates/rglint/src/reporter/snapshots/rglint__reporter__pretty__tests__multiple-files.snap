@@ -1,0 +1,21 @@
+---
+source: crates/rglint/src/reporter/pretty.rs
+expression: "render(&[result(first, vec![first_diag]), result(second, vec![second_diag]),])"
+---
+first.graphql:
+first-rule
+
+  ⚠ First field is discouraged
+   ╭─[first.graphql]
+ 1 │ query First { hero }
+   ·               ────
+   ╰────
+second.graphql:
+second-rule
+
+  × Second field is invalid
+   ╭─[second.graphql]
+ 1 │ query Second { villain }
+   ·                ───────
+   ╰────
+✖ 2 problems (1 errors, 1 warnings)

@@ -139,6 +139,10 @@ pub struct ProjectLintResult {
     pub by_file: HashMap<PathBuf, Vec<Diagnostic>>,
     /// All diagnostics, sorted by `(file, line, column, rule_id)`.
     pub all: Vec<Diagnostic>,
+    /// Source text for every file that the engine visited, keyed by its
+    /// physical path. Reporters use this index to render snippets without
+    /// rereading files (and so inline sources remain renderable).
+    pub sources: HashMap<PathBuf, std::sync::Arc<SourceFile>>,
 }
 
 /// The lint engine: holds the compiled rule registry + resolved config
@@ -287,6 +291,7 @@ impl LintEngine {
             project_name: project.config.name.clone(),
             by_file,
             all,
+            sources: source_index,
         })
     }
 }

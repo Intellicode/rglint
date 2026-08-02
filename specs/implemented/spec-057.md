@@ -15,6 +15,8 @@ source snippets and `^^^` carets, powered by `miette`. This is the format
 - `reporter::pretty` — convert each `Diagnostic` into a `miette::Diagnostic`
   impl carrying: message, severity label, `LabeledSpan` (from `Diagnostic.span` +
   `SourceFile`), rule id as `code`, suggestions as `help` text.
+- `ProjectLintResult` retains a path-keyed source index so reporters render
+  inline and generated sources without rereading diagnostic paths from disk.
 - Render to a `String` (or `Write`) using `miette::GraphicalReportHandler` (or
   `GraphicalTheme`).
 - Aggregate per-file output with a file header and a summary line
@@ -61,6 +63,8 @@ impl Reporter for PrettyReporter { ... }
 - File paths rendered relative to CWD (absolute if outside).
 - Summary counts errors vs warnings by `Severity`.
 - `color: false` → plain text (for CI logs / piped output).
+- Empty results, zero-length spans, missing source entries, and writer failures
+  are handled without panics; writer failures are returned to the caller.
 
 ## Testing
 

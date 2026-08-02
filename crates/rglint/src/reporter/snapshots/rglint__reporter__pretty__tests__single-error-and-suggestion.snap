@@ -1,0 +1,34 @@
+---
+source: crates/rglint/src/reporter/pretty.rs
+expression: "render(&[result(source.clone(), vec![single, suggestion, multi_line]),])"
+---
+pretty.graphql:
+no-name
+
+  × Name is not allowed
+   ╭─[pretty.graphql]
+ 2 │   hero {
+ 3 │     name
+   ·     ────
+ 4 │   }
+   ╰────
+rename
+
+  ⚠ Use `fullName`
+   ╭─[pretty.graphql]
+ 2 │   hero {
+ 3 │     name
+   ·     ────
+ 4 │   }
+   ╰────
+  help: Rename the field
+balanced
+
+  × Selection must be balanced
+   ╭─[pretty.graphql]
+ 2 │       hero {
+ 3 │ ╭─▶     name
+ 4 │ ╰─▶   }
+ 5 │     }
+   ╰────
+✖ 3 problems (2 errors, 1 warnings)
