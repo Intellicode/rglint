@@ -252,6 +252,12 @@ pub enum ConfigError {
         /// Validation detail.
         message: String,
     },
+    /// One or more known rules have invalid JSON options.
+    #[error("invalid rule options: {errors:?}")]
+    InvalidRuleOptions {
+        /// All option validation failures found in the config.
+        errors: Vec<crate::validate::RuleOptionError>,
+    },
     /// A GraphQL config points at an HTTP schema, which the local resolver
     /// does not fetch yet.
     #[error(

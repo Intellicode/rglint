@@ -173,7 +173,10 @@ impl RuleMeta {
             .get_or_init(|| {
                 self.option_schema_src.and_then(|src| {
                     let schema: serde_json::Value = serde_json::from_str(src).ok()?;
-                    jsonschema::JSONSchema::compile(&schema).ok()
+                    jsonschema::JSONSchema::options()
+                        .with_draft(jsonschema::Draft::Draft202012)
+                        .compile(&schema)
+                        .ok()
                 })
             })
             .as_ref()

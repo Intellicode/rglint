@@ -120,7 +120,7 @@ of work (a few hours to ~2 days) and declares its dependencies on prior specs.
 |------|-------|--------|
 | [spec-054](implemented/spec-054.md) | Config loader (.rglintrc) | `[x]` |
 | [spec-055](implemented/spec-055.md) | GraphQL config (.graphqlrc) interop | `[x]` |
-| [spec-056](spec-056.md) | JSON-schema option validation | `[ ]` |
+| [spec-056](implemented/spec-056.md) | JSON-schema option validation | `[x]` |
 | [spec-057](spec-057.md) | Pretty reporter (miette) | `[ ]` |
 | [spec-058](spec-058.md) | JSON reporter | `[ ]` |
 | [spec-059](spec-059.md) | SARIF reporter | `[ ]` |
