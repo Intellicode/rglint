@@ -1,0 +1,9 @@
+---
+source: crates/rglint/src/reporter/github.rs
+expression: "render(GithubReporter::new(true),\n&[result(vec![first, second], vec![first_error, second_warning])])"
+---
+::warning file=a.graphql,line=3,col=3::no-villain: Villain is discouraged
+::error file=z.graphql,line=1,col=15,endLine=3,endColumn=8::no-hero: Hero is 100%25 discouraged%0Akeep out
+::group::Summary
+2 problems (1 errors, 1 warnings)
+::endgroup::

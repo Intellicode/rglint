@@ -4,6 +4,7 @@ use std::io::{self, Write};
 
 use rglint_core::ProjectLintResult;
 
+pub mod github;
 pub mod json;
 pub mod pretty;
 pub mod sarif;
@@ -14,6 +15,7 @@ pub trait Reporter {
     fn render(&self, results: &[ProjectLintResult], out: &mut dyn Write) -> io::Result<()>;
 }
 
+pub use github::GithubReporter;
 pub use json::JsonReporter;
 pub use pretty::PrettyReporter;
 pub use sarif::SarifReporter;

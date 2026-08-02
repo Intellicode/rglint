@@ -890,6 +890,15 @@ for line and column output. A reporter must remain total for empty results,
 zero-length spans, missing source entries, and writer errors; these cases
 should produce stable text or a returned I/O error, never a panic.
 
+For line-oriented workflow commands such as the GitHub annotations reporter,
+separate property escaping from message escaping. Escape command delimiters
+before writing user-controlled paths or messages, truncate before escaping, and
+never allow a raw carriage return or newline into an annotation command. Keep
+the coordinate convention explicit (including whether end coordinates are
+exclusive), use a documented relative-path root, and test literal `%`, CR/LF,
+commas, colons, multi-line spans, Unicode truncation, and long messages. Summary
+output must be opt-in and its counts must exclude `Severity::Off` diagnostics.
+
 ## Branch / PR workflow
 
 - Branch name: `spec-NNN`
