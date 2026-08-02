@@ -252,6 +252,19 @@ pub enum ConfigError {
         /// Validation detail.
         message: String,
     },
+    /// A GraphQL config points at an HTTP schema, which the local resolver
+    /// does not fetch yet.
+    #[error(
+        "HTTP schema documents not supported yet for project `{project}`: `{url}` in config `{path}`"
+    )]
+    UnsupportedRemoteSchema {
+        /// GraphQL config path.
+        path: PathBuf,
+        /// Project containing the remote schema.
+        project: String,
+        /// Unsupported URL.
+        url: String,
+    },
 }
 
 /// Search upward from `start` and return the closest config, checking names in

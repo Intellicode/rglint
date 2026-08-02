@@ -1,0 +1,14 @@
+# Mirrors the multi-project graphql-config shape used by the ecosystem.
+projects:
+  web:
+    schema: web/schema.graphqls
+    documents: web/**/*.graphql
+    exclude:
+      - web/generated/**
+  admin:
+    schema: admin/schema.graphqls
+    documents: admin/**/*.graphql
+    exclude: admin/generated/**
+extensions:
+  codegen:
+    generates: {}

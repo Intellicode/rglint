@@ -93,6 +93,28 @@ result, merge result, and refreshed `main` status are all part of completion.
   workspace checks. If `cargo fmt --check` fails on untouched baseline files,
   report that limitation and use `rustfmt --check` on the touched config files.
 
+### GraphQL config interoperability
+
+- Keep `.graphqlrc`/`.graphqlconfig` parsing in `rglint-config`; the core
+  engine consumes only the normalized `Config`/`ProjectConfig` model.
+- Support the common filename aliases with nearest-directory discovery and a
+  deterministic within-directory precedence. Treat top-level project maps as
+  named projects, preserve relative paths, and keep the rules map empty so the
+  default preset can be applied by its owning spec.
+- Reject remote schema URLs during config loading with a dedicated error that
+  includes the config path, project, and URL. Do not let an HTTP URL fall
+  through as a local glob and produce a misleading no-match error.
+- When the core resolver does not yet apply GraphQL config filters, record the
+  conversion boundary explicitly in the spec and tests: `exclude` is retained
+  as project ignore data and `include` can supply documents when `documents`
+  is absent; when both are present, preserve the explicit `documents` value
+  and document that the resolver still lacks include filtering. Do not
+  silently broaden a filter.
+- Add fixture-backed tests for multi-project YAML, legacy JSON, discovery
+  precedence, extension-key tolerance, and the remote-schema failure. Keep
+  the fixture paths relative so tests also verify config-directory resolution
+  remains the resolver's responsibility.
+
 ### Upstream parity and handoff checklist
 
 - **Spec correction protocol.** Treat the pinned upstream source and tests as
