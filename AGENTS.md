@@ -70,6 +70,29 @@ result, merge result, and refreshed `main` status are all part of completion.
    limitation, then run `cargo build`, `cargo clippy`, and `cargo test` as
    separate commands so the first failure is unambiguous.
 
+### Configuration loader conventions
+
+- Keep the file-facing serde model separate from the normalized engine model.
+  JSON/TOML spelling and rule tuples belong in `rglint-config::schema`; the
+  normalized `Config` owns named projects, resolved `Severity` values, and raw
+  JSON options. Do not make the core engine parse config-file syntax.
+- Preserve relative schema/document paths until `ProjectResolver` receives the
+  config file's directory. Config loading must not accidentally resolve paths
+  against the process CWD, which breaks nested project configurations.
+- Discovery is nearest-directory first, with the documented filename
+  precedence applied within each directory. Add a test whenever a config name
+  or precedence rule changes, including the no-config case.
+- Normalize top-level `ignore` before project-local ignores and synthesize the
+  `default` project only when there is no explicit `projects` map. Unknown rule
+  ids remain loadable for forward compatibility; malformed severities and
+  tuple shapes must fail with a path and source location.
+- Keep rule options as unvalidated JSON until spec-056. Config tests must cover
+  both scalar severity (`"error"` becomes `{}` options) and tuple severity with
+  camelCase options, plus JSON/TOML round trips.
+- A focused config change must run `cargo test -p rglint-config` before the
+  workspace checks. If `cargo fmt --check` fails on untouched baseline files,
+  report that limitation and use `rustfmt --check` on the touched config files.
+
 ### Upstream parity and handoff checklist
 
 - **Spec correction protocol.** Treat the pinned upstream source and tests as
