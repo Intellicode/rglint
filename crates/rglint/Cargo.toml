@@ -16,3 +16,4 @@ rglint-rules = { path = "../rglint-rules" }
 
 [dev-dependencies]
 insta.workspace = true
+jsonschema.workspace = true

@@ -6,6 +6,7 @@ use rglint_core::ProjectLintResult;
 
 pub mod json;
 pub mod pretty;
+pub mod sarif;
 
 /// A formatter for one or more project lint results.
 pub trait Reporter {
@@ -15,3 +16,4 @@ pub trait Reporter {
 
 pub use json::JsonReporter;
 pub use pretty::PrettyReporter;
+pub use sarif::SarifReporter;

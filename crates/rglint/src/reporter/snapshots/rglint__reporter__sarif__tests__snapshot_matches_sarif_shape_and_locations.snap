@@ -1,0 +1,73 @@
+---
+source: crates/rglint/src/reporter/sarif.rs
+assertion_line: 269
+expression: "render(&[result(vec![first, second], vec![error, warning],)])"
+---
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "rglint",
+          "version": "0.1.0",
+          "rules": [
+            {
+              "id": "no-hero",
+              "name": "no-hero",
+              "helpUri": "https://rglint.dev/rules/no-hero"
+            },
+            {
+              "id": "no-villain",
+              "name": "no-villain",
+              "helpUri": "https://rglint.dev/rules/no-villain"
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "no-hero",
+          "level": "error",
+          "message": {
+            "text": "Hero is not allowed"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "01.graphql"
+                },
+                "region": {
+                  "startLine": 2,
+                  "startColumn": 3
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "no-villain",
+          "level": "warning",
+          "message": {
+            "text": "Villain is discouraged"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "02.graphql"
+                },
+                "region": {
+                  "startLine": 2,
+                  "startColumn": 5
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
