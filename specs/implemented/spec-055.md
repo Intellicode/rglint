@@ -25,6 +25,11 @@ rglint without duplicating config.
   gets the default rule preset, spec-063).
 - YAML support via `serde_yaml` (add to deps).
 
+The normalized resolver currently stores project `exclude` globs as its
+project ignore list. `include` is used as the document spec when a project has
+no explicit `documents` key; applying those filters during file loading is
+left to the resolver's existing ignore/filtering boundary.
+
 **Out of scope:**
 
 - `.rglintrc` itself (spec-054).
@@ -54,6 +59,8 @@ pub fn load_graphql_config(path: &Path) -> Result<Config>;
 - Single-project graphql-config (no `projects` key) → one rglint project
   named `default`.
 - Multi-project (`projects: { web: ..., admin: ... }`) → N rglint projects.
+- Top-level schema/document maps (`{ project: value }`) → one project per map
+  key, with scalar values shared across those projects.
 - `schema` as `{ http: "...url..." }` → error "HTTP schema documents not
   supported yet" (PLAN §11).
 - Comments / extension keys ignored.

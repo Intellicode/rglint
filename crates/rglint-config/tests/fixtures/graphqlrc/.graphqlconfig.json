@@ -1,0 +1,9 @@
+{
+  "schema": "schema.graphql",
+  "documents": ["src/**/*.graphql", "tests/**/*.graphql"],
+  "extensions": {
+    "codegen": {
+      "generates": {}
+    }
+  }
+}
