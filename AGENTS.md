@@ -93,6 +93,26 @@ result, merge result, and refreshed `main` status are all part of completion.
   workspace checks. If `cargo fmt --check` fails on untouched baseline files,
   report that limitation and use `rustfmt --check` on the touched config files.
 
+### Configuration validation and registry boundaries
+
+- Before introducing a config error type, inspect the existing public error
+  enum and preserve its variants for callers from earlier specs. Add a
+  focused variant or payload for the new failure rather than replacing a
+  stable error surface to match a draft interface literally.
+- Keep option validation in `rglint-config` independent of the built-in rule
+  crate: callers pass the `&RuleEntry` registry explicitly. Validate only
+  known, non-`off` rules, skip unknown ids for forward compatibility, and
+  return all option failures in one error so callers do not need a retry loop.
+- Apply `RuleMeta::default_options` to a cloned option value with a shallow,
+  user-wins merge before validation. Do not silently rewrite the normalized
+  config unless the API explicitly promises persistence of defaults.
+- JSON-Schema option paths in diagnostics should be JSON Pointers to the
+  offending instance (escaping `~` as `~0` and `/` as `~1`), and the validator
+  draft must be explicit when the dependency supports multiple drafts.
+- If a later CLI or integration spec owns the call site, record that boundary
+  in the current spec and add the call only when that entry point exists; do
+  not add a dependency cycle merely to make an unimplemented caller compile.
+
 ### GraphQL config interoperability
 
 - Keep `.graphqlrc`/`.graphqlconfig` parsing in `rglint-config`; the core
