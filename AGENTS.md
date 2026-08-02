@@ -308,6 +308,15 @@ severity mapping, coordinate convention, and path policy in its spec and test
 those details directly. Do not infer compatibility from a generic
 `serde::Serialize` derive on `Diagnostic`.
 
+For schema-backed machine formats, keep the emitted contract and its vendored
+schema in the same focused change. The schema should be strict for the fields
+the reporter emits, while tests should validate both a representative
+multi-diagnostic document and the empty/suppressed case against it. Record the
+schema draft, tool/version policy, URI/path normalization, and fallback used
+when a diagnostic's `SourceFile` is missing. If the format has a standard
+schema, pin its immutable source or clearly label a deliberately reduced
+subset; never call a self-authored subset the full standard.
+
 ## Rule implementation template
 
 New rule file: `crates/rglint-rules/src/<category>/<snake_case>.rs`

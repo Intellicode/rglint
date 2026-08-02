@@ -123,7 +123,7 @@ of work (a few hours to ~2 days) and declares its dependencies on prior specs.
 | [spec-056](implemented/spec-056.md) | JSON-schema option validation | `[x]` |
 | [spec-057](implemented/spec-057.md) | Pretty reporter (miette) | `[x]` |
 | [spec-058](implemented/spec-058.md) | JSON reporter | `[x]` |
-| [spec-059](spec-059.md) | SARIF reporter | `[ ]` |
+| [spec-059](implemented/spec-059.md) | SARIF reporter | `[x]` |
 | [spec-060](spec-060.md) | GitHub annotations reporter | `[ ]` |
 | [spec-061](spec-061.md) | --fix mode | `[ ]` |
 | [spec-062](spec-062.md) | CLI (clap) entry point & exit codes | `[ ]` |
