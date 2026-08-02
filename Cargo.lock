@@ -1324,6 +1324,7 @@ name = "rglint"
 version = "0.1.0"
 dependencies = [
  "clap",
+ "insta",
  "miette",
  "rglint-config",
  "rglint-core",

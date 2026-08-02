@@ -11,3 +11,6 @@ miette.workspace = true
 rglint-core = { path = "../rglint-core" }
 rglint-config = { path = "../rglint-config" }
 rglint-rules = { path = "../rglint-rules" }
+
+[dev-dependencies]
+insta.workspace = true

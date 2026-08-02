@@ -844,6 +844,18 @@ for (type_name, ext_type) in &schema.types {
 
 `column` in `expected.json` is 0-based byte offset from the start of the line (graphql-eslint style, via `SourceFile::location_eslint`). Count bytes, not characters. For single-line sources, column = byte offset from file start.
 
+### Reporter source ownership
+
+Reporters consume `ProjectLintResult`, so every result must retain the
+`SourceFile` handles needed to render its diagnostics. Do not make reporters
+re-read diagnostic paths from disk: inline fixtures, generated sources, and
+deduplicated documents may not have a readable path or may have source text
+that differs from the current filesystem. Keep the source index keyed by the
+same path stored in `Diagnostic::file`, and use the engine's source mapping
+for line and column output. A reporter must remain total for empty results,
+zero-length spans, missing source entries, and writer errors; these cases
+should produce stable text or a returned I/O error, never a panic.
+
 ## Branch / PR workflow
 
 - Branch name: `spec-NNN`
