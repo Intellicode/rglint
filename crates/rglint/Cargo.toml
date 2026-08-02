@@ -8,6 +8,8 @@ repository.workspace = true
 [dependencies]
 clap.workspace = true
 miette.workspace = true
+serde.workspace = true
+serde_json.workspace = true
 rglint-core = { path = "../rglint-core" }
 rglint-config = { path = "../rglint-config" }
 rglint-rules = { path = "../rglint-rules" }

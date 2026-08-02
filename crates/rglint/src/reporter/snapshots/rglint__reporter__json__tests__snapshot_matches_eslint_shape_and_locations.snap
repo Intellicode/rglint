@@ -1,0 +1,38 @@
+---
+source: crates/rglint/src/reporter/json.rs
+expression: "render(JsonReporter::new(true),\n&[result(vec![first, second], vec![error, warning])])"
+---
+[
+  {
+    "filePath": "01.graphql",
+    "messages": [
+      {
+        "ruleId": "no-hero",
+        "severity": 2,
+        "message": "Hero is not allowed",
+        "line": 2,
+        "column": 2,
+        "endLine": 2,
+        "endColumn": 6
+      }
+    ],
+    "errorCount": 1,
+    "warningCount": 0
+  },
+  {
+    "filePath": "02.graphql",
+    "messages": [
+      {
+        "ruleId": "no-villain",
+        "severity": 1,
+        "message": "Villain is discouraged",
+        "line": 2,
+        "column": 4,
+        "endLine": 3,
+        "endColumn": 1
+      }
+    ],
+    "errorCount": 0,
+    "warningCount": 1
+  }
+]
