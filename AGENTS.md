@@ -283,6 +283,31 @@ commands, and any deliberate scope difference. After merging, refresh `main`
 and verify `git status -sb`; report any remaining changes instead of cleaning
 them up implicitly.
 
+## Reporter implementation contract
+
+Reporters are adapters over `ProjectLintResult`, not alternate lint engines.
+Keep output-specific serialization structs private to the reporter and leave
+the core diagnostic model independent of presentation formats. A reporter must:
+
+- resolve line, column, and end locations through the result's `SourceFile`
+  index; never reread paths from disk, because fixtures and generated inputs
+  may not exist on the filesystem;
+- define deterministic file grouping, diagnostic ordering, and serialized key
+  order so snapshots and parity diffs are stable across runs and projects;
+- explicitly handle empty results, suppressed severities, zero-length spans,
+  and missing source entries without panicking; use the format's documented
+  fallback for data that cannot be resolved;
+- propagate writer and serialization failures as `io::Error` rather than
+  silently truncating output; and
+- test both the format's human-readable and compact/machine modes where they
+  exist, including a parsed shape assertion in addition to a byte-stable
+  snapshot.
+
+When a format claims upstream compatibility, record the exact field names,
+severity mapping, coordinate convention, and path policy in its spec and test
+those details directly. Do not infer compatibility from a generic
+`serde::Serialize` derive on `Diagnostic`.
+
 ## Rule implementation template
 
 New rule file: `crates/rglint-rules/src/<category>/<snake_case>.rs`
@@ -862,7 +887,8 @@ should produce stable text or a returned I/O error, never a panic.
 - Commit message: `spec-NNN: <rule-id>` (matches existing pattern)
 - Push, then `gh pr create --title "spec-NNN: <rule-id>" --body "<description>"`
 - Merge via `gh pr merge --squash`
-- `git checkout main && git pull`
+- After merge, run `git switch main`, `git pull --ff-only origin main`, and
+  `git status -sb`; report any remaining changes rather than hiding them.
 
 ## Build / test commands
 

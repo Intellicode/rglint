@@ -4,6 +4,7 @@ use std::io::{self, Write};
 
 use rglint_core::ProjectLintResult;
 
+pub mod json;
 pub mod pretty;
 
 /// A formatter for one or more project lint results.
@@ -12,4 +13,5 @@ pub trait Reporter {
     fn render(&self, results: &[ProjectLintResult], out: &mut dyn Write) -> io::Result<()>;
 }
 
+pub use json::JsonReporter;
 pub use pretty::PrettyReporter;

@@ -1329,6 +1329,8 @@ dependencies = [
  "rglint-config",
  "rglint-core",
  "rglint-rules",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

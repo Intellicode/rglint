@@ -42,6 +42,11 @@ parity harness (spec-069 diffs this against graphql-eslint's JSON output).
 - Snapshot of the JSON output for a fixed fixture (used as the parity-harness
   contract).
 
+The reporter owns a private JSON projection of diagnostics. It resolves
+locations from each result's retained `SourceFile` index and uses deterministic
+file/key ordering; it does not reread source paths from disk or serialize the
+engine's internal diagnostic shape directly.
+
 ## Interface / API
 
 ```rust
