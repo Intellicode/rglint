@@ -127,7 +127,7 @@ of work (a few hours to ~2 days) and declares its dependencies on prior specs.
 | [spec-060](implemented/spec-060.md) | GitHub annotations reporter | `[x]` |
 | [spec-061](implemented/spec-061.md) | --fix mode | `[x]` |
 | [spec-062](implemented/spec-062.md) | CLI (clap) entry point & exit codes | `[x]` |
-| [spec-063](spec-063.md) | Default recommended config preset | `[ ]` |
+| [spec-063](implemented/spec-063.md) | Default recommended config preset | `[x]` |
 
 ### Phase 9 — Performance + packaging
 

@@ -74,6 +74,24 @@ fn max_warnings_turns_a_warning_into_exit_one() {
 }
 
 #[test]
+fn recommended_preset_runs_through_the_combined_rule_registry() {
+    let dir = tempdir().expect("tempdir");
+    fs::write(dir.path().join("query.graphql"), "query { hero }\n").expect("document");
+    fs::write(
+        dir.path().join(".rglintrc.toml"),
+        "extends = \"recommended\"\ndocuments = \"query.graphql\"\n",
+    )
+    .expect("config");
+
+    command()
+        .current_dir(dir.path())
+        .args(["--format", "json"])
+        .assert()
+        .code(1)
+        .stdout(predicates::str::contains("no-anonymous-operations"));
+}
+
+#[test]
 fn bad_config_uses_exit_two_and_stderr() {
     let dir = tempdir().expect("tempdir");
     fs::write(dir.path().join("bad.toml"), "format = \"not-a-format\"\n").expect("config");
@@ -99,7 +117,7 @@ fn init_creates_a_starter_config_and_does_not_overwrite() {
         .success();
     let path = dir.path().join(".rglintrc.toml");
     let original = fs::read_to_string(&path).expect("starter config");
-    assert!(original.contains("spec-063"));
+    assert!(original.contains("extends = \"recommended\""));
 
     command()
         .current_dir(dir.path())

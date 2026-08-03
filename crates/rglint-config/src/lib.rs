@@ -1,6 +1,7 @@
 //! Configuration loading and normalization for `.rglintrc` files.
 
 pub mod graphql_config;
+pub mod preset;
 pub mod schema;
 pub mod validate;
 

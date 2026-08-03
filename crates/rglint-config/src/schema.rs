@@ -148,6 +148,32 @@ pub struct Config {
 }
 
 impl Config {
+    /// Merge a preset into this config, keeping values already present in
+    /// `self` when both configs define them. Rules use whole `(severity,
+    /// options)` entries, so a user tuple replaces the preset tuple together.
+    pub fn extend_with(&mut self, preset: Config) {
+        let Config {
+            projects,
+            rules,
+            ignore,
+            format: _,
+        } = preset;
+
+        if self.projects.is_empty() {
+            self.projects = projects;
+        }
+        for pattern in ignore {
+            if !self.ignore.contains(&pattern) {
+                self.ignore.push(pattern);
+            }
+        }
+        for (id, setting) in rules {
+            self.rules.entry(id).or_insert(setting);
+        }
+        // `format` is a scalar user setting, so the existing value in `self`
+        // always wins. Built-in presets intentionally use the default format.
+    }
+
     /// Convert the normalized rule map into the engine's configuration.
     pub fn rules_config(&self) -> RulesConfig {
         let mut ids: Vec<_> = self.rules.keys().collect();
@@ -209,6 +235,7 @@ impl Serialize for Config {
             })
             .collect::<BTreeMap<_, _>>();
         RawConfig {
+            extends: None,
             projects: Some(projects),
             schema: None,
             documents: None,
@@ -271,6 +298,14 @@ pub enum ConfigError {
         /// Unsupported URL.
         url: String,
     },
+    /// A config extends an unknown preset or contains an inheritance cycle.
+    #[error("invalid preset `{name}`: {message}")]
+    InvalidPreset {
+        /// Requested preset name.
+        name: String,
+        /// Resolution detail.
+        message: String,
+    },
 }
 
 /// Search upward from `start` and return the closest config, checking names in
@@ -331,6 +366,11 @@ fn parse_raw(path: &Path, source: &str) -> Result<RawConfig, ConfigError> {
 }
 
 fn normalize(raw: RawConfig) -> Result<Config, ConfigError> {
+    let extends = match raw.extends {
+        Some(ExtendsRaw::Single(name)) => vec![name],
+        Some(ExtendsRaw::Multiple(names)) => names,
+        None => Vec::new(),
+    };
     let top_ignore = raw.ignore;
     let projects = match raw.projects {
         Some(projects) => projects
@@ -354,12 +394,26 @@ fn normalize(raw: RawConfig) -> Result<Config, ConfigError> {
         .into_iter()
         .map(|(id, setting)| parse_rule(&id, setting).map(|resolved| (id, resolved)))
         .collect::<Result<AHashMap<_, _>, _>>()?;
-    Ok(Config {
+    let mut config = Config {
         projects,
         rules,
         ignore: top_ignore,
         format: raw.format.unwrap_or_default(),
-    })
+    };
+
+    for name in extends {
+        let preset = crate::preset::resolve(&name, &mut Vec::new()).map_err(|message| {
+            ConfigError::InvalidPreset {
+                name: name.clone(),
+                message,
+            }
+        })?;
+        // `Config::extend_with` keeps `self` as the overriding layer, so
+        // applying the preset to the user config gives user rules precedence.
+        config.extend_with(preset);
+    }
+
+    Ok(config)
 }
 
 fn parse_rule(id: &str, setting: RuleConfig) -> Result<(Severity, serde_json::Value), ConfigError> {
@@ -459,13 +513,14 @@ fn warn_unknown_toml_keys(path: &Path, source: &str) {
 }
 
 fn warn_unknown_keys<'a>(path: &Path, keys: impl Iterator<Item = &'a str>) {
-    const KNOWN: [&str; 6] = [
+    const KNOWN: [&str; 7] = [
         "projects",
         "schema",
         "documents",
         "rules",
         "ignore",
         "format",
+        "extends",
     ];
     for key in keys {
         if !KNOWN.contains(&key) {
@@ -477,12 +532,20 @@ fn warn_unknown_keys<'a>(path: &Path, keys: impl Iterator<Item = &'a str>) {
 #[derive(Debug, Default, Deserialize, Serialize)]
 #[serde(default)]
 struct RawConfig {
+    extends: Option<ExtendsRaw>,
     projects: Option<BTreeMap<String, RawProjectConfig>>,
     schema: Option<SchemaSpecRaw>,
     documents: Option<DocumentSpecRaw>,
     rules: BTreeMap<String, RuleConfig>,
     ignore: Vec<String>,
     format: Option<Format>,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(untagged)]
+enum ExtendsRaw {
+    Single(String),
+    Multiple(Vec<String>),
 }
 
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
@@ -588,6 +651,42 @@ ignore = ["web-generated/**"]
         assert_eq!(rules.rules.len(), 1);
         assert_eq!(rules.rules[0].severity, Severity::Warn);
         assert_eq!(rules.rules[0].options, serde_json::json!({"maxDepth": 7}));
+    }
+
+    #[test]
+    fn extends_preset_then_applies_user_rule_overrides() {
+        let dir = tempdir().unwrap();
+        let path = dir.path().join(".rglintrc.toml");
+        fs::write(
+            &path,
+            r#"extends = ["schema-recommended", "operations-recommended"]
+
+[rules]
+"no-deprecated" = "off"
+"selection-set-depth" = ["warn", { maxDepth = 3 }]
+"#,
+        )
+        .unwrap();
+
+        let config = load(&path).unwrap();
+        assert_eq!(config.rules["description-style"].0, Severity::Error);
+        assert_eq!(config.rules["no-deprecated"].0, Severity::Off);
+        assert_eq!(config.rules["selection-set-depth"].0, Severity::Warn);
+        assert_eq!(
+            config.rules["selection-set-depth"].1,
+            serde_json::json!({"maxDepth": 3})
+        );
+    }
+
+    #[test]
+    fn unknown_preset_is_a_config_error() {
+        let dir = tempdir().unwrap();
+        let path = dir.path().join(".rglintrc.toml");
+        fs::write(&path, "extends = \"team-default\"\n").unwrap();
+
+        let error = load(&path).unwrap_err();
+        assert!(matches!(error, ConfigError::InvalidPreset { .. }));
+        assert!(error.to_string().contains("team-default"));
     }
 
     #[test]
