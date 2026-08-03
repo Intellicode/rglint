@@ -4,22 +4,27 @@
 
 ## Goal
 
-Implement `--fix`: apply rule suggestions (`Fix`) to source files in place,
-re-linting iteratively until no fixable diagnostics remain (or a fixed
-iteration cap). Rules with `hasSuggestions: true` contribute fixes; `--fix`
-edits the files on disk.
+Implement the core of `--fix`: apply rule suggestions (`Fix`) to operation
+source files in place, re-linting iteratively until no fixable diagnostics
+remain (or a fixed iteration cap). The CLI flags are wired by spec-062; this
+spec owns the reusable `Fixer` API and its filesystem-independent dry-run
+simulation.
 
 ## Scope
 
 **In scope:**
 
-- A `Fixer` that, given a `ProjectLintResult` + the source files, groups
-  `Diagnostic.suggestions[].fix` by file, applies non-overlapping fixes
-  (rightmost-first to preserve offsets), writes the new source, and re-runs
-  the engine.
+- A `Fixer` that, given a `ProjectLintResult` + the retained source files,
+  groups `Diagnostic.suggestions[].fix` by operation-document file, applies
+  non-overlapping fixes (rightmost-first to preserve offsets), writes the new
+  source, reloads the project, and re-runs the engine.
 - Iteration cap (default 10) to avoid fix loops.
-- `--fix-dry-run` flag: print the diff (`unified_diff`) without writing.
+- A dry-run API that simulates the same passes and returns `unified_diff`
+  values without writing; spec-062 prints these for `--fix-dry-run`.
 - `--fix` only applies fixes whose rule is enabled and `hasSuggestions: true`.
+- Fix eligibility is based on membership in `Project.documents`, not rule
+  category, so mixed rules may fix executable nodes while schema files remain
+  untouched.
 - Conflict resolution: overlapping fix spans → keep the first (lowest offset),
   skip the rest in that pass, retry next iteration.
 - Back up original files? No (git is the user's safety net) — but print a
@@ -41,9 +46,9 @@ edits the files on disk.
 
 - `crates/rglint-core/src/fixer.rs` (or `crates/rglint/src/fixer.rs` —
   decide; core keeps it testable without CLI).
-- Integration test: a fixture with 2 fixable `alphabetize` swaps → after
-  `--fix`, re-lint yields zero diagnostics.
-- `--fix-dry-run` snapshot test (unified diff).
+- Integration test: two operation selection sets with fixable `alphabetize`
+  swaps → after `Fixer::fix`, re-lint yields zero diagnostics.
+- Core dry-run snapshot-style assertion for a deterministic unified diff.
 
 ## Interface / API
 
@@ -68,8 +73,8 @@ pub struct FileDiff { pub path: PathBuf, pub unified_diff: String }
 
 ## Testing
 
-- Integration: `alphabetize` 3-field swap → one pass, file sorted, zero
-  remaining.
+- Integration: two operation selection swaps → one write pass, file sorted,
+  zero remaining.
 - Loop guard: a malicious fixture where a fix re-triggers itself → stops at
   `max_passes`, no infinite loop, warning logged.
 - Dry-run diff snapshot.

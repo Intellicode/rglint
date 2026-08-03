@@ -185,6 +185,11 @@ impl LintEngine {
         Self { rules }
     }
 
+    /// Return the resolved rules for engine adapters such as [`crate::Fixer`].
+    pub(crate) fn enabled_rules(&self) -> &[EnabledRule] {
+        &self.rules
+    }
+
     /// Run every enabled rule over every document in `project`, returning the
     /// collected diagnostics grouped per file and sorted across the project.
     ///

@@ -10,6 +10,7 @@ mod context;
 mod diagnostics;
 mod documents;
 mod engine;
+mod fixer;
 mod location;
 mod node;
 mod node_name;
@@ -30,6 +31,7 @@ pub use documents::{
 pub use engine::{
     EnabledRule, LintEngine, LintEngineError, ProjectLintResult, RuleConfig, RulesConfig,
 };
+pub use fixer::{FileDiff, FixError, FixSummary, Fixer, DEFAULT_MAX_PASSES};
 pub use location::{LineColumn, Location, Span};
 pub use node::Node;
 pub use node_name::node_name;

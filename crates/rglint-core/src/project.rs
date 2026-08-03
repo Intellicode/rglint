@@ -59,6 +59,7 @@
 //! [`ProjectResolver`] rejects `http://` / `https://` schema specs up front with
 //! [`ProjectResolveError::UnsupportedRemoteSchema`].
 
+use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
 
@@ -271,6 +272,67 @@ impl ProjectResolver {
             siblings,
         })
     }
+}
+
+impl Project {
+    /// Reload operation documents after applying in-memory replacements.
+    ///
+    /// The schema is intentionally left untouched: spec-061 only permits
+    /// fixes in executable documents. Existing input aliases are retained and
+    /// receive the replacement belonging to their deduplicated owner.
+    pub(crate) fn reload_documents(
+        &mut self,
+        replacements: &HashMap<PathBuf, String>,
+    ) -> Result<(), crate::documents::DocumentLoadError> {
+        let files = document_sources(&self.documents, replacements);
+        let loader = DocumentLoader::new();
+        let schema = self.schema.as_deref().map(|schema| &schema.compiler);
+        self.documents = loader.load_sources(&files, schema)?;
+        self.siblings = Siblings::from_documents(&self.documents);
+        Ok(())
+    }
+
+    /// Return a reloaded project without changing the caller's project. Used
+    /// by dry-run mode to simulate successive fix passes without filesystem
+    /// writes.
+    pub(crate) fn reloaded_documents(
+        &self,
+        replacements: &HashMap<PathBuf, String>,
+    ) -> Result<Self, crate::documents::DocumentLoadError> {
+        let files = document_sources(&self.documents, replacements);
+        let loader = DocumentLoader::new();
+        let schema = self.schema.as_deref().map(|schema| &schema.compiler);
+        let documents = loader.load_sources(&files, schema)?;
+        let siblings = Siblings::from_documents(&documents);
+        let project = Self {
+            config: self.config.clone(),
+            schema: self.schema.clone(),
+            documents,
+            siblings,
+        };
+        Ok(project)
+    }
+}
+
+fn document_sources(
+    documents: &LoadedDocuments,
+    replacements: &HashMap<PathBuf, String>,
+) -> Vec<(PathBuf, String)> {
+    documents
+        .by_file
+        .keys()
+        .map(|path| {
+            let owner = documents
+                .document_for_file(path)
+                .expect("LoadedDocuments::by_file points to a loaded document");
+            let content = replacements
+                .get(owner.source.path())
+                .or_else(|| replacements.get(path))
+                .cloned()
+                .unwrap_or_else(|| owner.source.source().to_owned());
+            (path.clone(), content)
+        })
+        .collect()
 }
 
 /// Construct an empty [`LoadedDocuments`] for a document-less project.

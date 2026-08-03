@@ -20,3 +20,4 @@ thiserror.workspace = true
 rglint-test-harness = { path = "../rglint-test-harness" }
 insta.workspace = true
 proptest.workspace = true
+tempfile.workspace = true
