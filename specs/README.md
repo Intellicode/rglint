@@ -133,7 +133,7 @@ of work (a few hours to ~2 days) and declares its dependencies on prior specs.
 
 | Spec | Title | Status |
 |------|-------|--------|
-| [spec-064](spec-064.md) | Rayon parallelization | `[ ]` |
+| [spec-064](implemented/spec-064.md) | Rayon parallelization | `[x]` |
 | [spec-065](spec-065.md) | Benchmarks (criterion) | `[ ]` |
 | [spec-066](spec-066.md) | Release binary & cargo-binstall | `[ ]` |
 

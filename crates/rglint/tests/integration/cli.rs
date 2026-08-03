@@ -74,6 +74,20 @@ fn max_warnings_turns_a_warning_into_exit_one() {
 }
 
 #[test]
+fn jobs_flag_accepts_a_positive_worker_count() {
+    let dir = tempdir().expect("tempdir");
+    fs::write(dir.path().join("query.graphql"), "query { hero }\n").expect("document");
+    write_config(dir.path(), "no-anonymous-operations = \"warn\"\n");
+
+    command()
+        .current_dir(dir.path())
+        .args(["--format", "json", "--jobs", "1"])
+        .assert()
+        .code(0)
+        .stdout(predicates::str::contains("no-anonymous-operations"));
+}
+
+#[test]
 fn recommended_preset_runs_through_the_combined_rule_registry() {
     let dir = tempdir().expect("tempdir");
     fs::write(dir.path().join("query.graphql"), "query { hero }\n").expect("document");

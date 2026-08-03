@@ -261,6 +261,76 @@ fn two_rules_produce_exactly_two_diagnostics_sorted() {
 }
 
 #[test]
+fn repeated_parallel_lints_are_deterministic() {
+    let project = build_project();
+    let engine = build_engine();
+    engine.set_thread_pool(4).expect("four workers are valid");
+
+    let first =
+        serde_json::to_string(&engine.lint(&project).unwrap().all).expect("diagnostics serialize");
+    for _ in 0..10 {
+        let current = serde_json::to_string(&engine.lint(&project).unwrap().all)
+            .expect("diagnostics serialize");
+        assert_eq!(current, first, "parallel lint output must be stable");
+    }
+}
+
+#[test]
+fn worker_panics_become_internal_error_diagnostics() {
+    struct PanicRule;
+    impl Rule for PanicRule {
+        fn meta(&self) -> &'static RuleMeta {
+            &PANIC_META
+        }
+
+        fn create(&self, _ctx: &mut RuleContext) -> Box<dyn Handler> {
+            Box::new(PanicHandler)
+        }
+    }
+
+    static PANIC_META: RuleMeta = RuleMeta::new(
+        "__rg_engine_panic",
+        Category::Operations,
+        Severity::Warn,
+        "Panics to exercise worker recovery.",
+        None,
+        None,
+        false,
+        false,
+        false,
+        None,
+        false,
+    );
+    static PANIC_ENTRY: RuleEntry = RuleEntry {
+        meta: &PANIC_META,
+        factory: || Box::new(PanicRule),
+        interested_kinds: &[SyntaxKind::OPERATION_DEFINITION],
+    };
+
+    struct PanicHandler;
+    impl Handler for PanicHandler {
+        fn on_node(
+            &mut self,
+            _node: &rglint_core::Node<'_>,
+            _parent: Option<&rglint_core::Node<'_>>,
+        ) {
+            panic!("intentional worker panic");
+        }
+    }
+
+    let engine = LintEngine::from_enabled_rules(vec![rglint_core::EnabledRule {
+        entry: &PANIC_ENTRY,
+        severity: Severity::Warn,
+        options: serde_json::Value::Null,
+    }]);
+    let result = engine.lint(&build_project()).expect("panic is contained");
+    assert_eq!(result.all.len(), 1);
+    assert_eq!(result.all[0].rule_id, "internal-error");
+    assert_eq!(result.all[0].severity, Severity::Error);
+    assert!(result.all[0].message.contains("intentional worker panic"));
+}
+
+#[test]
 fn severity_off_diagnostics_are_dropped() {
     let project = build_project();
     let rules = RulesConfig {

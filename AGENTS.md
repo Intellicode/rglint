@@ -955,6 +955,28 @@ CLI tests must cover the no-config path, explicit `--config` path resolution,
 stable physical inputs before handing them to `ProjectResolver`; keep config
 relative paths relative until the resolver receives the config directory.
 
+## Parallel engine and cache invariants
+
+Per-file parallelism belongs at the engine boundary: keep one multiplexed rule
+walk per source file, share only immutable schema/sibling context, and use a
+scoped Rayon pool rather than mutating Rayon’s global pool. `--jobs` must reject
+zero and every flag change needs a parser test. The WASM build must retain the
+same API validation while taking a serial path.
+
+Worker closures must catch panics at the file boundary and return an
+`internal-error` diagnostic attributed to the affected source. Do not allow a
+panic to poison a shared cache lock or abort unrelated files. Cache reads must
+return owned snapshots (never lock guards), lock poisoning must recover, and
+any engine-integrated cache key must include the rule/config/schema/sibling
+execution context in addition to source content. Add a contention test and a
+repeat-run byte-stability test whenever the dispatch or cache implementation
+changes.
+
+Performance timing harnesses belong to the benchmark spec that owns their
+framework and corpus. A correctness spec may add focused smoke/contended tests,
+but must not add a second ad-hoc benchmark framework or make a flaky wall-clock
+threshold part of the normal test suite.
+
 ## Branch / PR workflow
 
 - Branch name: `spec-NNN`

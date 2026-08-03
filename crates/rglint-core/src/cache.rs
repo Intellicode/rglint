@@ -21,10 +21,10 @@
 //! existing `serde_json` dep (no new crate). The size overhead vs bincode is
 //! acceptable: cache files are small and `flush` is rare (once per run).
 
-use std::collections::hash_map;
 use std::fs;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
+use std::sync::{Mutex, RwLock};
 
 use ahash::AHashMap;
 use serde::{Deserialize, Serialize};
@@ -58,32 +58,40 @@ pub struct CachedResult {
 
 /// Backing store for a [`Cache`]: either purely in-memory (tests, or when no
 /// on-disk path is configured) or backed by a file that [`Cache::flush`] writes
-/// atomically.
-#[derive(Default)]
+/// atomically. The map is behind a read/write lock because lint workers share
+/// one cache while they process files in parallel.
+#[derive(Debug)]
 enum CacheStore {
-    #[default]
-    Memory,
+    Memory {
+        mem: RwLock<AHashMap<CacheKey, CachedResult>>,
+    },
     File {
         path: PathBuf,
-        mem: AHashMap<CacheKey, CachedResult>,
+        mem: RwLock<AHashMap<CacheKey, CachedResult>>,
     },
 }
 
 /// Content-hash cache. See the module docs for the v1 tradeoffs.
 ///
 /// Construct with [`Cache::memory`] (no persistence) or [`Cache::load`] (load
-/// from disk, degrading to empty on any error). Insert entries during a run and
-/// call [`Cache::flush`] at the end to persist.
+/// from disk, degrading to empty on any error). Both modes are live stores;
+/// `memory` simply skips persistence. Insert entries during a run and call
+/// [`Cache::flush`] at the end to persist a file-backed store.
+#[derive(Debug)]
 pub struct Cache {
     store: CacheStore,
+    flush_lock: Mutex<()>,
 }
 
 impl Cache {
-    /// New in-memory cache (never persisted). Used by tests and when caching
-    /// is disabled.
+    /// New in-memory cache (never persisted). Useful for tests and for callers
+    /// that want contention-safe caching without a cache file.
     pub fn memory() -> Self {
         Self {
-            store: CacheStore::Memory,
+            store: CacheStore::Memory {
+                mem: RwLock::new(AHashMap::new()),
+            },
+            flush_lock: Mutex::new(()),
         }
     }
 
@@ -98,16 +106,18 @@ impl Cache {
             Ok(mem) => Self {
                 store: CacheStore::File {
                     path: path.to_path_buf(),
-                    mem,
+                    mem: RwLock::new(mem),
                 },
+                flush_lock: Mutex::new(()),
             },
             Err(e) => {
                 tracing::warn!(%e, path = %path.display(), "rglint cache: ignoring unreadable cache file");
                 Self {
                     store: CacheStore::File {
                         path: path.to_path_buf(),
-                        mem: AHashMap::new(),
+                        mem: RwLock::new(AHashMap::new()),
                     },
+                    flush_lock: Mutex::new(()),
                 }
             }
         }
@@ -119,60 +129,60 @@ impl Cache {
     }
 
     /// Look up a prior result for `key`. Returns `None` on a miss.
-    pub fn get(&self, key: &CacheKey) -> Option<&CachedResult> {
+    pub fn get(&self, key: &CacheKey) -> Option<CachedResult> {
         match &self.store {
-            CacheStore::Memory => None,
-            CacheStore::File { mem, .. } => mem.get(key),
+            CacheStore::Memory { mem } | CacheStore::File { mem, .. } => {
+                read_lock(mem).get(key).cloned()
+            }
         }
     }
 
     /// Insert (or replace) the cached result for `key`.
-    pub fn insert(&mut self, key: CacheKey, result: CachedResult) {
-        match &mut self.store {
-            CacheStore::Memory => {
-                // Memory mode keeps no state across inserts intentionally: the
-                // Memory variant exists for "caching disabled", where there is
-                // nothing to look up. File-backed mode does the real caching.
-                let _ = (key, result);
-            }
-            CacheStore::File { mem, .. } => {
-                mem.insert(key, result);
+    pub fn insert(&self, key: CacheKey, result: CachedResult) {
+        match &self.store {
+            CacheStore::Memory { mem } | CacheStore::File { mem, .. } => {
+                write_lock(mem).insert(key, result);
             }
         }
     }
 
-    /// Number of cached entries (file-backed mode only).
+    /// Number of cached entries.
     pub fn len(&self) -> usize {
         match &self.store {
-            CacheStore::Memory => 0,
-            CacheStore::File { mem, .. } => mem.len(),
+            CacheStore::Memory { mem } | CacheStore::File { mem, .. } => read_lock(mem).len(),
         }
     }
 
-    /// Whether the cache holds any entries. Always `true` for in-memory mode
-    /// (which never stores anything).
+    /// Whether the cache holds no entries.
     pub fn is_empty(&self) -> bool {
         self.len() == 0
     }
 
-    /// Iterator over entries (file-backed mode only). Order is unspecified.
-    pub fn iter(&self) -> CacheIter<'_> {
-        CacheIter {
-            inner: match &self.store {
-                CacheStore::Memory => None,
-                CacheStore::File { mem, .. } => Some(mem.iter()),
-            },
-        }
+    /// Snapshot the entries. Order is unspecified; the snapshot releases the
+    /// cache lock before the caller iterates.
+    pub fn iter(&self) -> CacheIter {
+        let entries = match &self.store {
+            CacheStore::Memory { mem } | CacheStore::File { mem, .. } => {
+                let entries: Vec<_> = read_lock(mem)
+                    .iter()
+                    .map(|(key, result)| (key.clone(), result.clone()))
+                    .collect();
+                entries.into_iter()
+            }
+        };
+        CacheIter { inner: entries }
     }
 
     /// Persist the cache to disk. Atomic: writes `<path>.tmp` then renames
     /// over the target. No-op (returns `Ok(())`) for in-memory caches.
     pub fn flush(&self) -> io::Result<()> {
         let (path, mem) = match &self.store {
-            CacheStore::Memory => return Ok(()),
+            CacheStore::Memory { .. } => return Ok(()),
             CacheStore::File { path, mem } => (path, mem),
         };
-        let bytes = encode(mem);
+        let _flush_guard = mutex_lock(&self.flush_lock);
+        let snapshot = read_lock(mem).clone();
+        let bytes = encode(&snapshot);
         let mut tmp = path.to_path_buf();
         tmp.set_extension("tmp");
         {
@@ -190,16 +200,16 @@ impl Cache {
     }
 }
 
-/// Iterator over a [`Cache`]'s entries.
-pub struct CacheIter<'a> {
-    inner: Option<hash_map::Iter<'a, CacheKey, CachedResult>>,
+/// Snapshot iterator over a [`Cache`]'s entries.
+pub struct CacheIter {
+    inner: std::vec::IntoIter<(CacheKey, CachedResult)>,
 }
 
-impl<'a> Iterator for CacheIter<'a> {
-    type Item = (&'a CacheKey, &'a CachedResult);
+impl Iterator for CacheIter {
+    type Item = (CacheKey, CachedResult);
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.inner.as_mut().and_then(|it| it.next())
+        self.inner.next()
     }
 }
 
@@ -267,7 +277,7 @@ mod tests {
         let dir = tempdir().unwrap();
         let path = dir.path().join("rglint-cache.bin");
         {
-            let mut cache = Cache::load(&path);
+            let cache = Cache::load(&path);
             assert_eq!(cache.len(), 0);
 
             let k1 = CacheKey {
@@ -361,7 +371,7 @@ mod tests {
         let content = b"type Query { x: Int }";
         let h = Cache::hash(content);
         {
-            let mut cache = Cache::load(&path);
+            let cache = Cache::load(&path);
             cache.insert(
                 CacheKey {
                     path: PathBuf::from("a.graphql"),
@@ -387,7 +397,7 @@ mod tests {
         let dir = tempdir().unwrap();
         let path = dir.path().join("rglint-cache.bin");
         {
-            let mut cache = Cache::load(&path);
+            let cache = Cache::load(&path);
             cache.insert(
                 CacheKey {
                     path: PathBuf::from("a.graphql"),
@@ -409,8 +419,8 @@ mod tests {
     }
 
     #[test]
-    fn memory_cache_is_no_op() {
-        let mut cache = Cache::memory();
+    fn memory_cache_stores_entries() {
+        let cache = Cache::memory();
         let k = CacheKey {
             path: PathBuf::from("a.graphql"),
             hash: 1,
@@ -421,8 +431,8 @@ mod tests {
                 diagnostics: vec![diag("x")],
             },
         );
-        assert!(cache.get(&k).is_none());
-        assert_eq!(cache.len(), 0);
+        assert_eq!(cache.get(&k).unwrap().diagnostics[0].message, "x");
+        assert_eq!(cache.len(), 1);
         // flush on a memory cache is a no-op.
         cache.flush().unwrap();
     }
@@ -432,4 +442,50 @@ mod tests {
         // xxh3_64 of empty input is a fixed, well-known constant:
         assert_eq!(Cache::hash(b""), 0x2d06800538d394c2);
     }
+
+    #[test]
+    fn concurrent_reads_and_writes_do_not_panic() {
+        use std::sync::Arc;
+        use std::thread;
+
+        let cache = Arc::new(Cache::memory());
+        let mut workers = Vec::new();
+        for i in 0..8 {
+            let cache = Arc::clone(&cache);
+            workers.push(thread::spawn(move || {
+                for j in 0..100 {
+                    let key = CacheKey {
+                        path: PathBuf::from(format!("{i}-{j}.graphql")),
+                        hash: j,
+                    };
+                    cache.insert(
+                        key.clone(),
+                        CachedResult {
+                            diagnostics: vec![diag("concurrent")],
+                        },
+                    );
+                    assert!(cache.get(&key).is_some());
+                }
+            }));
+        }
+        for worker in workers {
+            worker.join().expect("cache worker must not panic");
+        }
+        assert_eq!(cache.len(), 800);
+    }
+}
+
+fn read_lock<T>(lock: &RwLock<T>) -> std::sync::RwLockReadGuard<'_, T> {
+    lock.read()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
+}
+
+fn write_lock<T>(lock: &RwLock<T>) -> std::sync::RwLockWriteGuard<'_, T> {
+    lock.write()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
+}
+
+fn mutex_lock<T>(lock: &Mutex<T>) -> std::sync::MutexGuard<'_, T> {
+    lock.lock()
+        .unwrap_or_else(std::sync::PoisonError::into_inner)
 }
