@@ -1398,6 +1398,7 @@ dependencies = [
  "predicates",
  "rglint-config",
  "rglint-core",
+ "rglint-graphql-spec",
  "rglint-rules",
  "serde",
  "serde_json",

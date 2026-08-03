@@ -246,7 +246,11 @@ fn configured_rules(config: &Config, overrides: &[String]) -> Result<RulesConfig
                 .collect(),
         });
     }
-    let entries: Vec<_> = rglint_rules::all_rules().iter().collect();
+    // Keep both built-in registries linked: the recommended presets contain
+    // graphql-js validation ids as well as rglint-native rules.
+    let _ = rglint_rules::all_rules();
+    let _ = rglint_graphql_spec::all_spec_rules();
+    let entries: Vec<_> = rglint_core::ALL_RULES.iter().collect();
     config
         .validate(&entries)
         .map_err(|error| error.to_string())?;
@@ -361,7 +365,7 @@ fn init_config() -> ExitCode {
             format!("refusing to overwrite `{}`", path.display()),
         );
     }
-    let template = "# rglint configuration\n# The default recommended preset will be enabled by spec-063.\n# [rules]\n# no-anonymous-operations = \"warn\"\n";
+    let template = "# rglint configuration\nextends = \"recommended\"\n\n# [rules]\n# no-anonymous-operations = \"warn\"\n";
     match std::fs::write(&path, template) {
         Ok(()) => ExitCode::Clean,
         Err(error) => fail(

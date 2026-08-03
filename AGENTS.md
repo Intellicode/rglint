@@ -113,6 +113,23 @@ result, merge result, and refreshed `main` status are all part of completion.
   in the current spec and add the call only when that entry point exists; do
   not add a dependency cycle merely to make an unimplemented caller compile.
 
+### Built-in preset and registry parity
+
+- Treat pinned upstream config snapshots as the authority for built-in preset
+  rule ids, severities, and option objects. Keep the revision and the exact
+  source paths in the owning spec, and test the complete normalized maps rather
+  than only checking that a few representative rules are present.
+- Presets may combine entries from multiple rule crates. Any CLI or integration
+  entry point that consumes a preset must force-link and validate the complete
+  registry, including `rglint-graphql-spec`; do not silently drop unknown preset
+  entries or make a preset appear usable only in config-loader unit tests.
+- Keep preset inheritance and user overrides separate: resolve built-in parent
+  presets first, then apply user rules/options. Preserve user project paths and
+  ignores, deduplicate merged ignores deterministically, and reject unknown
+  preset names or inheritance cycles with actionable config errors.
+- When a spec owns the default preset, update `--init` in the same focused
+  change and test that the generated config contains the live preset reference.
+
 ### GraphQL config interoperability
 
 - Keep `.graphqlrc`/`.graphqlconfig` parsing in `rglint-config`; the core

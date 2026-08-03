@@ -12,6 +12,7 @@ serde.workspace = true
 serde_json.workspace = true
 rglint-core = { path = "../rglint-core" }
 rglint-config = { path = "../rglint-config" }
+rglint-graphql-spec = { path = "../rglint-graphql-spec" }
 rglint-rules = { path = "../rglint-rules" }
 walkdir.workspace = true
 

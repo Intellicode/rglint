@@ -10,7 +10,14 @@ default rule set without enumerating every rule.
 
 ## Source
 
-`packages/plugin/src/configs/{schema-recommended,schema-all,operations-recommended,operations-all,schema-relay,index}.ts`.
+Pinned upstream snapshot: `f0f200ef0b030cb8a905bbcb32fe346b87cc2e24`.
+
+`packages/plugin/src/configs/{schema-recommended,schema-all,operations-recommended,operations-all,schema-relay,index}.ts` at that revision.
+
+The upstream source is authoritative for the preset contents. In particular,
+`schema-all` extends `schema-recommended`, `operations-all` extends
+`operations-recommended`, and `schema-relay` contains only the four Relay
+rules; the latter does not extend the schema-recommended preset.
 
 ## Scope
 
@@ -23,7 +30,7 @@ default rule set without enumerating every rule.
     `schema_all()`, `operations_all()` (granular presets).
 - Each preset is a `Config` with `rules` populated by rule id + default
   severity, matching the TS source exactly.
-- A `extends: "recommended"` (or `["schema-recommended", "operations-recommended"]`) key in `.rglintrc` pulls in a preset; user `rules` override preset severities/options.
+- A `extends: "recommended"` (or `["schema-recommended", "operations-recommended"]`) key in `.rglintrc` pulls in a preset; user `rules` override preset severities/options. The normalized config retains only the resolved rules, not the source `extends` spelling.
 - `rglint --init` writes a `.rglintrc.toml` with `extends = "recommended"`
   (spec-062).
 
@@ -64,9 +71,9 @@ impl Config {
 
 ## Behavior
 
-- `extends` resolution: a preset can itself `extends` another (e.g.
-  `schema-relay` extends `schema-recommended`); resolve transitively, detect
-  cycles.
+- `extends` resolution: built-in composite presets resolve their documented
+  parent presets transitively and detect cycles in the resolver. User config
+  may name built-in presets only; custom user presets remain out of scope.
 - Merge: rule in both → user's wins; rule only in preset → preset's; rule
   only in user → user's.
 - `ignore` and `format` merge: union / user-wins respectively.
