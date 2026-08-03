@@ -918,6 +918,26 @@ in the spec/architecture notes. Do not add a speculative CLI entry point or
 duplicate config parsing merely to exercise a core API early; the owning entry
 point spec should consume the stable public interface.
 
+## CLI and process-boundary conventions
+
+The binary is a thin adapter over the public config, resolver, engine, fixer,
+and reporter APIs. Keep command-line parsing in `crates/rglint/src/cli.rs`,
+numeric status mapping in `exit.rs`, and `main.rs` limited to parsing plus
+`std::process::exit`; do not duplicate linting or config parsing in `main`.
+
+Treat stdout and stderr as separate interfaces: diagnostics and fix diffs go
+to stdout, while configuration, usage, progress, and internal errors go to
+stderr. `--quiet` suppresses progress and human-readable summaries but must
+not suppress machine-readable diagnostics. Every new flag needs a parser test
+and, when it changes process behavior, an integration test that asserts both
+the status code and the affected stream.
+
+CLI tests must cover the no-config path, explicit `--config` path resolution,
+`--max-warnings`, `--init` refusing to overwrite an existing file, and
+`--fix-dry-run` leaving source files unchanged. Resolve positional paths to
+stable physical inputs before handing them to `ProjectResolver`; keep config
+relative paths relative until the resolver receives the config directory.
+
 ## Branch / PR workflow
 
 - Branch name: `spec-NNN`

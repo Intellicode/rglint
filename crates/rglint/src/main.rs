@@ -1,5 +1,6 @@
-#![allow(dead_code)]
+use clap::Parser;
 
 fn main() {
-    println!("rglint");
+    let code = rglint::cli::run(rglint::cli::Cli::parse());
+    std::process::exit(code.code().into());
 }

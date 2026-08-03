@@ -90,3 +90,19 @@ pub fn run(cli: Cli) -> ExitCode;
 
 - Keep `main.rs` thin (delegates to `run`) so the integration tests can call
   `run` directly without spawning a process where convenient.
+
+## Implementation notes
+
+Implemented in `crates/rglint` with a thin `main.rs`, public `cli::run`, and
+stable `exit::ExitCode` mapping. The CLI resolves `.rglintrc` first and then
+the GraphQL-config aliases, preserves the selected config directory for
+`ProjectResolver`, and supports direct file/directory positional inputs. Rule
+overrides intentionally enable the named built-in rules at warning severity;
+external `--rulesdir` remains an accepted no-op stub as specified.
+
+The `--init` template leaves the recommended preset commented out because
+spec-063 owns the preset contents. Pretty reporter summary suppression is
+implemented as a reporter option so `--quiet` does not affect machine-readable
+output. Positional directories are expanded to `.graphql`/`.gql` files before
+resolution; unsupported glob expressions are intentionally deferred until a
+future CLI path-expansion change.
