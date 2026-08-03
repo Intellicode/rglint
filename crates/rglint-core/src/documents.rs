@@ -183,12 +183,28 @@ impl DocumentLoader {
         schema: Option<&Schema>,
     ) -> Result<LoadedDocuments, DocumentLoadError> {
         let files = resolve(spec, base)?;
+        self.load_sources(&files, schema)
+    }
+
+    /// Parse already-resolved document sources. This is the reload seam used
+    /// by `Fixer`: it keeps the resolver's path semantics while allowing a
+    /// changed operation source to be re-linted from memory before the next
+    /// pass.
+    pub fn load_sources(
+        &self,
+        files: &[(PathBuf, String)],
+        schema: Option<&Schema>,
+    ) -> Result<LoadedDocuments, DocumentLoadError> {
         let valid_schema = schema.map(Valid::assume_valid_ref);
 
         let mut docs: Vec<LoadedDocument> = Vec::new();
         // content-hash -> index into docs
         let mut hash_to_idx: HashMap<u64, usize> = HashMap::new();
         let mut by_file: HashMap<PathBuf, usize> = HashMap::new();
+
+        let mut files = files.to_vec();
+        files.sort_by(|left, right| left.0.cmp(&right.0));
+        files.dedup_by(|left, right| left.0 == right.0);
 
         for (path, content) in files {
             let hash = xxh3::xxh3_64(content.as_bytes());

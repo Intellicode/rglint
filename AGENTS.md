@@ -899,6 +899,25 @@ exclusive), use a documented relative-path root, and test literal `%`, CR/LF,
 commas, colons, multi-line spans, Unicode truncation, and long messages. Summary
 output must be opt-in and its counts must exclude `Severity::Off` diagnostics.
 
+## Fix application and staged entry points
+
+Fixers are adapters over `ProjectLintResult`, just like reporters are. They
+must use the result's retained `SourceFile` text for byte-range validation and
+must not reread a diagnostic path to calculate an edit. Group suggestions by
+physical file, sort deterministically, keep the lowest-offset non-overlapping
+edits, and apply accepted edits rightmost-first. Reject out-of-bounds or
+non-UTF-8-boundary ranges with an error; do not silently clamp user-facing
+fixes. `--fix` v1 is limited to files in `Project.documents`, so schema source
+files remain untouched even when a mixed rule has suggestions. Dry-run must
+share the same conflict and iteration logic without filesystem writes, and
+no-op or self-recreating fixes must be bounded by an explicit pass cap.
+
+When a spec lists a later CLI or integration spec as a dependency, implement
+the testable core seam owned by the current spec and record the wiring boundary
+in the spec/architecture notes. Do not add a speculative CLI entry point or
+duplicate config parsing merely to exercise a core API early; the owning entry
+point spec should consume the stable public interface.
+
 ## Branch / PR workflow
 
 - Branch name: `spec-NNN`

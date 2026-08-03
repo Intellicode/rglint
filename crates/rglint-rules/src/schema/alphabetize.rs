@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use rglint_core::{DiagnosticBuilder, Handler, Node, RuleContext, Span, SyntaxKind};
+use rglint_core::{DiagnosticBuilder, Fix, Handler, Node, RuleContext, Span, SyntaxKind};
 use rglint_derive::Rule;
 use serde::Deserialize;
 
@@ -455,6 +455,9 @@ impl Handler for AlphabetizeHandler {
         }
 
         let has_groups = !self.groups.is_empty();
+        let source = ctx.source_code().source().to_owned();
+        let path = ctx.source_code().path().to_path_buf();
+        let rule_id = ctx.rule_id();
 
         for indices in by_container.values_mut() {
             indices.sort_by_key(|&i| self.entries[i].offset);
@@ -516,12 +519,33 @@ impl Handler for AlphabetizeHandler {
 
                 let message = format!("{curr_display} should be before {prev_display}");
 
-                ctx.report(DiagnosticBuilder::new(
-                    ctx.rule_id(),
-                    ctx.source_code().path().to_path_buf(),
-                    self.entries[curr_idx].span,
-                    message,
-                ));
+                let previous = &self.entries[prev_idx];
+                let current = &self.entries[curr_idx];
+                let previous_text = source
+                    .get(previous.span.offset..previous.span.end())
+                    .unwrap_or_default()
+                    .to_owned();
+                let current_text = source
+                    .get(current.span.offset..current.span.end())
+                    .unwrap_or_default()
+                    .to_owned();
+                ctx.report(
+                    DiagnosticBuilder::new(rule_id, path.clone(), current.span, message)
+                    .suggestion(
+                        format!("Move {} before {}", curr_display, prev_display),
+                        Fix::Replace {
+                            span: current.span,
+                            text: previous_text,
+                        },
+                    )
+                    .suggestion(
+                        format!("Move {} after {}", prev_display, curr_display),
+                        Fix::Replace {
+                            span: previous.span,
+                            text: current_text,
+                        },
+                    ),
+                );
             }
         }
     }

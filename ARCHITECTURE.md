@@ -103,3 +103,20 @@ cache file.
 cache file is treated as an empty cache with a `tracing` warn — caching is a
 perf optimization, never a correctness or hard-error path. Version mismatches
 have no downgrade path in v1.
+
+### Fixer source ownership and staged CLI wiring (spec-061)
+
+`rglint_core::Fixer` is the machine-fix adapter over `LintEngine` and
+`ProjectLintResult`. It validates suggestion ranges against the result's
+retained `SourceFile`, groups edits by physical operation-document path, keeps
+the lowest-offset non-overlapping edits, and applies accepted edits
+rightmost-first. Fixes are reloaded into the project between passes so sibling
+indexes and parsed executable documents reflect the new source. Schema source
+files are deliberately excluded by requiring membership in
+`Project.documents`; this is a source-ownership check rather than a rule
+category check because some rules intentionally visit both schema and
+executable CST kinds. A capped in-memory simulation provides dry-run diffs.
+
+The CLI flags and reporter output remain owned by spec-062. This keeps the
+core API usable by tests and future integrations without introducing a
+second, provisional CLI/configuration path while the CLI spec is unimplemented.
