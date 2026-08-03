@@ -14,9 +14,10 @@ parallel dispatch + cache locking.
 
 - Replace the single-threaded per-file loop in `LintEngine::lint` with a
   `rayon::par_iter` over documents.
-- Thread-safe cache (spec-013): wrap the in-memory map in a `DashMap` (or
-  `Mutex<HashMap>`) so parallel workers can read cached diagnostics without
-  contention.
+- Thread-safe cache (spec-013): protect the in-memory map with a recoverable
+  `RwLock` so parallel workers can read cached diagnostics without
+  contention. `Cache::get` returns an owned snapshot, so no lock guard escapes
+  the cache.
 - Per-file results collected into `ProjectLintResult` with deterministic order
   (sort by path after parallel collect — parallel iteration order is
   nondeterministic; the final sort in spec-011 is preserved).
@@ -42,8 +43,9 @@ parallel dispatch + cache locking.
 
 - Modified `crates/rglint-core/src/engine.rs`.
 - Modified `crates/rglint-core/src/cache.rs` (thread-safe store).
-- A benchmark (feeds into spec-065) showing ≥2× speedup on a 50-file project
-  with 4+ cores.
+- A focused determinism/contention test suite. Criterion benchmark corpus and
+  the ≥2× 50-file speedup measurement remain owned by spec-065, which provides
+  the benchmark harness used by the performance phase.
 
 ## Interface / API
 
@@ -56,7 +58,7 @@ impl LintEngine {
             .collect();
         // sort + assemble
     }
-    pub fn set_thread_pool(&self, n: usize);  // or use rayon::ThreadPoolBuilder
+    pub fn set_thread_pool(&self, n: usize) -> Result<(), LintEngineError>;
 }
 ```
 
@@ -79,3 +81,21 @@ impl LintEngine {
 - `apollo_compiler` types: verify `Schema` and `ExecutableDocument` are
   `Sync` (they should be — they're ASTs behind `Arc`). If not, the parallel
   path shares clones rather than refs.
+
+## Implementation notes
+
+- `LintEngine` owns a scoped Rayon pool, defaults it to
+  `available_parallelism()`, and exposes the already-owned CLI `--jobs` value
+  through `set_thread_pool`. The WASM build validates the value but uses the
+  serial collector.
+- The engine catches a panic around each worker's complete file lint and emits
+  one `internal-error` diagnostic for that file. It also adds a project/rules
+  namespace to cache hashes so a shared engine cannot reuse diagnostics across
+  different schemas, sibling documents, or rule options.
+- Final diagnostic ordering uses a stable sort over the specified
+  `(file, line, column, rule_id)` key. Rayon’s indexed collection preserves the
+  deterministic input-file and within-file emission order for diagnostics that
+  share the same primary key.
+- The benchmark deliverable is deliberately left to spec-065's Criterion
+  setup; this spec's tests cover correctness and contention without introducing
+  a competing timing harness.

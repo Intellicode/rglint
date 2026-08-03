@@ -46,6 +46,9 @@ pub struct Cli {
     /// Fail when the warning count exceeds this number.
     #[arg(long, value_name = "N")]
     pub max_warnings: Option<usize>,
+    /// Cap the number of parallel file workers. Defaults to the CPU count.
+    #[arg(long, value_name = "N", value_parser = parse_positive_jobs)]
+    pub jobs: Option<usize>,
     /// Enable a rule, replacing the configured rules. May be repeated.
     #[arg(long, value_name = "RULE", action = clap::ArgAction::Append)]
     pub rule: Vec<String>,
@@ -122,6 +125,11 @@ pub fn run(cli: Cli) -> ExitCode {
         Ok(engine) => engine,
         Err(error) => return fail(ExitCode::ConfigError, error.to_string()),
     };
+    if let Some(jobs) = cli.jobs {
+        if let Err(error) = engine.set_thread_pool(jobs) {
+            return fail(ExitCode::ConfigError, error.to_string());
+        }
+    }
     let resolver = rglint_core::ProjectResolver::new(config_dir);
     let mut projects = match resolver.resolve(&project_configs) {
         Ok(projects) => projects,
@@ -300,6 +308,16 @@ fn absolute(cwd: &Path, path: &Path) -> PathBuf {
     }
 }
 
+fn parse_positive_jobs(value: &str) -> Result<usize, String> {
+    let jobs = value
+        .parse::<usize>()
+        .map_err(|_| format!("worker count `{value}` is not a positive integer"))?;
+    if jobs == 0 {
+        return Err("worker count must be greater than zero".to_owned());
+    }
+    Ok(jobs)
+}
+
 fn render(
     format: Format,
     color: bool,
@@ -393,6 +411,8 @@ mod tests {
             "--fix-dry-run",
             "--max-warnings",
             "0",
+            "--jobs",
+            "2",
             "--rule",
             "alphabetize",
             "file.graphql",
@@ -401,7 +421,13 @@ mod tests {
         assert_eq!(cli.format, Some(OutputFormat::Json));
         assert!(cli.fix_dry_run);
         assert_eq!(cli.max_warnings, Some(0));
+        assert_eq!(cli.jobs, Some(2));
         assert_eq!(cli.rule, vec!["alphabetize"]);
+    }
+
+    #[test]
+    fn parser_rejects_zero_jobs() {
+        assert!(Cli::try_parse_from(["rglint", "--jobs", "0"]).is_err());
     }
 
     #[test]

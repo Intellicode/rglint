@@ -50,12 +50,19 @@
 //! beyond a second pass over the bytes.
 
 use std::collections::HashMap;
+use std::panic::{catch_unwind, AssertUnwindSafe};
 use std::path::PathBuf;
+use std::sync::{Arc, RwLock};
 
 use apollo_parser::cst::CstNode;
 use apollo_parser::{Parser, SyntaxKind, SyntaxNode};
+#[cfg(not(target_arch = "wasm32"))]
+use rayon::prelude::*;
+#[cfg(not(target_arch = "wasm32"))]
+use rayon::{ThreadPool, ThreadPoolBuilder};
 
-use crate::diagnostics::{Diagnostic, Severity};
+use crate::cache::{Cache, CacheKey, CachedResult};
+use crate::diagnostics::{Diagnostic, DiagnosticBuilder, Severity};
 use crate::location::Span;
 use crate::node::Node;
 use crate::project::Project;
@@ -72,6 +79,12 @@ pub enum LintEngineError {
     UnknownRule {
         /// The unresolved rule id.
         rule_id: String,
+    },
+    /// Rayon could not create the requested worker pool.
+    #[error("invalid lint worker pool: {message}")]
+    ThreadPool {
+        /// The underlying Rayon configuration error.
+        message: String,
     },
 }
 
@@ -151,6 +164,9 @@ pub struct ProjectLintResult {
 #[derive(Debug)]
 pub struct LintEngine {
     rules: Vec<EnabledRule>,
+    cache: Arc<Cache>,
+    #[cfg(not(target_arch = "wasm32"))]
+    thread_pool: RwLock<ThreadPool>,
 }
 
 impl LintEngine {
@@ -161,6 +177,15 @@ impl LintEngine {
     /// [`LintEngineError::UnknownRule`] for the first rule id in `config` that
     /// is not present in the registry.
     pub fn new(config: &RulesConfig) -> Result<Self, LintEngineError> {
+        Self::new_with_cache(config, Cache::memory())
+    }
+
+    /// Resolve the configured rules and use `cache` for concurrent, content
+    /// addressed diagnostic reuse. The cache is scoped by the engine's rules
+    /// and each project's schema/document set before a file key is generated,
+    /// so reusing one engine across projects cannot return diagnostics from a
+    /// different execution context.
+    pub fn new_with_cache(config: &RulesConfig, cache: Cache) -> Result<Self, LintEngineError> {
         let mut rules = Vec::with_capacity(config.rules.len());
         for rc in &config.rules {
             let entry = ALL_RULES
@@ -175,14 +200,52 @@ impl LintEngine {
                 options: rc.options.clone(),
             });
         }
-        Ok(Self { rules })
+        Ok(Self {
+            rules,
+            cache: Arc::new(cache),
+            #[cfg(not(target_arch = "wasm32"))]
+            thread_pool: RwLock::new(
+                default_thread_pool().map_err(|message| LintEngineError::ThreadPool { message })?,
+            ),
+        })
     }
 
     /// Build an engine from already-resolved [`EnabledRule`]s, bypassing the
     /// registry lookup. Useful for tests that construct [`RuleEntry`]s manually
     /// (e.g. to set `interested_kinds`) without going through `#[derive(Rule)]`.
     pub fn from_enabled_rules(rules: Vec<EnabledRule>) -> Self {
-        Self { rules }
+        Self {
+            rules,
+            cache: Arc::new(Cache::memory()),
+            #[cfg(not(target_arch = "wasm32"))]
+            thread_pool: RwLock::new(
+                default_thread_pool().expect("the default Rayon worker pool must build"),
+            ),
+        }
+    }
+
+    /// Replace this engine's worker pool. `n` must be greater than zero.
+    /// WASM keeps the validation surface but always uses the serial path.
+    pub fn set_thread_pool(&self, n: usize) -> Result<(), LintEngineError> {
+        if n == 0 {
+            return Err(LintEngineError::ThreadPool {
+                message: "worker count must be greater than zero".to_owned(),
+            });
+        }
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            let pool = ThreadPoolBuilder::new()
+                .num_threads(n)
+                .build()
+                .map_err(|error| LintEngineError::ThreadPool {
+                    message: error.to_string(),
+                })?;
+            *self
+                .thread_pool
+                .write()
+                .unwrap_or_else(std::sync::PoisonError::into_inner) = pool;
+        }
+        Ok(())
     }
 
     /// Return the resolved rules for engine adapters such as [`crate::Fixer`].
@@ -195,8 +258,9 @@ impl LintEngine {
     ///
     /// Rules whose `requires_schema` precondition is unmet (project has no
     /// schema) are skipped silently, as are `requires_siblings` rules when no
-    /// document siblings were loaded. Parallelism (spec-064) and `--fix`
-    /// (spec-061) are out of scope here; this is a single-threaded walk today.
+    /// document siblings were loaded. Files are dispatched through the
+    /// engine's scoped Rayon pool; the WASM build uses the same code path
+    /// serially because it has no worker threads.
     pub fn lint(&self, project: &Project) -> Result<ProjectLintResult, LintEngineError> {
         let schema_ref = project.schema.as_deref().map(|ls| &ls.compiler);
         let siblings = if project.siblings.is_available() {
@@ -218,6 +282,35 @@ impl LintEngine {
             source_index.insert(doc.source.path().to_path_buf(), doc.source.clone());
         }
 
+        // Build a stable input list first. The list order is useful for
+        // diagnostics and aliases, but workers must not rely on collection
+        // order because Rayon is deliberately free to schedule files
+        // differently on each run.
+        let mut inputs = Vec::new();
+        if let Some(schema) = project.schema.as_deref() {
+            for sf in &schema.sources {
+                inputs.push(LintInput {
+                    source: sf.clone(),
+                    parse_errors: Vec::new(),
+                });
+            }
+        }
+        for doc in &project.documents.docs {
+            inputs.push(LintInput {
+                source: doc.source.clone(),
+                parse_errors: doc.parse_errors.clone(),
+            });
+        }
+
+        let cache_namespace = cache_namespace(project, &self.rules);
+        let results = self.lint_inputs(
+            &inputs,
+            schema_ref,
+            siblings,
+            &project.config,
+            cache_namespace,
+        );
+
         // Each entry: (file_path, file_diags). We collect first per source
         // file (so `by_file` reflects the file the diagnostics point at), then
         // merge into the result's `all` and `by_file`.
@@ -227,36 +320,8 @@ impl LintEngine {
         // diagnostics (see ProjectLintResult docs).
         let mut by_file: HashMap<PathBuf, Vec<Diagnostic>> =
             HashMap::with_capacity(source_index.len());
-
-        // 1. Schema source files (walked for schema-rules; operation rules
-        //    self-filter by kind since CST has no OPERATION_DEFINITION here).
-        if let Some(schema) = project.schema.as_deref() {
-            for sf in &schema.sources {
-                let file_diags = lint_one_file(
-                    sf.as_ref(),
-                    &self.rules,
-                    schema_ref,
-                    siblings,
-                    &project.config,
-                    &[],
-                );
-                index_into(&mut by_file, &mut all, sf.path(), file_diags);
-            }
-        }
-
-        // 2. Operation documents. Parse errors from each LoadedDocument are
-        //    emitted *before* rule handlers run (spec step 1).
-        for doc in &project.documents.docs {
-            let sf = doc.source.as_ref();
-            let file_diags = lint_one_file(
-                sf,
-                &self.rules,
-                schema_ref,
-                siblings,
-                &project.config,
-                &doc.parse_errors,
-            );
-            index_into(&mut by_file, &mut all, sf.path(), file_diags);
+        for (path, file_diags) in results {
+            index_into(&mut by_file, &mut all, &path, file_diags);
         }
 
         // 3. Aliased paths (deduped to the same content hash) share the same
@@ -290,7 +355,7 @@ impl LintEngine {
         //    a stable sort key (path / line / column / rule_id bytes) so
         //    configurations ordering equal-key diagnostics deterministically
         //    by emission order.
-        all.sort_by_key(|d| sort_key(&source_index, d));
+        all.sort_by_key(|diagnostic| sort_key(&source_index, diagnostic));
 
         Ok(ProjectLintResult {
             project_name: project.config.name.clone(),
@@ -298,6 +363,184 @@ impl LintEngine {
             all,
             sources: source_index,
         })
+    }
+
+    fn lint_inputs(
+        &self,
+        inputs: &[LintInput],
+        schema: Option<&apollo_compiler::Schema>,
+        siblings: Option<&crate::siblings::Siblings>,
+        project_config: &crate::project::ProjectConfig,
+        cache_namespace: u64,
+    ) -> Vec<(PathBuf, Vec<Diagnostic>)> {
+        #[cfg(not(target_arch = "wasm32"))]
+        let run = || {
+            inputs
+                .par_iter()
+                .map(|input| {
+                    lint_one_file_cached(
+                        input,
+                        &self.rules,
+                        schema,
+                        siblings,
+                        project_config,
+                        cache_namespace,
+                        &self.cache,
+                    )
+                })
+                .collect()
+        };
+        #[cfg(target_arch = "wasm32")]
+        let run = || {
+            inputs
+                .iter()
+                .map(|input| {
+                    lint_one_file_cached(
+                        input,
+                        &self.rules,
+                        schema,
+                        siblings,
+                        project_config,
+                        cache_namespace,
+                        &self.cache,
+                    )
+                })
+                .collect()
+        };
+
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            let pool = self
+                .thread_pool
+                .read()
+                .unwrap_or_else(std::sync::PoisonError::into_inner);
+            pool.install(run)
+        }
+        #[cfg(target_arch = "wasm32")]
+        {
+            run()
+        }
+    }
+}
+
+/// One independent source unit submitted to the worker pool.
+struct LintInput {
+    source: Arc<SourceFile>,
+    parse_errors: Vec<Diagnostic>,
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+fn default_thread_pool() -> Result<ThreadPool, String> {
+    let jobs = std::thread::available_parallelism()
+        .map(|count| count.get())
+        .unwrap_or(1);
+    ThreadPoolBuilder::new()
+        .num_threads(jobs)
+        .build()
+        .map_err(|error| error.to_string())
+}
+
+/// Build a namespace for the execution context, preventing a cache hit from
+/// crossing rule, schema, or sibling-document changes. The public cache still
+/// uses its documented `(path, hash)` key; the engine's hash is the source
+/// content combined with this namespace.
+fn cache_namespace(project: &Project, rules: &[EnabledRule]) -> u64 {
+    let mut bytes = Vec::new();
+    append_cache_part(&mut bytes, project.config.name.as_bytes());
+    for ignore in &project.config.ignore {
+        append_cache_part(&mut bytes, ignore.as_bytes());
+    }
+    for rule in rules {
+        append_cache_part(&mut bytes, rule.entry.meta.id.as_bytes());
+        append_cache_part(&mut bytes, &[rule.severity as u8]);
+        if let Ok(options) = serde_json::to_vec(&rule.options) {
+            append_cache_part(&mut bytes, &options);
+        }
+    }
+    if let Some(schema) = &project.schema {
+        for source in &schema.sources {
+            append_cache_part(&mut bytes, source.path().to_string_lossy().as_bytes());
+            append_cache_part(&mut bytes, source.source().as_bytes());
+        }
+    }
+    for document in &project.documents.docs {
+        append_cache_part(
+            &mut bytes,
+            document.source.path().to_string_lossy().as_bytes(),
+        );
+        append_cache_part(&mut bytes, document.source.source().as_bytes());
+    }
+    Cache::hash(&bytes)
+}
+
+fn append_cache_part(bytes: &mut Vec<u8>, part: &[u8]) {
+    bytes.extend_from_slice(&(part.len() as u64).to_le_bytes());
+    bytes.extend_from_slice(part);
+}
+
+fn lint_one_file_cached(
+    input: &LintInput,
+    rules: &[EnabledRule],
+    schema: Option<&apollo_compiler::Schema>,
+    siblings: Option<&crate::siblings::Siblings>,
+    project_config: &crate::project::ProjectConfig,
+    cache_namespace: u64,
+    cache: &Cache,
+) -> (PathBuf, Vec<Diagnostic>) {
+    let path = input.source.path().to_path_buf();
+    let mut material = Vec::with_capacity(input.source.source().len() + 8);
+    material.extend_from_slice(input.source.source().as_bytes());
+    material.extend_from_slice(&cache_namespace.to_le_bytes());
+    let key = CacheKey {
+        path: path.clone(),
+        hash: Cache::hash(&material),
+    };
+    if let Some(cached) = cache.get(&key) {
+        return (path, cached.diagnostics);
+    }
+
+    let result = catch_unwind(AssertUnwindSafe(|| {
+        lint_one_file(
+            input.source.as_ref(),
+            rules,
+            schema,
+            siblings,
+            project_config,
+            &input.parse_errors,
+        )
+    }));
+    match result {
+        Ok(diagnostics) => {
+            cache.insert(
+                key,
+                CachedResult {
+                    diagnostics: diagnostics.clone(),
+                },
+            );
+            (path, diagnostics)
+        }
+        Err(payload) => {
+            let message = format!(
+                "worker panicked while linting `{}`: {}",
+                path.display(),
+                panic_message(payload.as_ref()),
+            );
+            let diagnostic =
+                DiagnosticBuilder::new("internal-error", path.clone(), Span::new(0, 0), message)
+                    .severity(Severity::Error)
+                    .finish();
+            (path, vec![diagnostic])
+        }
+    }
+}
+
+fn panic_message(payload: &(dyn std::any::Any + Send)) -> String {
+    if let Some(message) = payload.downcast_ref::<&str>() {
+        (*message).to_owned()
+    } else if let Some(message) = payload.downcast_ref::<String>() {
+        message.clone()
+    } else {
+        "unknown panic payload".to_owned()
     }
 }
 
