@@ -13,7 +13,11 @@ serde_json.workspace = true
 rglint-core = { path = "../rglint-core" }
 rglint-config = { path = "../rglint-config" }
 rglint-rules = { path = "../rglint-rules" }
+walkdir.workspace = true
 
 [dev-dependencies]
+assert_cmd = "2"
 insta.workspace = true
 jsonschema.workspace = true
+predicates = "3"
+tempfile.workspace = true

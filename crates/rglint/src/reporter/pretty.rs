@@ -17,12 +17,22 @@ use super::Reporter;
 pub struct PrettyReporter {
     /// Whether miette should use ANSI styling.
     pub color: bool,
+    /// Whether to append the problems summary.
+    pub summary: bool,
 }
 
 impl PrettyReporter {
     /// Construct a reporter with explicit color behavior.
     pub const fn new(color: bool) -> Self {
-        Self { color }
+        Self {
+            color,
+            summary: true,
+        }
+    }
+
+    /// Construct a reporter with explicit color and summary behavior.
+    pub const fn new_with_summary(color: bool, summary: bool) -> Self {
+        Self { color, summary }
     }
 
     fn handler(&self) -> GraphicalReportHandler {
@@ -92,13 +102,15 @@ impl Reporter for PrettyReporter {
             }
         }
 
-        writeln!(
-            out,
-            "✖ {} problems ({} errors, {} warnings)",
-            errors + warnings,
-            errors,
-            warnings
-        )?;
+        if self.summary {
+            writeln!(
+                out,
+                "✖ {} problems ({} errors, {} warnings)",
+                errors + warnings,
+                errors,
+                warnings
+            )?;
+        }
         Ok(())
     }
 }
