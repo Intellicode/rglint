@@ -179,6 +179,7 @@ fn normalize_project(
             .exclude
             .map(StringOrStrings::into_vec)
             .unwrap_or_default(),
+        rules: None,
     })
 }
 

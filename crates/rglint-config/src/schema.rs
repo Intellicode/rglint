@@ -16,6 +16,8 @@ const CONFIG_NAMES: [&str; 4] = [
     "rglint.config.json",
 ];
 
+type ResolvedRuleMap = AHashMap<String, (Severity, serde_json::Value)>;
+
 /// The output format selected by the configuration file.
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub enum Format {
@@ -100,6 +102,9 @@ pub struct ProjectConfigRaw {
     pub documents: Option<DocumentSpecRaw>,
     /// Project-specific ignore globs, after top-level ignores are prepended.
     pub ignore: Vec<String>,
+    /// Project-local rules after resolving the project's `extends` entries,
+    /// or `None` when the project inherits the top-level rules unchanged.
+    pub rules: Option<AHashMap<String, (Severity, serde_json::Value)>>,
 }
 
 impl ProjectConfigRaw {
@@ -176,23 +181,40 @@ impl Config {
 
     /// Convert the normalized rule map into the engine's configuration.
     pub fn rules_config(&self) -> RulesConfig {
-        let mut ids: Vec<_> = self.rules.keys().collect();
-        ids.sort_unstable();
-        RulesConfig {
-            rules: ids
-                .into_iter()
-                .map(|id| {
-                    let (severity, options) = &self.rules[id];
-                    rglint_core::RuleConfig {
-                        id: id.clone(),
-                        severity: *severity,
-                        options: options.clone(),
-                    }
-                })
-                .collect(),
-        }
+        rules_config_from_map(&self.rules)
     }
 
+    /// Convert the effective rules for one named project into the engine's
+    /// configuration. Project-local rules layer over the top-level rules;
+    /// projects without a local rules block inherit the top-level map.
+    pub fn rules_config_for_project(&self, project: &ProjectConfigRaw) -> RulesConfig {
+        let mut rules = self.rules.clone();
+        if let Some(project_rules) = &project.rules {
+            rules.extend(project_rules.clone());
+        }
+        rules_config_from_map(&rules)
+    }
+}
+
+fn rules_config_from_map(rules: &AHashMap<String, (Severity, serde_json::Value)>) -> RulesConfig {
+    let mut ids: Vec<_> = rules.keys().collect();
+    ids.sort_unstable();
+    RulesConfig {
+        rules: ids
+            .into_iter()
+            .map(|id| {
+                let (severity, options) = &rules[id];
+                rglint_core::RuleConfig {
+                    id: id.clone(),
+                    severity: *severity,
+                    options: options.clone(),
+                }
+            })
+            .collect(),
+    }
+}
+
+impl Config {
     /// Convert normalized projects for [`rglint_core::ProjectResolver`].
     pub fn project_configs(&self) -> Vec<ProjectConfig> {
         self.projects
@@ -217,6 +239,8 @@ impl Serialize for Config {
                         schema: project.schema.clone(),
                         documents: project.documents.clone(),
                         ignore: local_ignore(&self.ignore, &project.ignore),
+                        rules: project.rules.as_ref().map(serialize_rules),
+                        extends: None,
                     },
                 )
             })
@@ -375,18 +399,25 @@ fn normalize(raw: RawConfig) -> Result<Config, ConfigError> {
     let projects = match raw.projects {
         Some(projects) => projects
             .into_iter()
-            .map(|(name, project)| ProjectConfigRaw {
-                name,
-                schema: project.schema,
-                documents: project.documents,
-                ignore: prepend_ignore(&top_ignore, project.ignore),
+            .map(|(name, project)| {
+                Ok(ProjectConfigRaw {
+                    name,
+                    schema: project.schema,
+                    documents: project.documents,
+                    ignore: prepend_ignore(&top_ignore, project.ignore),
+                    rules: resolve_project_rules(
+                        project.extends,
+                        project.rules.unwrap_or_default(),
+                    )?,
+                })
             })
-            .collect(),
+            .collect::<Result<Vec<_>, _>>()?,
         None => vec![ProjectConfigRaw {
             name: "default".to_owned(),
             schema: raw.schema,
             documents: raw.documents,
             ignore: top_ignore.clone(),
+            rules: None,
         }],
     };
     let rules = raw
@@ -414,6 +445,43 @@ fn normalize(raw: RawConfig) -> Result<Config, ConfigError> {
     }
 
     Ok(config)
+}
+
+fn resolve_project_rules(
+    extends: Option<ExtendsRaw>,
+    raw_rules: BTreeMap<String, RuleConfig>,
+) -> Result<Option<ResolvedRuleMap>, ConfigError> {
+    if extends.is_none() && raw_rules.is_empty() {
+        return Ok(None);
+    }
+
+    let rules = raw_rules
+        .into_iter()
+        .map(|(id, setting)| parse_rule(&id, setting).map(|resolved| (id, resolved)))
+        .collect::<Result<AHashMap<_, _>, _>>()?;
+    let mut config = Config {
+        projects: Vec::new(),
+        rules,
+        ignore: Vec::new(),
+        format: Format::default(),
+    };
+
+    let extends = match extends {
+        Some(ExtendsRaw::Single(name)) => vec![name],
+        Some(ExtendsRaw::Multiple(names)) => names,
+        None => Vec::new(),
+    };
+    for name in extends {
+        let preset = crate::preset::resolve(&name, &mut Vec::new()).map_err(|message| {
+            ConfigError::InvalidPreset {
+                name: name.clone(),
+                message,
+            }
+        })?;
+        config.extend_with(preset);
+    }
+
+    Ok(Some(config.rules))
 }
 
 fn parse_rule(id: &str, setting: RuleConfig) -> Result<(Severity, serde_json::Value), ConfigError> {
@@ -464,6 +532,23 @@ fn severity_to_str(severity: Severity) -> &'static str {
         Severity::Warn => "warn",
         Severity::Error => "error",
     }
+}
+
+fn serialize_rules(
+    rules: &AHashMap<String, (Severity, serde_json::Value)>,
+) -> BTreeMap<String, RuleConfig> {
+    rules
+        .iter()
+        .map(|(id, (severity, options))| {
+            (
+                id.clone(),
+                RuleConfig::Tuple(vec![
+                    serde_json::Value::String(severity_to_str(*severity).to_owned()),
+                    options.clone(),
+                ]),
+            )
+        })
+        .collect()
 }
 
 fn prepend_ignore(top: &[String], local: Vec<String>) -> Vec<String> {
@@ -551,9 +636,12 @@ enum ExtendsRaw {
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
 #[serde(default)]
 struct RawProjectConfig {
+    extends: Option<ExtendsRaw>,
     schema: Option<SchemaSpecRaw>,
     documents: Option<DocumentSpecRaw>,
     ignore: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    rules: Option<BTreeMap<String, RuleConfig>>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -632,6 +720,44 @@ ignore = ["web-generated/**"]
         );
         assert_eq!(config.format, Format::Sarif);
         assert_eq!(config.rules["naming-convention"].0, Severity::Off);
+    }
+
+    #[test]
+    fn project_rules_resolve_presets_and_override_top_level_rules() {
+        let dir = tempdir().unwrap();
+        let path = dir.path().join(".rglintrc.toml");
+        fs::write(
+            &path,
+            r#"extends = "operations-recommended"
+
+[rules]
+"no-anonymous-operations" = "off"
+
+[projects.schema]
+schema = "schema.graphqls"
+extends = "schema-recommended"
+
+[projects.schema.rules]
+"naming-convention" = "off"
+"#,
+        )
+        .unwrap();
+
+        let config = load(&path).unwrap();
+        let schema = &config.projects[0];
+        let local_rules = schema.rules.as_ref().expect("project rules");
+        assert_eq!(local_rules["description-style"].0, Severity::Error);
+        assert_eq!(local_rules["naming-convention"].0, Severity::Off);
+
+        let effective = config.rules_config_for_project(schema);
+        assert!(effective
+            .rules
+            .iter()
+            .any(|rule| rule.id == "no-anonymous-operations" && rule.severity == Severity::Off));
+        assert!(effective
+            .rules
+            .iter()
+            .any(|rule| rule.id == "description-style" && rule.severity == Severity::Error));
     }
 
     #[test]
@@ -717,7 +843,7 @@ ignore = ["web-generated/**"]
         let source = dir.path().join(".rglintrc.json");
         fs::write(
             &source,
-            r#"{"projects":{"web":{"schema":"schema.graphql","documents":"src/*.graphql","ignore":["generated/**"]}},"rules":{"no-deprecated":["error",{}]},"ignore":["node_modules/**"],"format":"github"}"#,
+            r#"{"projects":{"web":{"schema":"schema.graphql","documents":"src/*.graphql","ignore":["generated/**"],"rules":{"no-anonymous-operations":"warn"}}},"rules":{"no-deprecated":["error",{}]},"ignore":["node_modules/**"],"format":"github"}"#,
         )
         .unwrap();
         let original = load(&source).unwrap();

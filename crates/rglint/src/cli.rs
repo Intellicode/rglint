@@ -117,29 +117,34 @@ pub fn run(cli: Cli) -> ExitCode {
         project_configs[0].documents = Some(rglint_core::DocumentSpec::Files(files));
     }
 
-    let rules = match configured_rules(&config, &cli.rule) {
-        Ok(rules) => rules,
-        Err(error) => return fail(ExitCode::ConfigError, error),
-    };
-    let engine = match LintEngine::new(&rules) {
-        Ok(engine) => engine,
-        Err(error) => return fail(ExitCode::ConfigError, error.to_string()),
-    };
-    if let Some(jobs) = cli.jobs {
-        if let Err(error) = engine.set_thread_pool(jobs) {
-            return fail(ExitCode::ConfigError, error.to_string());
-        }
-    }
     let resolver = rglint_core::ProjectResolver::new(config_dir);
     let mut projects = match resolver.resolve(&project_configs) {
         Ok(projects) => projects,
         Err(error) => return fail(ExitCode::ConfigError, error.to_string()),
     };
 
+    let mut engines = Vec::with_capacity(projects.len());
+    for project in &projects {
+        let rules = match configured_rules(&config, &cli.rule, &project.config.name) {
+            Ok(rules) => rules,
+            Err(error) => return fail(ExitCode::ConfigError, error),
+        };
+        let engine = match LintEngine::new(&rules) {
+            Ok(engine) => engine,
+            Err(error) => return fail(ExitCode::ConfigError, error.to_string()),
+        };
+        if let Some(jobs) = cli.jobs {
+            if let Err(error) = engine.set_thread_pool(jobs) {
+                return fail(ExitCode::ConfigError, error.to_string());
+            }
+        }
+        engines.push(engine);
+    }
+
     if cli.fix_dry_run {
-        let fixer = Fixer::new(&engine);
         let mut stdout = io::stdout().lock();
-        for project in &projects {
+        for (project, engine) in projects.iter().zip(&engines) {
+            let fixer = Fixer::new(engine);
             match fixer.dry_run(project) {
                 Ok(diffs) => {
                     for diff in diffs {
@@ -158,10 +163,10 @@ pub fn run(cli: Cli) -> ExitCode {
     }
 
     let mut results = Vec::with_capacity(projects.len());
-    for project in &mut projects {
+    for (project, engine) in projects.iter_mut().zip(&engines) {
         progress(project, cli.quiet);
         if cli.fix {
-            match Fixer::new(&engine).fix(project) {
+            match Fixer::new(engine).fix(project) {
                 Ok(summary) if !cli.quiet => {
                     eprintln!(
                         "Fixed {} file(s) in {} pass(es); {} diagnostic(s) remain.",
@@ -208,6 +213,7 @@ fn read_config(cli: &Cli, cwd: &Path) -> Result<(Config, PathBuf), String> {
                 schema: None,
                 documents: None,
                 ignore: Vec::new(),
+                rules: None,
             }]
         } else {
             vec![ProjectConfigRaw {
@@ -215,6 +221,7 @@ fn read_config(cli: &Cli, cwd: &Path) -> Result<(Config, PathBuf), String> {
                 schema: None,
                 documents: Some(DocumentSpecRaw::Multiple(Vec::new())),
                 ignore: Vec::new(),
+                rules: None,
             }]
         };
         return Ok((
@@ -241,7 +248,11 @@ fn read_config(cli: &Cli, cwd: &Path) -> Result<(Config, PathBuf), String> {
     Ok((config, path.parent().unwrap_or(cwd).to_path_buf()))
 }
 
-fn configured_rules(config: &Config, overrides: &[String]) -> Result<RulesConfig, String> {
+fn configured_rules(
+    config: &Config,
+    overrides: &[String],
+    project_name: &str,
+) -> Result<RulesConfig, String> {
     if !overrides.is_empty() {
         return Ok(RulesConfig {
             rules: overrides
@@ -262,7 +273,13 @@ fn configured_rules(config: &Config, overrides: &[String]) -> Result<RulesConfig
     config
         .validate(&entries)
         .map_err(|error| error.to_string())?;
-    Ok(config.rules_config())
+    let project = config
+        .projects
+        .iter()
+        .find(|project| project.name == project_name);
+    Ok(project
+        .map(|project| config.rules_config_for_project(project))
+        .unwrap_or_else(|| config.rules_config()))
 }
 
 fn collect_paths(cwd: &Path, paths: &[PathBuf]) -> Result<Vec<PathBuf>, String> {

@@ -106,6 +106,73 @@ fn recommended_preset_runs_through_the_combined_rule_registry() {
 }
 
 #[test]
+fn project_rules_are_selected_independently() {
+    let dir = tempdir().expect("tempdir");
+    fs::write(
+        dir.path().join("schema.graphqls"),
+        "type User { userId: ID }\n",
+    )
+    .expect("schema");
+    fs::write(dir.path().join("query.graphql"), "query { hero }\n").expect("document");
+    fs::write(
+        dir.path().join(".rglintrc.toml"),
+        r#"[projects.schema]
+schema = "schema.graphqls"
+
+[projects.schema.rules]
+"no-typename-prefix" = "error"
+
+[projects.operations]
+documents = "query.graphql"
+
+[projects.operations.rules]
+"no-anonymous-operations" = "error"
+"#,
+    )
+    .expect("config");
+
+    let output = command()
+        .current_dir(dir.path())
+        .args(["--format", "json"])
+        .output()
+        .expect("run rglint");
+
+    assert_eq!(output.status.code(), Some(1));
+    let json: Value = serde_json::from_slice(&output.stdout).expect("json output");
+    let messages: Vec<(String, String)> = json
+        .as_array()
+        .expect("file results")
+        .iter()
+        .flat_map(|file| {
+            let path = file["filePath"].as_str().unwrap_or_default().to_owned();
+            file["messages"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .map(move |message| {
+                    (
+                        path.clone(),
+                        message["ruleId"].as_str().unwrap_or_default().to_owned(),
+                    )
+                })
+        })
+        .collect();
+
+    assert!(messages
+        .iter()
+        .any(|(path, rule)| { path.ends_with("schema.graphqls") && rule == "no-typename-prefix" }));
+    assert!(messages.iter().any(|(path, rule)| {
+        path.ends_with("query.graphql") && rule == "no-anonymous-operations"
+    }));
+    assert!(!messages.iter().any(|(path, rule)| {
+        path.ends_with("schema.graphqls") && rule == "no-anonymous-operations"
+    }));
+    assert!(!messages
+        .iter()
+        .any(|(path, rule)| { path.ends_with("query.graphql") && rule == "no-typename-prefix" }));
+}
+
+#[test]
 fn bad_config_uses_exit_two_and_stderr() {
     let dir = tempdir().expect("tempdir");
     fs::write(dir.path().join("bad.toml"), "format = \"not-a-format\"\n").expect("config");

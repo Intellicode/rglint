@@ -5,6 +5,7 @@
 //! those values without making the file-facing config model depend on the
 //! built-in rule crate.
 
+use ahash::AHashMap;
 use rglint_core::{RuleEntry, RuleMeta, Severity};
 use serde_json::Value;
 
@@ -75,17 +76,10 @@ impl Config {
     pub fn validate(&self, rules: &[&RuleEntry]) -> Result<(), ConfigError> {
         let mut errors = Vec::new();
 
-        for (rule_id, (severity, options)) in &self.rules {
-            if *severity == Severity::Off {
-                continue;
-            }
-
-            let Some(entry) = rules.iter().find(|entry| entry.meta.id == rule_id) else {
-                continue;
-            };
-
-            if let Err(mut rule_errors) = validate_rule_options(entry.meta, options) {
-                errors.append(&mut rule_errors);
+        validate_rule_map(&self.rules, rules, &mut errors);
+        for project in &self.projects {
+            if let Some(project_rules) = &project.rules {
+                validate_rule_map(project_rules, rules, &mut errors);
             }
         }
 
@@ -93,6 +87,26 @@ impl Config {
             Ok(())
         } else {
             Err(ConfigError::InvalidRuleOptions { errors })
+        }
+    }
+}
+
+fn validate_rule_map(
+    configured: &AHashMap<String, (Severity, Value)>,
+    rules: &[&RuleEntry],
+    errors: &mut Vec<RuleOptionError>,
+) {
+    for (rule_id, (severity, options)) in configured {
+        if *severity == Severity::Off {
+            continue;
+        }
+
+        let Some(entry) = rules.iter().find(|entry| entry.meta.id == rule_id) else {
+            continue;
+        };
+
+        if let Err(mut rule_errors) = validate_rule_options(entry.meta, options) {
+            errors.append(&mut rule_errors);
         }
     }
 }
@@ -252,5 +266,33 @@ mod tests {
             }
             other => panic!("unexpected error: {other:?}"),
         }
+    }
+
+    #[test]
+    fn config_validation_checks_project_local_options() {
+        let config = Config {
+            projects: vec![crate::ProjectConfigRaw {
+                name: "project".to_owned(),
+                schema: None,
+                documents: None,
+                ignore: Vec::new(),
+                rules: Some(
+                    [(
+                        "test-options".to_owned(),
+                        (Severity::Error, serde_json::json!({"maxDepth": "x"})),
+                    )]
+                    .into_iter()
+                    .collect(),
+                ),
+            }],
+            rules: Default::default(),
+            ignore: Vec::new(),
+            format: crate::Format::Pretty,
+        };
+
+        let error = config
+            .validate(&[&TEST_ENTRY])
+            .expect_err("project-local invalid options must be returned");
+        assert!(matches!(error, ConfigError::InvalidRuleOptions { .. }));
     }
 }
