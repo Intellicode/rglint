@@ -177,6 +177,24 @@ result, merge result, and refreshed `main` status are all part of completion.
   diff before staging; a local Rust test run does not validate GitHub Actions
   expression syntax or matrix behavior.
 
+### Coverage and cross-cutting test hygiene
+
+- Keep `scripts/coverage-gate.sh` fail-closed: a missing or malformed
+  Cobertura report, missing workspace rate, or missing `rglint-rules` module
+  data is a gate failure, never a skipped check. If thresholds are ratcheted,
+  update `docs/contributing.md` and the spec in the same focused change.
+- Coverage module rates must be derived from source-line hit counts, not only
+  package names; tarpaulin output layouts can vary between versions. Keep the
+  parser deterministic and print the complete module breakdown before failing.
+- Cross-cutting integration tests belong under the owning package's `tests/`
+  directory so Cargo actually compiles them; a root-level `tests/` directory
+  is not a workspace test target. Force-link every registry crate exercised by
+  a registry-wide test and deduplicate rule ids before iterating.
+- Malformed-input tests must assert both graceful completion and the stable
+  `parse-error` rule id. The engine must not run rule handlers against a file
+  whose parser already reported errors, while independent files and projects
+  in the same run continue normally.
+
 ### Configuration loader conventions
 
 - Keep the file-facing serde model separate from the normalized engine model.

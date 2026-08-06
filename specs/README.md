@@ -144,7 +144,7 @@ of work (a few hours to ~2 days) and declares its dependencies on prior specs.
 | [spec-067](implemented/spec-067.md) | CI pipeline (GitHub Actions) | `[x]` |
 | [spec-068](implemented/spec-068.md) | xtask gen-docs | `[x]` |
 | [spec-069](implemented/spec-069.md) | xtask check-parity | `[x]` |
-| [spec-070](spec-070.md) | Coverage gate + cross-cutting invariant tests | `[ ]` |
+| [spec-070](implemented/spec-070.md) | Coverage gate + cross-cutting invariant tests | `[x]` |
 
 ### Phase 10 — Optional stretch
 
