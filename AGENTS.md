@@ -70,6 +70,28 @@ result, merge result, and refreshed `main` status are all part of completion.
    limitation, then run `cargo build`, `cargo clippy`, and `cargo test` as
    separate commands so the first failure is unambiguous.
 
+### Benchmark and baseline hygiene
+
+- Put Criterion targets in the owning package and declare external benchmark
+  paths explicitly when the repository-level `benches/` layout is part of the
+  public workflow. Keep benchmark identifiers stable as `group/name`; changing
+  an identifier invalidates the corresponding baseline and must be called out
+  in the spec/PR.
+- Benchmark the behavior the spec claims: move corpus loading, project
+  resolution, and engine construction into Criterion setup when measuring lint
+  throughput, and create a fresh cache or explicitly document cache-hit
+  measurement. Do not let a persistent content-hash cache turn a full-lint
+  benchmark into a cache benchmark accidentally.
+- Treat committed performance baselines as deliberate pins, not generated
+  build output. Regenerate them only with the repository's comparison script,
+  review the complete key set, and record the command, host class, and reason
+  for re-pinning in the PR. CI compile-only checks must use `cargo bench
+  --no-run`; regression comparisons belong on dedicated or scheduled runners
+  because shared CI timing is noisy.
+- Every checked-in benchmark corpus needs a provenance/license note and must be
+  immutable input during a run. Prefer small, representative, license-clean
+  corpora over network downloads so benchmark results are reproducible offline.
+
 ### Configuration loader conventions
 
 - Keep the file-facing serde model separate from the normalized engine model.

@@ -1,0 +1,258 @@
+"""A repository and organization API used by the benchmark corpus."""
+type Query {
+  """Look up a repository by its owner and name."""
+  repository(owner: String!, name: String!): Repository
+  """Find repositories matching a search expression."""
+  searchRepositories(query: String!, first: Int = 20, after: String): RepositoryConnection!
+  """Look up an organization by login."""
+  organization(login: String!): Organization
+  """Return the authenticated viewer."""
+  viewer: User!
+}
+
+"""Mutations that change repository state."""
+type Mutation {
+  """Create an issue in a repository."""
+  createIssue(input: CreateIssueInput!): CreateIssuePayload!
+  """Add a label to an issue."""
+  addLabelsToLabelable(input: AddLabelsInput!): AddLabelsPayload!
+}
+
+"""The common identity interface."""
+interface Node {
+  """The globally unique identifier."""
+  id: ID!
+}
+
+"""A Git repository."""
+type Repository implements Node {
+  """The globally unique identifier."""
+  id: ID!
+  """The repository name."""
+  name: String!
+  """The repository's URL-friendly name."""
+  nameWithOwner: String!
+  """The repository description."""
+  description: String
+  """The repository owner."""
+  owner: RepositoryOwner!
+  """Whether the repository is archived."""
+  isArchived: Boolean!
+  """The repository's primary language."""
+  primaryLanguage: Language
+  """Issues opened in this repository."""
+  issues(first: Int = 20, after: String, states: [IssueState!] = [OPEN]): IssueConnection!
+  """Pull requests opened in this repository."""
+  pullRequests(first: Int = 20, after: String, states: [PullRequestState!] = [OPEN]): PullRequestConnection!
+  """The repository labels."""
+  labels(first: Int = 20, after: String): LabelConnection!
+  """The repository's default branch."""
+  defaultBranch: Ref
+  """The repository's topics."""
+  repositoryTopics(first: Int = 20, after: String): RepositoryTopicConnection!
+}
+
+"""A person or organization that owns a repository."""
+union RepositoryOwner = Organization | User
+
+"""A user account."""
+type User implements Node {
+  """The globally unique identifier."""
+  id: ID!
+  """The account login."""
+  login: String!
+  """The account's display name."""
+  name: String
+  """The account biography."""
+  bio: String
+  """Repositories owned by this account."""
+  repositories(first: Int = 20, after: String): RepositoryConnection!
+  """Issues authored by this account."""
+  issues(first: Int = 20, after: String): IssueConnection!
+}
+
+"""An organization account."""
+type Organization implements Node {
+  """The globally unique identifier."""
+  id: ID!
+  """The organization login."""
+  login: String!
+  """The organization name."""
+  name: String
+  """Repositories owned by this organization."""
+  repositories(first: Int = 20, after: String): RepositoryConnection!
+  """Members of this organization."""
+  members(first: Int = 20, after: String): UserConnection!
+}
+
+"""A programming language."""
+type Language implements Node {
+  """The globally unique identifier."""
+  id: ID!
+  """The language name."""
+  name: String!
+  """The language color."""
+  color: String
+}
+
+"""A branch or tag reference."""
+type Ref implements Node {
+  """The globally unique identifier."""
+  id: ID!
+  """The reference name."""
+  name: String!
+  """The commit at this reference."""
+  target: GitObject
+}
+
+"""A Git object."""
+interface GitObject implements Node {
+  """The globally unique identifier."""
+  id: ID!
+  """The abbreviated object name."""
+  abbreviatedOid: String!
+}
+
+"""A commit in a repository."""
+type Commit implements GitObject & Node {
+  """The globally unique identifier."""
+  id: ID!
+  """The abbreviated object name."""
+  abbreviatedOid: String!
+  """The commit message."""
+  message: String!
+  """The commit author."""
+  author: GitActor
+  """The commit timestamp."""
+  committedDate: DateTime
+  """The files changed by this commit."""
+  changedFilesIfAvailable: Int
+}
+
+"""A person or bot that authored a commit."""
+type GitActor implements Node {
+  """The globally unique identifier."""
+  id: ID!
+  """The actor's login."""
+  login: String
+  """The actor's display name."""
+  name: String
+  """The actor's email address."""
+  email: String
+}
+
+"""An issue in a repository."""
+type Issue implements Node & Assignable & Commentable {
+  """The globally unique identifier."""
+  id: ID!
+  """The issue number."""
+  number: Int!
+  """The issue title."""
+  title: String!
+  """The issue body."""
+  body: String!
+  """The issue state."""
+  state: IssueState!
+  """The issue author."""
+  author: User
+  """The issue labels."""
+  labels(first: Int = 20, after: String): LabelConnection!
+  """The issue comments."""
+  comments(first: Int = 20, after: String): CommentConnection!
+  """The issue assignees."""
+  assignees(first: Int = 20, after: String): UserConnection!
+}
+
+"""An issue or pull request label."""
+type Label implements Node {
+  """The globally unique identifier."""
+  id: ID!
+  """The label name."""
+  name: String!
+  """The label color without the leading hash."""
+  color: String!
+  """The label description."""
+  description: String
+}
+
+"""A pull request."""
+type PullRequest implements Node & Assignable & Commentable {
+  """The globally unique identifier."""
+  id: ID!
+  """The pull request number."""
+  number: Int!
+  """The pull request title."""
+  title: String!
+  """The pull request body."""
+  body: String!
+  """The pull request state."""
+  state: PullRequestState!
+  """The pull request author."""
+  author: User
+  """The pull request head reference."""
+  headRef: Ref
+  """The pull request base reference."""
+  baseRef: Ref
+  """The pull request review threads."""
+  reviewThreads(first: Int = 20, after: String): ReviewThreadConnection!
+}
+
+"""A commentable resource."""
+interface Commentable implements Node {
+  """The globally unique identifier."""
+  id: ID!
+  """Comments on the resource."""
+  comments(first: Int = 20, after: String): CommentConnection!
+}
+
+"""A resource that can be assigned to users."""
+interface Assignable implements Node {
+  """The globally unique identifier."""
+  id: ID!
+  """Users assigned to the resource."""
+  assignees(first: Int = 20, after: String): UserConnection!
+}
+
+"""A comment on an issue or pull request."""
+type Comment implements Node {
+  """The globally unique identifier."""
+  id: ID!
+  """The comment body."""
+  body: String!
+  """The comment author."""
+  author: User
+  """The comment creation time."""
+  createdAt: DateTime!
+}
+
+"""A review thread on a pull request."""
+type ReviewThread implements Node {
+  """The globally unique identifier."""
+  id: ID!
+  """The thread body."""
+  body: String!
+  """Whether the thread is resolved."""
+  isResolved: Boolean!
+  """The thread comments."""
+  comments(first: Int = 20, after: String): CommentConnection!
+}
+
+type RepositoryConnection { """The page information.""" pageInfo: PageInfo! """The repositories.""" nodes: [Repository!]! }
+type IssueConnection { """The page information.""" pageInfo: PageInfo! """The issues.""" nodes: [Issue!]! }
+type PullRequestConnection { """The page information.""" pageInfo: PageInfo! """The pull requests.""" nodes: [PullRequest!]! }
+type LabelConnection { """The page information.""" pageInfo: PageInfo! """The labels.""" nodes: [Label!]! }
+type UserConnection { """The page information.""" pageInfo: PageInfo! """The users.""" nodes: [User!]! }
+type CommentConnection { """The page information.""" pageInfo: PageInfo! """The comments.""" nodes: [Comment!]! }
+type ReviewThreadConnection { """The page information.""" pageInfo: PageInfo! """The threads.""" nodes: [ReviewThread!]! }
+type RepositoryTopicConnection { """The page information.""" pageInfo: PageInfo! """The topics.""" nodes: [RepositoryTopic!]! }
+type RepositoryTopic implements Node { """The globally unique identifier.""" id: ID! """The topic name.""" topic: String! }
+type PageInfo { """Whether another page exists.""" hasNextPage: Boolean! """Whether a prior page exists.""" hasPreviousPage: Boolean! """The first cursor.""" startCursor: String """The final cursor.""" endCursor: String }
+
+input CreateIssueInput { """The repository identifier.""" repositoryId: ID! """The issue title.""" title: String! """The issue body.""" body: String """The issue labels.""" labelIds: [ID!] = [] }
+input AddLabelsInput { """The labelable identifier.""" labelableId: ID! """The labels to add.""" labelIds: [ID!]! }
+type CreateIssuePayload { """The created issue.""" issue: Issue """The client mutation id.""" clientMutationId: String }
+type AddLabelsPayload { """The updated resource.""" labelable: Commentable """The client mutation id.""" clientMutationId: String }
+
+enum IssueState { OPEN CLOSED }
+enum PullRequestState { OPEN CLOSED MERGED }
+scalar DateTime
