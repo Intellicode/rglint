@@ -13,3 +13,6 @@ serde_json.workspace = true
 toml.workspace = true
 walkdir.workspace = true
 xxhash-rust = { workspace = true, features = ["xxh3"] }
+rglint-core = { path = "../crates/rglint-core" }
+rglint-rules = { path = "../crates/rglint-rules" }
+rglint-graphql-spec = { path = "../crates/rglint-graphql-spec" }

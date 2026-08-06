@@ -70,6 +70,23 @@ result, merge result, and refreshed `main` status are all part of completion.
    limitation, then run `cargo build`, `cargo clippy`, and `cargo test` as
    separate commands so the first failure is unambiguous.
 
+## Generated artifacts and repository-wide checks
+
+- Treat checked-in generated files as reproducible build artifacts, not hand-
+  edited source. The owning spec must identify the generator, its complete
+  output directory, and the command that verifies freshness.
+- A generator's check mode must compare the complete expected file set,
+  including removed or unexpected outputs, and must not modify the working
+  tree. Keep output ordering and formatting deterministic so failures are
+  reviewable and reproducible locally and in CI.
+- When a generator consumes registries or metadata from more than one crate,
+  exercise every source registry in the implementation and deduplicate only
+  by an explicit stable identifier. Add a test for the duplicate/merge
+  boundary so a new registry cannot silently disappear from generated output.
+- CI jobs that gate generated artifacts must run the repository-locked command
+  (`cargo run --locked ... --check`) and should remain separate from build or
+  test jobs so stale output is immediately attributable.
+
 ### Benchmark and baseline hygiene
 
 - Put Criterion targets in the owning package and declare external benchmark
