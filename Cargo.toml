@@ -15,7 +15,7 @@ members = [
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
-repository = "https://github.com/anomalyco/rglint"
+repository = "https://github.com/Intellicode/rglint"
 
 [workspace.dependencies]
 apollo-parser = "0.8"

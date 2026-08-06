@@ -29,6 +29,12 @@ for the target matrix via GitHub Actions.
 - Static linking of libc on Linux (`musl` target) — optional; add
   `x86_64-unknown-linux-musl` if musl builds cleanly.
 
+The current `cargo-binstall` manifest format has no supported `checksum` URL
+field. The release workflow therefore publishes one SHA256 file per archive
+and verifies each checksum before upload; the manifest uses only supported
+`pkg-url`, `pkg-fmt`, and `bin-dir` fields. Adding an unsupported checksum key
+would not enable verification and is intentionally avoided.
+
 **Out of scope:**
 
 - npm/napi distribution (spec-071 stretch).
@@ -56,7 +62,9 @@ rglint --version             # prints version + triple
 ## Behavior
 
 - `cargo binstall` resolves the manifest URL, downloads the matching triple's
-  archive, verifies the checksum, installs to `~/.cargo/bin`.
+  archive, and installs to `~/.cargo/bin`. The matching published SHA256 file
+  is available for manual verification; checksum verification is performed in
+  the release workflow because current binstall metadata cannot configure it.
 - `rglint --version` includes the build target for support diagnostics.
 - Release artifacts are immutable (no re-uploads; new tag for fixes).
 

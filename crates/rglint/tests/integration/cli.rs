@@ -8,6 +8,16 @@ fn command() -> Command {
     Command::cargo_bin("rglint").expect("rglint binary")
 }
 
+#[test]
+fn version_includes_build_target() {
+    command()
+        .arg("--version")
+        .assert()
+        .success()
+        .stdout(predicates::str::contains(env!("CARGO_PKG_VERSION")))
+        .stdout(predicates::str::contains(std::env::consts::ARCH));
+}
+
 fn write_config(dir: &std::path::Path, rules: &str) {
     fs::write(
         dir.join(".rglintrc.toml"),
