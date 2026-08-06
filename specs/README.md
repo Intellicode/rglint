@@ -135,7 +135,7 @@ of work (a few hours to ~2 days) and declares its dependencies on prior specs.
 |------|-------|--------|
 | [spec-064](implemented/spec-064.md) | Rayon parallelization | `[x]` |
 | [spec-065](implemented/spec-065.md) | Benchmarks (criterion) | `[x]` |
-| [spec-066](spec-066.md) | Release binary & cargo-binstall | `[ ]` |
+| [spec-066](implemented/spec-066.md) | Release binary & cargo-binstall | `[x]` |
 
 ### Cross-cutting — CI & tooling
 

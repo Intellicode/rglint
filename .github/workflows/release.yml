@@ -1,0 +1,156 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.target }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            runner: ubuntu-24.04
+            cross: false
+            archive: tgz
+          - target: aarch64-unknown-linux-gnu
+            runner: ubuntu-24.04
+            cross: true
+            archive: tgz
+          - target: x86_64-apple-darwin
+            runner: macos-13
+            cross: false
+            archive: tgz
+          - target: aarch64-apple-darwin
+            runner: macos-14
+            cross: false
+            archive: tgz
+          - target: x86_64-pc-windows-msvc
+            runner: windows-2022
+            cross: false
+            archive: zip
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install cross
+        if: matrix.cross
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cross
+
+      - name: Build release binary
+        shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          set -euo pipefail
+          if [[ "${{ matrix.cross }}" == "true" ]]; then
+            cross build --locked --release --target "$TARGET" -p rglint
+          else
+            cargo build --locked --release --target "$TARGET" -p rglint
+          fi
+
+      - name: Package Unix artifact
+        if: matrix.archive == 'tgz'
+        shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME#v}"
+          root="rglint-${version}-${TARGET}"
+          archive="${root}.tar.gz"
+          mkdir "$root"
+          cp "target/${TARGET}/release/rglint" "$root/rglint"
+          strip "$root/rglint"
+          tar -czf "$archive" "$root"
+          tar -tzf "$archive" | grep -Fx "$root/rglint"
+          if command -v sha256sum >/dev/null 2>&1; then
+            sha256sum "$archive" > "${archive}.sha256"
+          else
+            shasum -a 256 "$archive" > "${archive}.sha256"
+          fi
+
+      - name: Package Windows artifact
+        if: matrix.archive == 'zip'
+        shell: pwsh
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          $version = $env:GITHUB_REF_NAME.TrimStart('v')
+          $root = "rglint-$version-$env:TARGET"
+          $archive = "$root.zip"
+          New-Item -ItemType Directory -Path $root | Out-Null
+          Copy-Item "target/$env:TARGET/release/rglint.exe" "$root/rglint.exe"
+          Compress-Archive -Path $root -DestinationPath $archive
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          $zip = [System.IO.Compression.ZipFile]::OpenRead($archive)
+          try {
+            if (-not ($zip.Entries.FullName -contains "$root/rglint.exe")) {
+              throw "archive does not contain the expected executable"
+            }
+          } finally {
+            $zip.Dispose()
+          }
+          $hash = (Get-FileHash -Algorithm SHA256 $archive).Hash.ToLowerInvariant()
+          "$hash  $archive" | Out-File -Encoding ascii "$archive.sha256"
+
+      - name: Verify package checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          if command -v sha256sum >/dev/null 2>&1; then
+            sha256sum --check ./*.sha256
+          else
+            for checksum in ./*.sha256; do
+              archive="${checksum%.sha256}"
+              expected="$(awk '{ print $1 }' "$checksum")"
+              actual="$(shasum -a 256 "$archive" | awk '{ print $1 }')"
+              [[ "$expected" == "$actual" ]]
+            done
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rglint-${{ matrix.target }}
+          path: |
+            rglint-*.tar.gz
+            rglint-*.zip
+            rglint-*.sha256
+          if-no-files-found: error
+
+  publish:
+    name: Publish GitHub release
+    needs: build
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: rglint-*
+          path: dist
+          merge-multiple: true
+
+      - name: Verify all release checksums
+        working-directory: dist
+        run: sha256sum --check ./*.sha256
+
+      - name: Create immutable release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          gh release create "$TAG" --verify-tag --title "$TAG" --generate-notes
+          gh release upload "$TAG" dist/*

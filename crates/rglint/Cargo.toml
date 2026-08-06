@@ -5,6 +5,14 @@ edition.workspace = true
 license.workspace = true
 repository.workspace = true
 
+[package.metadata.binstall]
+pkg-url = "{ repo }/releases/download/v{ version }/rglint-{ version }-{ target }{ archive-suffix }"
+bin-dir = "rglint-{ version }-{ target }/{ bin }{ binary-ext }"
+pkg-fmt = "tgz"
+
+[package.metadata.binstall.overrides.'cfg(target_os = "windows")']
+pkg-fmt = "zip"
+
 [dependencies]
 clap.workspace = true
 miette.workspace = true

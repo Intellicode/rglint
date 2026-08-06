@@ -92,6 +92,29 @@ result, merge result, and refreshed `main` status are all part of completion.
   immutable input during a run. Prefer small, representative, license-clean
   corpora over network downloads so benchmark results are reproducible offline.
 
+### Release and packaging hygiene
+
+- Treat the release archive layout as a public interface. Keep the version,
+  target triple, top-level directory, executable name, archive suffix, and
+  `cargo-binstall` templates synchronized; add a manifest/workflow validation
+  step whenever one changes.
+- Release workflows must be tag-scoped and fail closed: grant only the
+  `contents: write` permission needed to publish, verify the pushed tag, and
+  create/upload assets exactly once. Do not use mutable asset names or
+  `--clobber`; fixes require a new tag.
+- Generate a checksum beside every archive and verify it in the build job and
+  again in the publish job. Do not add an installer metadata key merely because
+  it sounds security-related: confirm that the consuming tool supports it, or
+  document the verification boundary and publish the checksum for downstream
+  use.
+- Cross-compilation must be explicit per target. Prefer native runners where
+  available, isolate Docker-based cross builds to the targets that need them,
+  and document platform-specific stripping, signing, notarization, or
+  Gatekeeper differences in a design record.
+- Release tests should validate the actual archive contents and the binary's
+  `--version` target marker. A local build or YAML parse alone does not prove
+  that a binstall URL resolves to the executable path inside the archive.
+
 ### Configuration loader conventions
 
 - Keep the file-facing serde model separate from the normalized engine model.

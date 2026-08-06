@@ -14,11 +14,18 @@ use rglint_core::{Fixer, LintEngine, Project, ProjectConfig, RulesConfig, Severi
 use crate::exit::ExitCode;
 use crate::reporter::{GithubReporter, JsonReporter, PrettyReporter, Reporter, SarifReporter};
 
+const VERSION: &str = concat!(
+    env!("CARGO_PKG_VERSION"),
+    " (",
+    env!("RGLINT_BUILD_TARGET"),
+    ")"
+);
+
 /// The `rglint` command-line interface.
 #[derive(Debug, Parser)]
 #[command(
     name = "rglint",
-    version,
+    version = VERSION,
     about = "Lint GraphQL schemas and operations"
 )]
 pub struct Cli {
