@@ -1,4 +1,7 @@
 /target
+parity/ts-output/
+parity/rust-output/
+parity/diff.md
 *.snap.new
 *.rs.bk
 *.pdb
