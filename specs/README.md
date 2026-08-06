@@ -141,7 +141,7 @@ of work (a few hours to ~2 days) and declares its dependencies on prior specs.
 
 | Spec | Title | Status |
 |------|-------|--------|
-| [spec-067](spec-067.md) | CI pipeline (GitHub Actions) | `[ ]` |
+| [spec-067](implemented/spec-067.md) | CI pipeline (GitHub Actions) | `[x]` |
 | [spec-068](spec-068.md) | xtask gen-docs | `[ ]` |
 | [spec-069](spec-069.md) | xtask check-parity | `[ ]` |
 | [spec-070](spec-070.md) | Coverage gate + cross-cutting invariant tests | `[ ]` |
