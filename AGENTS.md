@@ -115,6 +115,30 @@ result, merge result, and refreshed `main` status are all part of completion.
   `--version` target marker. A local build or YAML parse alone does not prove
   that a binstall URL resolves to the executable path inside the archive.
 
+### CI and workflow hygiene
+
+- Keep CI job names stable once they are used as required branch-protection
+  checks. If a matrix is used, include the operating system in the displayed
+  job name and update `docs/contributing.md` in the same change.
+- CI workflows should declare the least-privilege top-level permissions they
+  need (`contents: read` for validation). Keep write permissions limited to
+  release or publishing jobs that explicitly require them.
+- Use `--locked` on Cargo build, test, clippy, bench, and xtask commands in CI
+  so a workflow cannot silently validate a different dependency graph. Keep
+  formatting, linting, tests, and benchmark compilation as separate jobs so
+  the first failing check is actionable.
+- Make CI cancellation explicit with a pull-request-aware concurrency group;
+  newer pushes should cancel obsolete in-progress validation for the same
+  change.
+- Treat Linux-only tools such as tarpaulin and Node-backed parity/doc checks
+  as explicit Linux jobs. Do not mark required jobs `continue-on-error` to
+  hide missing tools or unfinished commands; fix the workflow or update its
+  owning spec instead.
+- Keep action and tool versions visible in workflow configuration and let
+  Dependabot propose updates. Validate workflow YAML and inspect the complete
+  diff before staging; a local Rust test run does not validate GitHub Actions
+  expression syntax or matrix behavior.
+
 ### Configuration loader conventions
 
 - Keep the file-facing serde model separate from the normalized engine model.
