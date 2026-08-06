@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "divergences": [
+    { "rule": "fields-on-correct-type", "case": "graphql-js-validation/invalid/01", "reason": "Apollo Compiler wording differs from graphql-eslint; spec-053 records the exact pair." },
+    { "rule": "known-argument-names", "case": "graphql-js-validation/invalid/02", "reason": "Apollo Compiler wording differs from graphql-eslint; spec-053 records the exact pair." },
+    { "rule": "no-unused-variables", "case": "graphql-js-validation/invalid/03", "reason": "Apollo Compiler wording differs from graphql-eslint; spec-053 records the exact pair." },
+    { "rule": "lone-anonymous-operation", "case": "graphql-js-validation/invalid/04", "reason": "Apollo Compiler wording differs from graphql-eslint; spec-053 records the exact pair." },
+    { "rule": "no-fragment-cycles", "case": "graphql-js-validation/invalid/05", "reason": "Apollo Compiler wording differs from graphql-eslint; spec-053 records the exact pair." },
+    { "rule": "scalar-leafs", "case": "graphql-js-validation/invalid/06", "reason": "Apollo Compiler wording differs from graphql-eslint; spec-053 records the exact pair." },
+    { "rule": "variables-in-allowed-position", "case": "graphql-js-validation/invalid/07", "reason": "Apollo Compiler wording differs from graphql-eslint; spec-053 records the exact pair." },
+    { "rule": "value-literals-of-correct-type", "case": "graphql-js-validation/invalid/08", "reason": "Apollo Compiler wording differs from graphql-eslint; spec-053 records the exact pair." },
+    { "rule": "known-fragment-names", "case": "graphql-js-validation/invalid/09", "reason": "Apollo Compiler wording differs from graphql-eslint; spec-053 records the exact pair." },
+    { "rule": "possible-fragment-spread", "case": "graphql-js-validation/invalid/10", "reason": "Apollo Compiler wording differs from graphql-eslint; spec-053 records the exact pair." },
+    { "rule": "provided-required-arguments", "case": "graphql-js-validation/invalid/11", "reason": "Apollo Compiler wording differs from graphql-eslint; spec-053 records the exact pair." },
+    { "rule": "unique-variable-names", "case": "graphql-js-validation/invalid/12", "reason": "Apollo Compiler wording differs from graphql-eslint; spec-053 records the exact pair." }
+  ]
+}

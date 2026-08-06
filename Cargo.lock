@@ -2395,6 +2395,7 @@ dependencies = [
  "rglint-core",
  "rglint-graphql-spec",
  "rglint-rules",
+ "rglint-test-harness",
  "serde",
  "serde_json",
  "toml",

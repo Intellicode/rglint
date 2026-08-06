@@ -14,5 +14,6 @@ toml.workspace = true
 walkdir.workspace = true
 xxhash-rust = { workspace = true, features = ["xxh3"] }
 rglint-core = { path = "../crates/rglint-core" }
+rglint-test-harness = { path = "../crates/rglint-test-harness" }
 rglint-rules = { path = "../crates/rglint-rules" }
 rglint-graphql-spec = { path = "../crates/rglint-graphql-spec" }

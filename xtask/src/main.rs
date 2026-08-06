@@ -1,5 +1,6 @@
 use clap::Parser;
 
+mod check_parity;
 mod gen_docs;
 mod port_fixture;
 
@@ -12,6 +13,8 @@ enum Xtask {
     PortFixture(port_fixture::PortFixtureArgs),
     /// Generate the checked-in rule reference documentation (spec-068).
     GenDocs(gen_docs::GenDocsArgs),
+    /// Compare the fixture oracle with rglint (spec-069).
+    CheckParity(check_parity::CheckParityArgs),
 }
 
 fn main() -> anyhow::Result<()> {
@@ -19,5 +22,6 @@ fn main() -> anyhow::Result<()> {
     match cmd {
         Xtask::PortFixture(args) => port_fixture::run(args),
         Xtask::GenDocs(args) => gen_docs::run(args),
+        Xtask::CheckParity(args) => check_parity::run(args),
     }
 }

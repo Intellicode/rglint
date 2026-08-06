@@ -87,6 +87,27 @@ result, merge result, and refreshed `main` status are all part of completion.
   (`cargo run --locked ... --check`) and should remain separate from build or
   test jobs so stale output is immediately attributable.
 
+### Parity harness and oracle hygiene
+
+- Run the offline parity gate with `cargo run --locked -p xtask --
+  check-parity`; it compares every fixture to the checked-in graphql-eslint
+  oracle and writes local artifacts under `parity/`. Do not commit
+  `parity/ts-output/`, `parity/rust-output/`, or `parity/diff.md`.
+- A live graphql-eslint comparison is opt-in through `--ts-command` or
+  `RGLINT_PARITY_TS_COMMAND`. The adapter must pin an immutable upstream
+  revision, accept the documented `RGLINT_PARITY_*` environment contract, and
+  emit machine-readable JSON only on stdout. Keep progress and errors on
+  stderr so the comparator cannot parse contaminated output.
+- Treat `parity/known-divergences.json` as reviewed source data, not a dump.
+  `--update-known` is a manual escape hatch: every new entry needs a specific
+  rule/case, a reason, and a focused review explaining why the divergence is
+  intentional. Never use it in CI or to mask a changed diagnostic.
+- When parity compares an external tool's one-based columns, normalize them
+  once at the adapter boundary to the repository's one-based line and
+  zero-based byte-column contract. Do not relax message, order, or location
+  comparisons globally; use a fixture's explicit `loose_message` or a scoped
+  allowlist entry.
+
 ### Benchmark and baseline hygiene
 
 - Put Criterion targets in the owning package and declare external benchmark
