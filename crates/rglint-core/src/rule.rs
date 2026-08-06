@@ -182,6 +182,15 @@ impl RuleMeta {
             .as_ref()
     }
 
+    /// Return the original JSON-Schema source, when the rule declares one.
+    ///
+    /// Consumers such as documentation generators need the source tree rather
+    /// than the compiled validator so they can preserve property names,
+    /// descriptions, and defaults in their output.
+    pub fn option_schema_source(&self) -> Option<&'static str> {
+        self.option_schema_src
+    }
+
     /// Lazily parse and return the rule's default options.
     pub fn default_options(&self) -> Option<&serde_json::Value> {
         self.default_options

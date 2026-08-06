@@ -2392,6 +2392,9 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "clap",
+ "rglint-core",
+ "rglint-graphql-spec",
+ "rglint-rules",
  "serde",
  "serde_json",
  "toml",

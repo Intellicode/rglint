@@ -1,5 +1,6 @@
 use clap::Parser;
 
+mod gen_docs;
 mod port_fixture;
 
 /// xtask entry point. Subcommands live in their own modules; the top-level
@@ -9,11 +10,14 @@ mod port_fixture;
 enum Xtask {
     /// Convert graphql-eslint TS test cases into rglint fixtures (spec-015).
     PortFixture(port_fixture::PortFixtureArgs),
+    /// Generate the checked-in rule reference documentation (spec-068).
+    GenDocs(gen_docs::GenDocsArgs),
 }
 
 fn main() -> anyhow::Result<()> {
     let cmd = Xtask::parse();
     match cmd {
         Xtask::PortFixture(args) => port_fixture::run(args),
+        Xtask::GenDocs(args) => gen_docs::run(args),
     }
 }
