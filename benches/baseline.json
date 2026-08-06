@@ -1,0 +1,165 @@
+{
+  "benchmarks": {
+    "lint/recommended-github-schema": {
+      "median_ns": 3171094.0
+    },
+    "lint/recommended-shopify-schema": {
+      "median_ns": 2782083.25
+    },
+    "lint_recommended-github-schema": {
+      "median_ns": 3148114.75
+    },
+    "lint_recommended-shopify-schema": {
+      "median_ns": 2642979.25
+    },
+    "parse/github-schema": {
+      "median_ns": 145211.47083333333
+    },
+    "parse/recommended-query": {
+      "median_ns": 36415.16923076923
+    },
+    "parse/shopify-schema": {
+      "median_ns": 159240.98333333334
+    },
+    "rule/description-style": {
+      "median_ns": 418513.9166666666
+    },
+    "rule/executable-definitions": {
+      "median_ns": 443342.175
+    },
+    "rule/fields-on-correct-type": {
+      "median_ns": 452335.875
+    },
+    "rule/fragments-on-composite-type": {
+      "median_ns": 447811.9714285714
+    },
+    "rule/known-argument-names": {
+      "median_ns": 458850.8333333334
+    },
+    "rule/known-directives": {
+      "median_ns": 446383.05555555556
+    },
+    "rule/known-fragment-names": {
+      "median_ns": 442470.0
+    },
+    "rule/known-type-names": {
+      "median_ns": 445631.9583333334
+    },
+    "rule/lone-anonymous-operation": {
+      "median_ns": 431807.5
+    },
+    "rule/lone-schema-definition": {
+      "median_ns": 469699.5357142857
+    },
+    "rule/naming-convention": {
+      "median_ns": 491867.0833333334
+    },
+    "rule/no-anonymous-operations": {
+      "median_ns": 407441.0
+    },
+    "rule/no-deprecated": {
+      "median_ns": 396603.0833333333
+    },
+    "rule/no-duplicate-fields": {
+      "median_ns": 442903.3392857143
+    },
+    "rule/no-fragment-cycles": {
+      "median_ns": 441649.9285714286
+    },
+    "rule/no-hashtag-description": {
+      "median_ns": 406833.4583333333
+    },
+    "rule/no-typename-prefix": {
+      "median_ns": 428679.78125
+    },
+    "rule/no-undefined-variables": {
+      "median_ns": 461899.76428571425
+    },
+    "rule/no-unreachable-types": {
+      "median_ns": 434670.5
+    },
+    "rule/no-unused-fragments": {
+      "median_ns": 458201.2916666666
+    },
+    "rule/no-unused-variables": {
+      "median_ns": 450260.375
+    },
+    "rule/one-field-subscriptions": {
+      "median_ns": 438647.5916666667
+    },
+    "rule/overlapping-fields-can-be-merged": {
+      "median_ns": 453559.9
+    },
+    "rule/possible-fragment-spread": {
+      "median_ns": 452338.425
+    },
+    "rule/possible-type-extension": {
+      "median_ns": 441081.5416666666
+    },
+    "rule/provided-required-arguments": {
+      "median_ns": 459826.8
+    },
+    "rule/require-deprecation-reason": {
+      "median_ns": 390746.5833333334
+    },
+    "rule/require-description": {
+      "median_ns": 444067.0
+    },
+    "rule/require-selections": {
+      "median_ns": 387889.375
+    },
+    "rule/scalar-leafs": {
+      "median_ns": 447944.1625
+    },
+    "rule/selection-set-depth": {
+      "median_ns": 396499.0357142857
+    },
+    "rule/strict-id-in-types": {
+      "median_ns": 405250.0416666666
+    },
+    "rule/unique-argument-names": {
+      "median_ns": 435898.8125
+    },
+    "rule/unique-directive-names": {
+      "median_ns": 447534.8333333334
+    },
+    "rule/unique-directive-names-per-location": {
+      "median_ns": 444414.7888888889
+    },
+    "rule/unique-enum-value-names": {
+      "median_ns": 392568.25
+    },
+    "rule/unique-field-definition-names": {
+      "median_ns": 445686.875
+    },
+    "rule/unique-fragment-name": {
+      "median_ns": 387630.3392857143
+    },
+    "rule/unique-input-field-names": {
+      "median_ns": 442055.98055555555
+    },
+    "rule/unique-operation-name": {
+      "median_ns": 381445.3125
+    },
+    "rule/unique-operation-types": {
+      "median_ns": 464954.9166666666
+    },
+    "rule/unique-type-names": {
+      "median_ns": 465802.125
+    },
+    "rule/unique-variable-names": {
+      "median_ns": 465919.0
+    },
+    "rule/value-literals-of-correct-type": {
+      "median_ns": 452426.08125
+    },
+    "rule/variables-are-input-types": {
+      "median_ns": 450858.21875
+    },
+    "rule/variables-in-allowed-position": {
+      "median_ns": 462716.65
+    }
+  },
+  "format_version": 1,
+  "tolerance": 0.1
+}

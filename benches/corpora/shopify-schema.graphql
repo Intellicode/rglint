@@ -1,0 +1,234 @@
+"""A commerce API used by the benchmark corpus."""
+type Query {
+  """Return a shop by its domain."""
+  shop: Shop!
+  """Return a product by its handle."""
+  product(handle: String!): Product
+  """Return products in a collection."""
+  collection(handle: String!): Collection
+  """Return the current customer account."""
+  customer: Customer
+}
+
+"""Mutations for cart and customer workflows."""
+type Mutation {
+  """Create a cart."""
+  cartCreate(input: CartInput!): CartPayload!
+  """Add lines to an existing cart."""
+  cartLinesAdd(cartId: ID!, lines: [CartLineInput!]!): CartPayload!
+  """Update customer information."""
+  customerUpdate(input: CustomerInput!): CustomerPayload!
+}
+
+"""A Shopify shop."""
+type Shop implements Node {
+  """The globally unique identifier."""
+  id: ID!
+  """The shop name."""
+  name: String!
+  """The shop's primary domain."""
+  primaryDomain: Domain!
+  """The shop currency."""
+  currencyCode: CurrencyCode!
+  """The shop's products."""
+  products(first: Int = 20, after: String, query: String): ProductConnection!
+  """The shop's collections."""
+  collections(first: Int = 20, after: String): CollectionConnection!
+  """The shop's policies."""
+  policies: ShopPolicyConnection!
+}
+
+"""A product sold by a shop."""
+type Product implements Node {
+  """The globally unique identifier."""
+  id: ID!
+  """The product title."""
+  title: String!
+  """The product handle."""
+  handle: String!
+  """The product description."""
+  description: String!
+  """The product description in HTML."""
+  descriptionHtml: String!
+  """The product vendor."""
+  vendor: String!
+  """The product type."""
+  productType: String!
+  """The product tags."""
+  tags: [String!]!
+  """The product images."""
+  images(first: Int = 20, after: String): ImageConnection!
+  """The product variants."""
+  variants(first: Int = 20, after: String): ProductVariantConnection!
+  """The collections containing this product."""
+  collections(first: Int = 20, after: String): CollectionConnection!
+  """The product's price range."""
+  priceRange: ProductPriceRange!
+  """Whether the product is available for purchase."""
+  availableForSale: Boolean!
+}
+
+"""A product collection."""
+type Collection implements Node {
+  """The globally unique identifier."""
+  id: ID!
+  """The collection title."""
+  title: String!
+  """The collection handle."""
+  handle: String!
+  """The collection description."""
+  description: String!
+  """Products in this collection."""
+  products(first: Int = 20, after: String): ProductConnection!
+  """The collection image."""
+  image: Image
+}
+
+"""A customer account."""
+type Customer implements Node {
+  """The globally unique identifier."""
+  id: ID!
+  """The customer's display name."""
+  displayName: String!
+  """The customer's email address."""
+  email: String!
+  """The customer's phone number."""
+  phone: String
+  """The customer's addresses."""
+  addresses(first: Int = 20, after: String): MailingAddressConnection!
+  """The customer's orders."""
+  orders(first: Int = 20, after: String): OrderConnection!
+  """The customer's default address."""
+  defaultAddress: MailingAddress
+}
+
+"""A product variant."""
+type ProductVariant implements Node {
+  """The globally unique identifier."""
+  id: ID!
+  """The variant title."""
+  title: String!
+  """The variant SKU."""
+  sku: String
+  """The variant price."""
+  price: MoneyV2!
+  """The variant compare-at price."""
+  compareAtPrice: MoneyV2
+  """Whether this variant is available."""
+  availableForSale: Boolean!
+  """The inventory quantity."""
+  quantityAvailable: Int
+  """The variant selected options."""
+  selectedOptions: [SelectedOption!]!
+}
+
+"""An image associated with a resource."""
+type Image implements Node {
+  """The globally unique identifier."""
+  id: ID!
+  """The image URL."""
+  url: String!
+  """The image alt text."""
+  altText: String
+  """The image width."""
+  width: Int
+  """The image height."""
+  height: Int
+}
+
+"""An order placed by a customer."""
+type Order implements Node {
+  """The globally unique identifier."""
+  id: ID!
+  """The order name."""
+  name: String!
+  """The order date."""
+  processedAt: DateTime
+  """The order financial status."""
+  financialStatus: FinancialStatus
+  """The order fulfillment status."""
+  fulfillmentStatus: FulfillmentStatus
+  """The order total."""
+  totalPrice: MoneyV2!
+  """The order line items."""
+  lineItems(first: Int = 20, after: String): LineItemConnection!
+}
+
+"""A line in an order."""
+type LineItem implements Node {
+  """The globally unique identifier."""
+  id: ID!
+  """The purchased quantity."""
+  quantity: Int!
+  """The line item title."""
+  title: String!
+  """The line item price."""
+  originalTotalPrice: MoneyV2!
+  """The purchased variant."""
+  variant: ProductVariant
+}
+
+"""A monetary amount in a currency."""
+type MoneyV2 implements Node {
+  """The globally unique identifier."""
+  id: ID!
+  """The amount as a decimal string."""
+  amount: String!
+  """The currency code."""
+  currencyCode: CurrencyCode!
+}
+
+"""A cart for checkout."""
+type Cart implements Node {
+  """The globally unique identifier."""
+  id: ID!
+  """The cart checkout URL."""
+  checkoutUrl: String!
+  """The cart lines."""
+  lines(first: Int = 20, after: String): CartLineConnection!
+  """The cart cost."""
+  cost: CartCost!
+}
+
+"""A line in a cart."""
+type CartLine implements Node {
+  """The globally unique identifier."""
+  id: ID!
+  """The requested quantity."""
+  quantity: Int!
+  """The merchandise in the line."""
+  merchandise: ProductVariant!
+}
+
+"""The store's domain."""
+type Domain { """The domain host.""" host: String! """Whether this is the primary domain.""" isSelected: Boolean! }
+type MailingAddress implements Node { """The globally unique identifier.""" id: ID! """The recipient name.""" name: String """The first address line.""" address1: String """The city.""" city: String """The country.""" country: String """The postal code.""" zip: String }
+type SelectedOption { """The option name.""" name: String! """The option value.""" value: String! }
+type ProductPriceRange { """The lowest price.""" minVariantPrice: MoneyV2! """The highest price.""" maxVariantPrice: MoneyV2! }
+type CartCost { """The subtotal.""" subtotalAmount: MoneyV2! """The total.""" totalAmount: MoneyV2! }
+type ShopPolicyConnection { """The page information.""" pageInfo: PageInfo! """The policies.""" nodes: [ShopPolicy!]! }
+type ShopPolicy { """The policy title.""" title: String! """The policy body.""" body: String! """The policy URL.""" url: String }
+type ProductConnection { """The page information.""" pageInfo: PageInfo! """The products.""" nodes: [Product!]! }
+type CollectionConnection { """The page information.""" pageInfo: PageInfo! """The collections.""" nodes: [Collection!]! }
+type ImageConnection { """The page information.""" pageInfo: PageInfo! """The images.""" nodes: [Image!]! }
+type ProductVariantConnection { """The page information.""" pageInfo: PageInfo! """The variants.""" nodes: [ProductVariant!]! }
+type CustomerConnection { """The page information.""" pageInfo: PageInfo! """The customers.""" nodes: [Customer!]! }
+type MailingAddressConnection { """The page information.""" pageInfo: PageInfo! """The addresses.""" nodes: [MailingAddress!]! }
+type OrderConnection { """The page information.""" pageInfo: PageInfo! """The orders.""" nodes: [Order!]! }
+type LineItemConnection { """The page information.""" pageInfo: PageInfo! """The line items.""" nodes: [LineItem!]! }
+type CartLineConnection { """The page information.""" pageInfo: PageInfo! """The cart lines.""" nodes: [CartLine!]! }
+type PageInfo { """Whether another page exists.""" hasNextPage: Boolean! """Whether a prior page exists.""" hasPreviousPage: Boolean! """The first cursor.""" startCursor: String """The final cursor.""" endCursor: String }
+type CartPayload { """The cart.""" cart: Cart """Errors returned by the mutation.""" userErrors: [UserError!]! }
+type CustomerPayload { """The customer.""" customer: Customer """Errors returned by the mutation.""" userErrors: [UserError!]! }
+type UserError { """The error message.""" message: String! """The input path.""" field: [String!]! }
+
+interface Node { """The globally unique identifier.""" id: ID! }
+input CartInput { """The initial cart lines.""" lines: [CartLineInput!] = [] """The customer email.""" buyerIdentity: BuyerIdentityInput }
+input CartLineInput { """The merchandise identifier.""" merchandiseId: ID! """The quantity.""" quantity: Int! }
+input BuyerIdentityInput { """The customer email.""" email: String """The country code.""" countryCode: CountryCode }
+input CustomerInput { """The customer email.""" email: String """The customer phone.""" phone: String }
+enum CurrencyCode { USD EUR GBP CAD AUD JPY }
+enum CountryCode { US CA GB AU DE FR JP }
+enum FinancialStatus { PENDING AUTHORIZED PAID REFUNDED VOIDED }
+enum FulfillmentStatus { UNFULFILLED PARTIAL FULFILLED }
+scalar DateTime

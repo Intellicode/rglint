@@ -1,0 +1,40 @@
+query RepositoryOverview($owner: String!, $name: String!, $first: Int = 10) {
+  repository(owner: $owner, name: $name) {
+    id
+    name
+    nameWithOwner
+    primaryLanguage { id name color }
+    owner {
+      ... on User { id login name }
+      ... on Organization { id login name }
+    }
+    issues(first: $first, states: [OPEN]) {
+      pageInfo { hasNextPage endCursor }
+      nodes {
+        id
+        number
+        title
+        author { id login }
+        labels(first: 5) { nodes { id name color } }
+      }
+    }
+    pullRequests(first: $first, states: [OPEN]) {
+      nodes { id number title state author { id login } }
+    }
+  }
+}
+
+query StorefrontOverview($handle: String!, $first: Int = 10) {
+  product(handle: $handle) {
+    id
+    title
+    handle
+    description
+    availableForSale
+    priceRange { minVariantPrice { id amount currencyCode } maxVariantPrice { id amount currencyCode } }
+    images(first: $first) { pageInfo { hasNextPage } nodes { id url altText width height } }
+    variants(first: $first) {
+      nodes { id title sku availableForSale price { id amount currencyCode } selectedOptions { name value } }
+    }
+  }
+}
