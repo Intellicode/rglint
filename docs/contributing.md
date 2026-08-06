@@ -31,3 +31,10 @@ cargo bench --locked --workspace --no-run
 The `coverage`, `parity`, and `docs-check` jobs require their respective
 tooling and are run in GitHub Actions until the matching xtask commands are
 available locally.
+
+Coverage currently ratchets from a 60% workspace line-rate floor while the
+cross-cutting suites are established. `scripts/coverage-gate.sh` also keeps a
+90% floor for each covered `rglint-rules` source module. Raise the workspace
+floor deliberately as coverage improves; both floors can be overridden for a
+local experiment with `RGLINT_COVERAGE_WORKSPACE_MIN` and
+`RGLINT_COVERAGE_RULES_MODULE_MIN`, but CI uses the checked-in defaults.

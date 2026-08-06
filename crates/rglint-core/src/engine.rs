@@ -600,6 +600,15 @@ fn lint_one_file(
 ) -> Vec<Diagnostic> {
     let mut diags: Vec<Diagnostic> = parse_errors.to_vec();
 
+    // A source with parser diagnostics is not a trustworthy AST for rule
+    // execution. Preserve every parse diagnostic, but stop before creating
+    // handlers or walking the recovery tree; otherwise a rule can report a
+    // second, misleading diagnostic for the same malformed file. Other files
+    // continue through the engine independently.
+    if !parse_errors.is_empty() {
+        return diags;
+    }
+
     // Skip rules whose preconditions are unmet *for this project*.
     let active: Vec<&EnabledRule> = rules
         .iter()

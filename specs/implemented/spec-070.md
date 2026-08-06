@@ -49,8 +49,9 @@ path coverage that don't belong to any single rule (PLAN §6.5, §6.6).
 
 ## Deliverables
 
-- `tests/invariants.rs`.
-- `tests/negative_paths.rs` (rstest-parametric).
+- `crates/rglint/tests/invariants.rs`.
+- `crates/rglint/tests/negative_paths.rs` (registry-driven macro
+  parametrization; the workspace does not otherwise depend on `rstest`).
 - `scripts/coverage-gate.sh`.
 - `xtask/src/coverage.rs` (thin wrapper) — optional.
 
@@ -74,9 +75,11 @@ rstest::fixture! fn all_rules() -> Vec<&'static str> { ... }
   thresholds; prints per-crate breakdown; exits non-zero on failure.
 - Invariant tests use the test harness (spec-014) to build configs + fixtures
   inline.
-- Negative-path: each rule gets a known-bad input (a list maintained in
-  `tests/negative_paths.json` keyed by rule id); the test loads it, runs the
-  engine, asserts `!panicked && diagnostics.len() >= 1`.
+- Negative-path: each registered rule gets the shared malformed operation
+  input; the test loads it, runs the engine, asserts no panic and at least one
+  `parse-error` diagnostic. This deliberately tests the engine's common
+  malformed-input boundary rather than pretending every rule has a distinct
+  semantic malformed corpus.
 
 ## Testing
 
@@ -85,9 +88,10 @@ rstest::fixture! fn all_rules() -> Vec<&'static str> { ... }
 
 ## Risks / Notes
 
-- The 85% floor may be unattainable early; start with a 60% floor and raise
-  incrementally, recording the target in `scripts/coverage-gate.sh`. Document
-  the ratchet in `docs/contributing.md`.
+- The 85% floor may be unattainable early; this implementation starts with a
+  60% workspace floor and raises it incrementally, recording the target in
+  `scripts/coverage-gate.sh` and `docs/contributing.md`. The per-module
+  `rglint-rules` floor remains 90%.
 - `rstest` parametrization over all rules: if a rule lacks a bad-input entry,
   the test is skipped with a warning (don't fail on missing negative-input
   data — that's a coverage-gap, not a regression).
