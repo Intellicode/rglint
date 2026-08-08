@@ -1,0 +1,9 @@
+{
+  "name": "@rglint/napi-win32-x64-msvc",
+  "version": "0.1.0",
+  "os": ["win32"],
+  "cpu": ["x64"],
+  "main": "rglint-napi.win32-x64-msvc.node",
+  "files": ["rglint-napi.win32-x64-msvc.node"],
+  "license": "MIT"
+}

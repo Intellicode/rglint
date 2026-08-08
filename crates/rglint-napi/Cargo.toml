@@ -1,0 +1,23 @@
+[package]
+name = "rglint-napi"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+napi = { version = "3.12", default-features = false, features = ["napi8", "serde-json"] }
+napi-derive = "3.6"
+rglint-config = { path = "../rglint-config", default-features = false, features = ["napi"] }
+rglint-core = { path = "../rglint-core", default-features = false, features = ["napi"] }
+rglint-graphql-spec = { path = "../rglint-graphql-spec", default-features = false, features = ["napi"] }
+rglint-rules = { path = "../rglint-rules", default-features = false, features = ["napi"] }
+serde.workspace = true
+serde_json.workspace = true
+
+[build-dependencies]
+napi-build = "2"

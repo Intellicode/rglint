@@ -5,8 +5,13 @@ edition.workspace = true
 license.workspace = true
 repository.workspace = true
 
+[features]
+default = ["native"]
+native = ["rglint-core/native"]
+napi = ["rglint-core/napi"]
+
 [dependencies]
-rglint-core = { path = "../rglint-core" }
+rglint-core = { path = "../rglint-core", default-features = false }
 ahash.workspace = true
 serde.workspace = true
 serde_json.workspace = true

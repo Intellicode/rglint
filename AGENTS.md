@@ -15,6 +15,12 @@ If the pull is not a fast-forward, stop and resolve the repository state before
 creating the implementation branch. Keep the branch focused on one spec and
 do not mix generated files, nested worktrees, or unrelated cleanup into it.
 
+When a spec adds a second delivery surface (for example, a Node package beside
+the Rust workspace), keep the source, lockfile, package metadata, and release
+workflow in the same focused branch. Do not check in platform binaries or
+locally generated `target/`/`node_modules/` output; the workflow must build the
+complete platform set from the pinned source revision.
+
 If `spec-NNN` already exists locally or on the remote, inspect it before
 reusing it: verify that it is based on the current `main`, that its worktree
 is clean, and that its diff contains only that spec. Never delete or force-
@@ -176,6 +182,28 @@ result, merge result, and refreshed `main` status are all part of completion.
   Dependabot propose updates. Validate workflow YAML and inspect the complete
   diff before staging; a local Rust test run does not validate GitHub Actions
   expression syntax or matrix behavior.
+
+### Native feature matrices and Node bindings
+
+- A crate with native-only dependencies must expose an explicit feature matrix.
+  Keep the native feature enabled by default for the CLI, and make the napi/
+  WASM dependency path use `default-features = false`; compile both paths so a
+  feature can never hide an uncompiled import. If the reduced path is
+  intentionally serial, test that behavior rather than silently retaining a
+  native thread-pool dependency.
+- N-API packages have one portable loader package and one platform package per
+  supported target. Keep package names, `os`/`cpu` metadata, binary filenames,
+  optional dependencies, and the release matrix synchronized. The root loader
+  must fail with an actionable unsupported-platform error.
+- N-API smoke tests must exercise the published loader shape, assert the JSON
+  contract and coordinate convention, and run only after a native module has
+  been built. Validate the loader with `node --check` independently so a
+  packaging failure is not confused with a Rust failure.
+- Any workflow that publishes native artifacts must be tag-scoped, pin its
+  Node/Rust/build-tool versions, use least-privilege permissions, and publish
+  platform packages before the loader package that declares them. Verify the
+  complete target matrix in the PR diff; do not treat a single host build as
+  evidence that all optional dependencies or package metadata are correct.
 
 ### Coverage and cross-cutting test hygiene
 

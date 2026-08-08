@@ -4,10 +4,9 @@
 
 ## Goal
 
-Optional `napi-rs` wrapper exposing rglint's engine to Node.js so the eslint
-ecosystem can consume Rust rules. Mirrors apollo-rs's
-`examples/validation-wasm-demo`. **Not blocking 1.0**; pursue only after
-Phases 1-9 are at parity.
+`napi-rs` wrapper exposing rglint's engine to Node.js so the eslint ecosystem
+can consume Rust rules. This stretch spec is being pursued now as an explicit
+integration request; it remains non-blocking for the Rust CLI release.
 
 ## Scope
 
@@ -53,6 +52,13 @@ export interface LintResult { ruleId: string; message: string; line: number; col
 - Synchronous API first (engine is fast); async variant later if needed.
 - Errors thrown as JS `Error` with the rglint error message.
 - Schema/documents passed as strings (not file paths) for portability.
+- `line` is one-based and `column` is zero-based, matching spec-058; source
+  identifiers are deterministic `<document-N>` names for inline documents.
+
+The Rust bridge uses `napi 3.12`/`napi-derive 3.6` and the package workflow
+builds the three platform artifacts from the tag revision. The core crate's
+default `native` feature supplies Rayon for the CLI, while the napi crate uses
+`default-features = false` and the serial `napi` feature.
 
 ## Testing
 
@@ -61,7 +67,9 @@ export interface LintResult { ruleId: string; message: string; line: number; col
 
 ## Risks / Notes
 
-- §12 decision: "Phase 10 stretch; do not block Phase 1-8 on it." Do not
-  schedule until Phases 1-9 are green and a consumer demand is identified.
+- §12 decision: "Phase 10 stretch; do not block Phase 1-8 on it." This branch
+  implements it because the user explicitly requested the next unimplemented
+  spec; it does not change the CLI release gate.
 - napi build complexity (per-platform toolchains) is the main cost; reuse
-  the release matrix from spec-066.
+  the release matrix from spec-066. Platform binaries remain release output,
+  not checked-in repository files.

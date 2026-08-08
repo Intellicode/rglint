@@ -1,0 +1,9 @@
+{
+  "name": "@rglint/napi-linux-x64-gnu",
+  "version": "0.1.0",
+  "os": ["linux"],
+  "cpu": ["x64"],
+  "main": "rglint-napi.linux-x64-gnu.node",
+  "files": ["rglint-napi.linux-x64-gnu.node"],
+  "license": "MIT"
+}

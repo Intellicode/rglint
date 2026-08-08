@@ -1,0 +1,75 @@
+name: N-API package
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build ${{ matrix.target }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            runner: ubuntu-24.04
+            package_dir: linux-x64-gnu
+            artifact: rglint-napi.linux-x64-gnu.node
+          - target: aarch64-apple-darwin
+            runner: macos-14
+            package_dir: darwin-arm64
+            artifact: rglint-napi.darwin-arm64.node
+          - target: x86_64-pc-windows-msvc
+            runner: windows-2022
+            package_dir: win32-x64-msvc
+            artifact: rglint-napi.win32-x64-msvc.node
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - name: Build native module
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --global @napi-rs/cli@3.8.2
+          napi build --platform --release --no-js \
+            --package-json-path npm/package.json \
+            --output-dir "npm/platform/${{ matrix.package_dir }}" \
+            --target ${{ matrix.target }} --package rglint-napi
+          mkdir -p "npm/platform/${{ matrix.package_dir }}"
+          test -f "npm/platform/${{ matrix.package_dir }}/${{ matrix.artifact }}"
+      - name: Run smoke test
+        if: matrix.runner == 'ubuntu-24.04'
+        run: node examples/napi-smoke.ts
+      - name: Publish platform package
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        working-directory: npm/platform/${{ matrix.package_dir }}
+        run: npm publish --access public
+
+  publish-loader:
+    name: Publish @rglint/napi loader
+    needs: build
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - name: Publish loader package
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        working-directory: npm
+        run: npm publish --access public
