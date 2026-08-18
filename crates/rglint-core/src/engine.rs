@@ -52,13 +52,15 @@
 use std::collections::HashMap;
 use std::panic::{catch_unwind, AssertUnwindSafe};
 use std::path::PathBuf;
-use std::sync::{Arc, RwLock};
+use std::sync::Arc;
+#[cfg(all(feature = "native", not(target_arch = "wasm32")))]
+use std::sync::RwLock;
 
 use apollo_parser::cst::CstNode;
 use apollo_parser::{Parser, SyntaxKind, SyntaxNode};
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(feature = "native", not(target_arch = "wasm32")))]
 use rayon::prelude::*;
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(feature = "native", not(target_arch = "wasm32")))]
 use rayon::{ThreadPool, ThreadPoolBuilder};
 
 use crate::cache::{Cache, CacheKey, CachedResult};
@@ -165,7 +167,7 @@ pub struct ProjectLintResult {
 pub struct LintEngine {
     rules: Vec<EnabledRule>,
     cache: Arc<Cache>,
-    #[cfg(not(target_arch = "wasm32"))]
+    #[cfg(all(feature = "native", not(target_arch = "wasm32")))]
     thread_pool: RwLock<ThreadPool>,
 }
 
@@ -203,7 +205,7 @@ impl LintEngine {
         Ok(Self {
             rules,
             cache: Arc::new(cache),
-            #[cfg(not(target_arch = "wasm32"))]
+            #[cfg(all(feature = "native", not(target_arch = "wasm32")))]
             thread_pool: RwLock::new(
                 default_thread_pool().map_err(|message| LintEngineError::ThreadPool { message })?,
             ),
@@ -217,7 +219,7 @@ impl LintEngine {
         Self {
             rules,
             cache: Arc::new(Cache::memory()),
-            #[cfg(not(target_arch = "wasm32"))]
+            #[cfg(all(feature = "native", not(target_arch = "wasm32")))]
             thread_pool: RwLock::new(
                 default_thread_pool().expect("the default Rayon worker pool must build"),
             ),
@@ -232,7 +234,7 @@ impl LintEngine {
                 message: "worker count must be greater than zero".to_owned(),
             });
         }
-        #[cfg(not(target_arch = "wasm32"))]
+        #[cfg(all(feature = "native", not(target_arch = "wasm32")))]
         {
             let pool = ThreadPoolBuilder::new()
                 .num_threads(n)
@@ -373,7 +375,7 @@ impl LintEngine {
         project_config: &crate::project::ProjectConfig,
         cache_namespace: u64,
     ) -> Vec<(PathBuf, Vec<Diagnostic>)> {
-        #[cfg(not(target_arch = "wasm32"))]
+        #[cfg(all(feature = "native", not(target_arch = "wasm32")))]
         let run = || {
             inputs
                 .par_iter()
@@ -390,7 +392,7 @@ impl LintEngine {
                 })
                 .collect()
         };
-        #[cfg(target_arch = "wasm32")]
+        #[cfg(not(all(feature = "native", not(target_arch = "wasm32"))))]
         let run = || {
             inputs
                 .iter()
@@ -408,7 +410,7 @@ impl LintEngine {
                 .collect()
         };
 
-        #[cfg(not(target_arch = "wasm32"))]
+        #[cfg(all(feature = "native", not(target_arch = "wasm32")))]
         {
             let pool = self
                 .thread_pool
@@ -416,7 +418,7 @@ impl LintEngine {
                 .unwrap_or_else(std::sync::PoisonError::into_inner);
             pool.install(run)
         }
-        #[cfg(target_arch = "wasm32")]
+        #[cfg(not(all(feature = "native", not(target_arch = "wasm32"))))]
         {
             run()
         }
@@ -429,7 +431,7 @@ struct LintInput {
     parse_errors: Vec<Diagnostic>,
 }
 
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(feature = "native", not(target_arch = "wasm32")))]
 fn default_thread_pool() -> Result<ThreadPool, String> {
     let jobs = std::thread::available_parallelism()
         .map(|count| count.get())

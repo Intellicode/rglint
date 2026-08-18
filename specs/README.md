@@ -150,7 +150,7 @@ of work (a few hours to ~2 days) and declares its dependencies on prior specs.
 
 | Spec | Title | Status |
 |------|-------|--------|
-| [spec-071](spec-071.md) | napi-rs bridge (stretch) | `[ ]` |
+| [spec-071](implemented/spec-071.md) | napi-rs bridge (stretch) | `[x]` |
 
 ## Plan coverage map
 
