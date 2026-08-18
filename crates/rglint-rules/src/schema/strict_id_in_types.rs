@@ -177,10 +177,7 @@ impl Handler for StrictIdInTypesHandler {
     }
 }
 
-fn count_valid_fields(
-    ext_type: &apollo_compiler::schema::ExtendedType,
-    opts: &Opts,
-) -> usize {
+fn count_valid_fields(ext_type: &apollo_compiler::schema::ExtendedType, opts: &Opts) -> usize {
     use apollo_compiler::ast::Type;
     use apollo_compiler::schema::ExtendedType;
     use std::ops::Deref;
@@ -260,8 +257,7 @@ mod tests {
 
     #[test]
     fn option_deserializes_with_defaults() {
-        let opts: Opts =
-            serde_json::from_value(serde_json::json!({})).unwrap_or_default();
+        let opts: Opts = serde_json::from_value(serde_json::json!({})).unwrap_or_default();
         assert_eq!(opts.accepted_id_names, vec!["id"]);
         assert_eq!(opts.accepted_id_types, vec!["ID"]);
         assert!(opts.exceptions.is_none());
@@ -317,8 +313,7 @@ mod tests {
             "type B { id: String! } type B1 { id: [String] }",
             "type B { id: ID! } type BError { message: String! }",
         ] {
-            let builder = apollo_compiler::Schema::builder()
-                .parse(source, "<inline>");
+            let builder = apollo_compiler::Schema::builder().parse(source, "<inline>");
             let result = builder.build();
             assert!(result.is_ok(), "schema build should succeed for: {source}");
         }

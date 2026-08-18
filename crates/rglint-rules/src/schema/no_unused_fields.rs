@@ -109,12 +109,9 @@ impl Handler for NoUnusedFieldsHandler {
                 continue;
             }
             let fields = match ext_type {
-                ExtendedType::Object(obj) => Some(
-                    obj.fields
-                        .keys()
-                        .map(|n| n.to_string())
-                        .collect::<Vec<_>>(),
-                ),
+                ExtendedType::Object(obj) => {
+                    Some(obj.fields.keys().map(|n| n.to_string()).collect::<Vec<_>>())
+                }
                 ExtendedType::Interface(iface) => Some(
                     iface
                         .fields

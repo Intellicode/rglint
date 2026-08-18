@@ -90,7 +90,9 @@ fn display_kind(kind: SyntaxKind) -> &'static str {
         SyntaxKind::INLINE_FRAGMENT => "inline fragment",
         SyntaxKind::OBJECT_TYPE_DEFINITION | SyntaxKind::OBJECT_TYPE_EXTENSION => "type",
         SyntaxKind::INTERFACE_TYPE_DEFINITION | SyntaxKind::INTERFACE_TYPE_EXTENSION => "interface",
-        SyntaxKind::INPUT_OBJECT_TYPE_DEFINITION | SyntaxKind::INPUT_OBJECT_TYPE_EXTENSION => "input",
+        SyntaxKind::INPUT_OBJECT_TYPE_DEFINITION | SyntaxKind::INPUT_OBJECT_TYPE_EXTENSION => {
+            "input"
+        }
         SyntaxKind::ENUM_TYPE_DEFINITION | SyntaxKind::ENUM_TYPE_EXTENSION => "enum",
         SyntaxKind::SCALAR_TYPE_DEFINITION | SyntaxKind::SCALAR_TYPE_EXTENSION => "scalar",
         SyntaxKind::UNION_TYPE_DEFINITION | SyntaxKind::UNION_TYPE_EXTENSION => "union",
@@ -211,7 +213,10 @@ impl Handler for AlphabetizeHandler {
                     let enabled = kind_name == "INPUT_OBJECT_TYPE_DEFINITION"
                         || kind_name == "INPUT_OBJECT_TYPE_EXTENSION";
                     if !enabled
-                        || !self.fields_enabled.iter().any(|k| k == "InputObjectTypeDefinition")
+                        || !self
+                            .fields_enabled
+                            .iter()
+                            .any(|k| k == "InputObjectTypeDefinition")
                     {
                         return;
                     }
@@ -232,8 +237,7 @@ impl Handler for AlphabetizeHandler {
                         return;
                     }
                     let is_enabled = self.arguments_enabled.iter().any(|k| {
-                        (k == "FieldDefinition"
-                            && gp.kind == SyntaxKind::FIELD_DEFINITION)
+                        (k == "FieldDefinition" && gp.kind == SyntaxKind::FIELD_DEFINITION)
                             || (k == "DirectiveDefinition"
                                 && gp.kind == SyntaxKind::DIRECTIVE_DEFINITION)
                     });
@@ -391,9 +395,9 @@ impl Handler for AlphabetizeHandler {
                 if !self.variables_enabled {
                     return;
                 }
-                let in_var_def = node.parent.is_some_and(|p| {
-                    p.kind == SyntaxKind::VARIABLE_DEFINITION
-                });
+                let in_var_def = node
+                    .parent
+                    .is_some_and(|p| p.kind == SyntaxKind::VARIABLE_DEFINITION);
                 if !in_var_def {
                     return;
                 }
@@ -422,9 +426,7 @@ impl Handler for AlphabetizeHandler {
                 if !is_definition_kind(kind) {
                     return;
                 }
-                let is_top_level = node.parent.is_some_and(|p| {
-                    p.kind == SyntaxKind::DOCUMENT
-                });
+                let is_top_level = node.parent.is_some_and(|p| p.kind == SyntaxKind::DOCUMENT);
                 if !is_top_level {
                     return;
                 }
@@ -502,11 +504,7 @@ impl Handler for AlphabetizeHandler {
 
                 let prev_display = match &prev_name {
                     Some(pn) => {
-                        format!(
-                            "{} \"{}\"",
-                            display_kind(self.entries[prev_idx].kind),
-                            pn
-                        )
+                        format!("{} \"{}\"", display_kind(self.entries[prev_idx].kind), pn)
                     }
                     None => lower_case_kind(self.entries[prev_idx].kind).to_owned(),
                 };
@@ -531,20 +529,20 @@ impl Handler for AlphabetizeHandler {
                     .to_owned();
                 ctx.report(
                     DiagnosticBuilder::new(rule_id, path.clone(), current.span, message)
-                    .suggestion(
-                        format!("Move {} before {}", curr_display, prev_display),
-                        Fix::Replace {
-                            span: current.span,
-                            text: previous_text,
-                        },
-                    )
-                    .suggestion(
-                        format!("Move {} after {}", prev_display, curr_display),
-                        Fix::Replace {
-                            span: previous.span,
-                            text: current_text,
-                        },
-                    ),
+                        .suggestion(
+                            format!("Move {} before {}", curr_display, prev_display),
+                            Fix::Replace {
+                                span: current.span,
+                                text: previous_text,
+                            },
+                        )
+                        .suggestion(
+                            format!("Move {} after {}", prev_display, curr_display),
+                            Fix::Replace {
+                                span: previous.span,
+                                text: current_text,
+                            },
+                        ),
                 );
             }
         }
@@ -564,17 +562,26 @@ impl AlphabetizeHandler {
         if let Some(idx) = self.groups.iter().position(|g| g == "{") {
             return idx;
         }
-        self.groups.iter().position(|g| g == "*").unwrap_or(usize::MAX)
+        self.groups
+            .iter()
+            .position(|g| g == "*")
+            .unwrap_or(usize::MAX)
     }
 
     fn is_selections_enabled(&self, sel_set: &Node<'_>) -> bool {
         let mut current = sel_set.parent;
         while let Some(p) = current {
             if p.kind == SyntaxKind::OPERATION_DEFINITION {
-                return self.selections_enabled.iter().any(|k| k == "OperationDefinition");
+                return self
+                    .selections_enabled
+                    .iter()
+                    .any(|k| k == "OperationDefinition");
             }
             if p.kind == SyntaxKind::FRAGMENT_DEFINITION {
-                return self.selections_enabled.iter().any(|k| k == "FragmentDefinition");
+                return self
+                    .selections_enabled
+                    .iter()
+                    .any(|k| k == "FragmentDefinition");
             }
             current = p.parent;
         }

@@ -34,9 +34,7 @@ fn two_files_with_same_operation_name_yield_one_diagnostic_on_second_file() {
     let schema_loader = SchemaLoader::new();
     let schema = schema_loader
         .load(
-            &rglint_core::SchemaSpec::Inline(
-                "type Query { a: Int b: Int c: Int }".to_owned(),
-            ),
+            &rglint_core::SchemaSpec::Inline("type Query { a: Int b: Int c: Int }".to_owned()),
             Path::new(""),
         )
         .expect("schema loads");

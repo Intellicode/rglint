@@ -16,7 +16,9 @@ impl RequireDeprecationDate {
     fn handler(&self, ctx: &mut RuleContext) -> Box<dyn Handler> {
         let opts: Opts = ctx.option().unwrap_or_default();
         Box::new(RequireDeprecationDateHandler {
-            argument_name: opts.argument_name.unwrap_or_else(|| "deletionDate".to_string()),
+            argument_name: opts
+                .argument_name
+                .unwrap_or_else(|| "deletionDate".to_string()),
             directives: HashMap::new(),
             arguments: HashMap::new(),
         })
@@ -48,7 +50,9 @@ fn find_deprecated_directive<'a>(start: Option<&'a Node<'a>>) -> Option<&'a Node
     let mut current = start;
     loop {
         match current {
-            Some(n) if n.kind == SyntaxKind::DIRECTIVE && n.name.as_deref() == Some("deprecated") => {
+            Some(n)
+                if n.kind == SyntaxKind::DIRECTIVE && n.name.as_deref() == Some("deprecated") =>
+            {
                 return Some(n);
             }
             Some(n) => current = n.parent,
@@ -125,7 +129,9 @@ fn display_kind_label(kind: SyntaxKind) -> &'static str {
         SyntaxKind::INTERFACE_TYPE_DEFINITION | SyntaxKind::INTERFACE_TYPE_EXTENSION => "interface",
         SyntaxKind::ENUM_TYPE_DEFINITION | SyntaxKind::ENUM_TYPE_EXTENSION => "enum",
         SyntaxKind::SCALAR_TYPE_DEFINITION | SyntaxKind::SCALAR_TYPE_EXTENSION => "scalar",
-        SyntaxKind::INPUT_OBJECT_TYPE_DEFINITION | SyntaxKind::INPUT_OBJECT_TYPE_EXTENSION => "input",
+        SyntaxKind::INPUT_OBJECT_TYPE_DEFINITION | SyntaxKind::INPUT_OBJECT_TYPE_EXTENSION => {
+            "input"
+        }
         SyntaxKind::UNION_TYPE_DEFINITION | SyntaxKind::UNION_TYPE_EXTENSION => "union",
         SyntaxKind::DIRECTIVE_DEFINITION => "directive",
         SyntaxKind::SCHEMA_DEFINITION | SyntaxKind::SCHEMA_EXTENSION => "schema",
@@ -150,7 +156,9 @@ fn get_node_name(info: &ParentInfo) -> String {
         | SyntaxKind::INPUT_VALUE_DEFINITION
         | SyntaxKind::ENUM_VALUE_DEFINITION => {
             let self_str = display_node_name(info.kind, &info.name);
-            let container_kind = info.container_kind.unwrap_or(SyntaxKind::OBJECT_TYPE_DEFINITION);
+            let container_kind = info
+                .container_kind
+                .unwrap_or(SyntaxKind::OBJECT_TYPE_DEFINITION);
             let container_str = display_node_name(container_kind, &info.container_name);
             format!("{self_str} in {container_str}")
         }
@@ -248,9 +256,7 @@ impl Handler for RequireDeprecationDateHandler {
                     }
                 }
             }
-            SyntaxKind::ARGUMENT
-                if node.name.as_deref() == Some(&self.argument_name) =>
-            {
+            SyntaxKind::ARGUMENT if node.name.as_deref() == Some(&self.argument_name) => {
                 if let Some(arg_span) = node.span {
                     if let Some(dir) = find_deprecated_directive(parent) {
                         if let Some(dir_span) = dir.span {
@@ -301,9 +307,8 @@ impl Handler for RequireDeprecationDateHandler {
                         let month: u32 = parts[1].parse().unwrap_or(0);
                         let year: u32 = parts[2].parse().unwrap_or(0);
 
-                        let is_valid_date = (1..=31).contains(&day)
-                            && (1..=12).contains(&month)
-                            && year >= 1;
+                        let is_valid_date =
+                            (1..=31).contains(&day) && (1..=12).contains(&month) && year >= 1;
 
                         if !is_valid_date {
                             ctx.report(DiagnosticBuilder::new(
@@ -335,18 +340,14 @@ impl Handler for RequireDeprecationDateHandler {
                                 .map_or(parent_info.span.offset, |n| {
                                     name_offset(&source, parent_info.span.offset, n)
                                 });
-                            let name_len =
-                                parent_info.name.as_ref().map_or(0, |n| n.len());
+                            let name_len = parent_info.name.as_ref().map_or(0, |n| n.len());
                             let parent_name_span = Span::new(name_start, name_len);
 
                             ctx.report(DiagnosticBuilder::new(
                                 rule_id,
                                 path.clone(),
                                 parent_name_span,
-                                format!(
-                                    "{} сan be removed",
-                                    get_node_name(parent_info)
-                                ),
+                                format!("{} сan be removed", get_node_name(parent_info)),
                             ));
                         }
                     }

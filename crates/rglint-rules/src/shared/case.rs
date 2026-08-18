@@ -91,14 +91,8 @@ pub fn detect_case(name: &str) -> Option<CaseStyle> {
         .chars()
         .filter(|c| c.is_ascii_alphabetic())
         .all(|c| c.is_ascii_lowercase());
-    let first_upper = name
-        .chars()
-        .next()
-        .is_some_and(|c| c.is_ascii_uppercase());
-    let first_lower = name
-        .chars()
-        .next()
-        .is_some_and(|c| c.is_ascii_lowercase());
+    let first_upper = name.chars().next().is_some_and(|c| c.is_ascii_uppercase());
+    let first_lower = name.chars().next().is_some_and(|c| c.is_ascii_lowercase());
 
     if has_hyphen {
         if all_upper {
@@ -352,58 +346,28 @@ mod tests {
     #[test]
     fn convert_to_camel() {
         assert_eq!(convert_case("foo_bar", CaseStyle::Camel, &[]), "fooBar");
-        assert_eq!(
-            convert_case("FOO_BAR", CaseStyle::Camel, &[]),
-            "fooBar"
-        );
+        assert_eq!(convert_case("FOO_BAR", CaseStyle::Camel, &[]), "fooBar");
         assert_eq!(convert_case("foo-bar", CaseStyle::Camel, &[]), "fooBar");
-        assert_eq!(
-            convert_case("FooBar", CaseStyle::Camel, &[]),
-            "fooBar"
-        );
-        assert_eq!(
-            convert_case("FOOBar", CaseStyle::Camel, &[]),
-            "fooBar"
-        );
+        assert_eq!(convert_case("FooBar", CaseStyle::Camel, &[]), "fooBar");
+        assert_eq!(convert_case("FOOBar", CaseStyle::Camel, &[]), "fooBar");
         assert_eq!(convert_case("foo", CaseStyle::Camel, &[]), "foo");
     }
 
     #[test]
     fn convert_to_pascal() {
-        assert_eq!(
-            convert_case("foo_bar", CaseStyle::Pascal, &[]),
-            "FooBar"
-        );
-        assert_eq!(
-            convert_case("fooBar", CaseStyle::Pascal, &[]),
-            "FooBar"
-        );
-        assert_eq!(
-            convert_case("FOO_BAR", CaseStyle::Pascal, &[]),
-            "FooBar"
-        );
+        assert_eq!(convert_case("foo_bar", CaseStyle::Pascal, &[]), "FooBar");
+        assert_eq!(convert_case("fooBar", CaseStyle::Pascal, &[]), "FooBar");
+        assert_eq!(convert_case("FOO_BAR", CaseStyle::Pascal, &[]), "FooBar");
         assert_eq!(convert_case("foo", CaseStyle::Pascal, &[]), "Foo");
         assert_eq!(convert_case("URL", CaseStyle::Pascal, &[]), "Url");
     }
 
     #[test]
     fn convert_to_snake() {
-        assert_eq!(
-            convert_case("fooBar", CaseStyle::Snake, &[]),
-            "foo_bar"
-        );
-        assert_eq!(
-            convert_case("FooBar", CaseStyle::Snake, &[]),
-            "foo_bar"
-        );
-        assert_eq!(
-            convert_case("FOOBar", CaseStyle::Snake, &[]),
-            "foo_bar"
-        );
-        assert_eq!(
-            convert_case("FOO-BAR", CaseStyle::Snake, &[]),
-            "foo_bar"
-        );
+        assert_eq!(convert_case("fooBar", CaseStyle::Snake, &[]), "foo_bar");
+        assert_eq!(convert_case("FooBar", CaseStyle::Snake, &[]), "foo_bar");
+        assert_eq!(convert_case("FOOBar", CaseStyle::Snake, &[]), "foo_bar");
+        assert_eq!(convert_case("FOO-BAR", CaseStyle::Snake, &[]), "foo_bar");
     }
 
     #[test]
@@ -424,18 +388,9 @@ mod tests {
 
     #[test]
     fn convert_to_kebab() {
-        assert_eq!(
-            convert_case("fooBar", CaseStyle::Kebab, &[]),
-            "foo-bar"
-        );
-        assert_eq!(
-            convert_case("FooBar", CaseStyle::Kebab, &[]),
-            "foo-bar"
-        );
-        assert_eq!(
-            convert_case("foo_bar", CaseStyle::Kebab, &[]),
-            "foo-bar"
-        );
+        assert_eq!(convert_case("fooBar", CaseStyle::Kebab, &[]), "foo-bar");
+        assert_eq!(convert_case("FooBar", CaseStyle::Kebab, &[]), "foo-bar");
+        assert_eq!(convert_case("foo_bar", CaseStyle::Kebab, &[]), "foo-bar");
     }
 
     #[test]

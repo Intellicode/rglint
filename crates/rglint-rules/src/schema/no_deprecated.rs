@@ -178,18 +178,18 @@ fn message_for(kind: &str, name: &str, reason: &str) -> String {
     if reason.is_empty() {
         format!("{kind} \"{name}\" is marked as deprecated in your GraphQL schema")
     } else {
-        format!("{kind} \"{name}\" is marked as deprecated in your GraphQL schema (reason: {reason})")
+        format!(
+            "{kind} \"{name}\" is marked as deprecated in your GraphQL schema (reason: {reason})"
+        )
     }
 }
 
 fn resolve_base_type_name(ty: &apollo_compiler::ast::Type) -> Option<&str> {
     match ty {
-        apollo_compiler::ast::Type::Named(name) | apollo_compiler::ast::Type::NonNullNamed(name) => {
-            Some(name.as_str())
-        }
-        apollo_compiler::ast::Type::List(inner) | apollo_compiler::ast::Type::NonNullList(inner) => {
-            resolve_base_type_name(inner)
-        }
+        apollo_compiler::ast::Type::Named(name)
+        | apollo_compiler::ast::Type::NonNullNamed(name) => Some(name.as_str()),
+        apollo_compiler::ast::Type::List(inner)
+        | apollo_compiler::ast::Type::NonNullList(inner) => resolve_base_type_name(inner),
     }
 }
 

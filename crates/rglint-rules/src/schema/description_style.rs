@@ -149,11 +149,7 @@ impl Handler for DescriptionStyleHandler {
                 continue;
             }
 
-            let style_label = if self.want_block {
-                "block"
-            } else {
-                "inline"
-            };
+            let style_label = if self.want_block { "block" } else { "inline" };
             let unexpected_style = if is_block { "block" } else { "inline" };
 
             // For ENUM_VALUE_DEFINITION look up the value name recorded when
@@ -317,8 +313,11 @@ mod tests {
         assert_eq!(opts.style, DescStyle::Single, "style=inline -> Single");
 
         // Empty object → default
-        let opts: Opts =
-            serde_json::from_value(serde_json::json!({})).unwrap_or_default();
-        assert_eq!(opts.style, DescStyle::Block, "empty object should default to Block");
+        let opts: Opts = serde_json::from_value(serde_json::json!({})).unwrap_or_default();
+        assert_eq!(
+            opts.style,
+            DescStyle::Block,
+            "empty object should default to Block"
+        );
     }
 }

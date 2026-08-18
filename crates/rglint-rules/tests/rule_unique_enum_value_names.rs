@@ -12,8 +12,8 @@ rglint_test_suite!("unique-enum-value-names", root = "../../rules-fixtures");
 #[test]
 fn case_insensitive_duplicate_in_enum_reported() {
     use rglint_core::{
-        LintEngine, LoadedDocuments, Project, ProjectConfig, RuleConfig, RulesConfig,
-        SchemaLoader, SchemaSpec, Severity, Siblings,
+        LintEngine, LoadedDocuments, Project, ProjectConfig, RuleConfig, RulesConfig, SchemaLoader,
+        SchemaSpec, Severity, Siblings,
     };
 
     let schema_loader = SchemaLoader::new();

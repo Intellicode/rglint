@@ -133,8 +133,7 @@ mod tests {
 
     #[test]
     fn option_deserializes_with_defaults() {
-        let opts: Opts =
-            serde_json::from_value(serde_json::json!({})).unwrap_or_default();
+        let opts: Opts = serde_json::from_value(serde_json::json!({})).unwrap_or_default();
         assert_eq!(opts.forbidden.len(), 3);
     }
 

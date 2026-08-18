@@ -25,9 +25,7 @@ pub struct NoUnreachableTypes;
 
 impl NoUnreachableTypes {
     fn handler(&self, _ctx: &mut RuleContext) -> Box<dyn Handler> {
-        Box::new(NoUnreachableTypesHandler {
-            defs: Vec::new(),
-        })
+        Box::new(NoUnreachableTypesHandler { defs: Vec::new() })
     }
 }
 
@@ -292,8 +290,6 @@ fn has_user_reachable_types(reachable: &HashSet<String>, schema: &apollo_compile
     }
     false
 }
-
-
 
 #[cfg(test)]
 mod tests {

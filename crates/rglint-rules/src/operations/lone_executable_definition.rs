@@ -160,7 +160,7 @@ mod tests {
         let op = root.syntax().children().next().unwrap();
         eprintln!("op kind: {:?}", op.kind());
         for child in op.children() {
-            eprintln!("  child kind: {:?} text='{}'", child.kind(), child.to_string());
+            eprintln!("  child kind: {:?} text='{}'", child.kind(), child);
             for t in child.children_with_tokens() {
                 use apollo_parser::SyntaxElement;
                 if let SyntaxElement::Token(tok) = t {
@@ -169,10 +169,7 @@ mod tests {
             }
         }
         assert_eq!(op.kind(), SyntaxKind::OPERATION_DEFINITION);
-        assert_eq!(
-            operation_type_from_cst(&op),
-            "Mutation"
-        );
+        assert_eq!(operation_type_from_cst(&op), "Mutation");
     }
 
     #[test]

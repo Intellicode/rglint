@@ -57,8 +57,9 @@ impl Opts {
                 SyntaxKind::OBJECT_TYPE_DEFINITION | SyntaxKind::OBJECT_TYPE_EXTENSION => {
                     self.object_type_definition
                 }
-                SyntaxKind::INTERFACE_TYPE_DEFINITION
-                | SyntaxKind::INTERFACE_TYPE_EXTENSION => self.interface_type_definition,
+                SyntaxKind::INTERFACE_TYPE_DEFINITION | SyntaxKind::INTERFACE_TYPE_EXTENSION => {
+                    self.interface_type_definition
+                }
                 SyntaxKind::ENUM_TYPE_DEFINITION | SyntaxKind::ENUM_TYPE_EXTENSION => {
                     self.enum_type_definition
                 }
@@ -80,7 +81,9 @@ impl Opts {
             SyntaxKind::OPERATION_DEFINITION => self.operation_definition,
             _ => None,
         };
-        specific.or(self.types.filter(|_| is_type_kind(kind))).unwrap_or(false)
+        specific
+            .or(self.types.filter(|_| is_type_kind(kind)))
+            .unwrap_or(false)
     }
 }
 
@@ -156,8 +159,7 @@ impl Handler for RequireDescriptionHandler {
                 if let Some(p) = parent {
                     if p.kind == SyntaxKind::ENUM_VALUE_DEFINITION {
                         if let Some(span) = p.span {
-                            self.enum_value_names
-                                .insert(span.offset, node.name.clone());
+                            self.enum_value_names.insert(span.offset, node.name.clone());
                         }
                     }
                 }
@@ -196,8 +198,7 @@ impl Handler for RequireDescriptionHandler {
         let path = source.path().to_path_buf();
         let rule_id = ctx.rule_id();
         for v in violations {
-            let actual_name = if v.kind == SyntaxKind::ENUM_VALUE_DEFINITION && v.name.is_none()
-            {
+            let actual_name = if v.kind == SyntaxKind::ENUM_VALUE_DEFINITION && v.name.is_none() {
                 self.enum_value_names
                     .get(&v.span.offset)
                     .and_then(|n| n.clone())
@@ -260,9 +261,7 @@ fn operation_type_label(source_text: &str, span: Span) -> &'static str {
 fn display_kind_label(kind: SyntaxKind) -> &'static str {
     match kind {
         SyntaxKind::OBJECT_TYPE_DEFINITION | SyntaxKind::OBJECT_TYPE_EXTENSION => "type",
-        SyntaxKind::INTERFACE_TYPE_DEFINITION | SyntaxKind::INTERFACE_TYPE_EXTENSION => {
-            "interface"
-        }
+        SyntaxKind::INTERFACE_TYPE_DEFINITION | SyntaxKind::INTERFACE_TYPE_EXTENSION => "interface",
         SyntaxKind::ENUM_TYPE_DEFINITION | SyntaxKind::ENUM_TYPE_EXTENSION => "enum",
         SyntaxKind::SCALAR_TYPE_DEFINITION | SyntaxKind::SCALAR_TYPE_EXTENSION => "scalar",
         SyntaxKind::INPUT_OBJECT_TYPE_DEFINITION | SyntaxKind::INPUT_OBJECT_TYPE_EXTENSION => {
@@ -340,15 +339,15 @@ mod tests {
 
     #[test]
     fn option_deserializes_from_json() {
-        let opts: Opts =
-            serde_json::from_value(serde_json::json!({"ObjectTypeDefinition": true}))
-                .unwrap_or_default();
+        let opts: Opts = serde_json::from_value(serde_json::json!({"ObjectTypeDefinition": true}))
+            .unwrap_or_default();
         assert!(opts.is_enabled(SyntaxKind::OBJECT_TYPE_DEFINITION));
         assert!(!opts.is_enabled(SyntaxKind::INTERFACE_TYPE_DEFINITION));
 
-        let opts: Opts =
-            serde_json::from_value(serde_json::json!({"types": true, "ObjectTypeDefinition": false}))
-                .unwrap_or_default();
+        let opts: Opts = serde_json::from_value(
+            serde_json::json!({"types": true, "ObjectTypeDefinition": false}),
+        )
+        .unwrap_or_default();
         assert!(!opts.is_enabled(SyntaxKind::OBJECT_TYPE_DEFINITION));
         assert!(opts.is_enabled(SyntaxKind::INTERFACE_TYPE_DEFINITION));
         assert!(opts.is_enabled(SyntaxKind::ENUM_TYPE_DEFINITION));
@@ -356,9 +355,8 @@ mod tests {
 
     #[test]
     fn option_deserializes_operation() {
-        let opts: Opts =
-            serde_json::from_value(serde_json::json!({"OperationDefinition": true}))
-                .unwrap_or_default();
+        let opts: Opts = serde_json::from_value(serde_json::json!({"OperationDefinition": true}))
+            .unwrap_or_default();
         assert!(opts.is_enabled(SyntaxKind::OPERATION_DEFINITION));
         assert!(!opts.is_enabled(SyntaxKind::FIELD_DEFINITION));
     }

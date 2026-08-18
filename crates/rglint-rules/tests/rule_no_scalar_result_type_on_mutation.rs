@@ -5,4 +5,7 @@ static _FORCE_LINK_RGLINT_RULES: fn() = || {
     let _ = rglint_rules::all_rules();
 };
 
-rglint_test_suite!("no-scalar-result-type-on-mutation", root = "../../rules-fixtures");
+rglint_test_suite!(
+    "no-scalar-result-type-on-mutation",
+    root = "../../rules-fixtures"
+);
