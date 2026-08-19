@@ -76,6 +76,7 @@ fn snapshot_invalid_01_caret_diagram() {
     // `assert_snapshot!` here keeps the `.snap` under
     // `crates/rglint-rules/tests/snapshots/`.
     let rendered = render_snapshot(&result.all, &source)
-        .replace(env!("CARGO_MANIFEST_DIR"), "$CARGO_MANIFEST_DIR");
+        .replace(env!("CARGO_MANIFEST_DIR"), "$CARGO_MANIFEST_DIR")
+        .replace('\\', "/");
     insta::assert_snapshot!(rendered);
 }
