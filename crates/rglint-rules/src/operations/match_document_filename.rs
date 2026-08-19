@@ -100,10 +100,7 @@ impl Handler for MatchDocumentFilenameHandler {
             .map(|s| s.to_string_lossy().to_string())
             .unwrap_or_default();
 
-        let expected_ext = opts
-            .file_extension
-            .as_deref()
-            .unwrap_or(&file_ext);
+        let expected_ext = opts.file_extension.as_deref().unwrap_or(&file_ext);
 
         if let Some(ref opt_ext) = opts.file_extension {
             if opt_ext.as_str() != file_ext {

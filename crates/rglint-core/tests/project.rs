@@ -33,7 +33,9 @@ fn two_project_fixture_resolves_into_independent_projects() {
         ProjectConfig {
             name: "admin".to_owned(),
             schema: Some(SchemaSpec::File(PathBuf::from("admin/schema.graphqls"))),
-            documents: Some(DocumentSpec::Files(vec![PathBuf::from("admin/doc.graphql")])),
+            documents: Some(DocumentSpec::Files(vec![PathBuf::from(
+                "admin/doc.graphql",
+            )])),
             ignore: Vec::new(),
         },
     ];

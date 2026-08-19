@@ -15,9 +15,7 @@ pub fn is_one_of_input(input: &ast::InputObjectTypeDefinition) -> bool {
 }
 
 /// Returns the fields declared by an input object, preserving source order.
-pub fn one_of_fields(
-    input: &ast::InputObjectTypeDefinition,
-) -> Vec<&ast::InputValueDefinition> {
+pub fn one_of_fields(input: &ast::InputObjectTypeDefinition) -> Vec<&ast::InputValueDefinition> {
     input.fields.iter().map(|field| field.as_ref()).collect()
 }
 

@@ -139,18 +139,14 @@ impl<'a> RuleContext<'a> {
         &self,
         rule_id: &str,
     ) -> Result<&apollo_compiler::Schema, RuleContextError> {
-        self.schema
-            .ok_or_else(|| RuleContextError::SchemaMissing {
-                rule_id: rule_id.to_owned(),
-            })
+        self.schema.ok_or_else(|| RuleContextError::SchemaMissing {
+            rule_id: rule_id.to_owned(),
+        })
     }
 
     /// Returns the siblings index, or an [`RuleContextError::SiblingsMissing`]
     /// naming `rule_id` if no siblings were loaded for this project.
-    pub fn require_operations(
-        &self,
-        rule_id: &str,
-    ) -> Result<&Siblings, RuleContextError> {
+    pub fn require_operations(&self, rule_id: &str) -> Result<&Siblings, RuleContextError> {
         self.siblings
             .ok_or_else(|| RuleContextError::SiblingsMissing {
                 rule_id: rule_id.to_owned(),
@@ -273,10 +269,7 @@ mod tests {
             .expect_err("invalid options must error");
         assert!(matches!(err, RuleContextError::OptionsInvalid { .. }));
         let msg = format!("{err}");
-        assert!(
-            msg.contains("depth-rule"),
-            "error names the rule: {msg}"
-        );
+        assert!(msg.contains("depth-rule"), "error names the rule: {msg}");
     }
 
     #[test]
@@ -299,10 +292,7 @@ mod tests {
             .expect_err("schema missing");
         assert!(matches!(err, RuleContextError::SchemaMissing { .. }));
         let msg = format!("{err}");
-        assert!(
-            msg.contains("schema-rule"),
-            "error names the rule: {msg}"
-        );
+        assert!(msg.contains("schema-rule"), "error names the rule: {msg}");
     }
 
     #[test]
@@ -323,10 +313,7 @@ mod tests {
             .expect_err("siblings missing");
         assert!(matches!(err, RuleContextError::SiblingsMissing { .. }));
         let msg = format!("{err}");
-        assert!(
-            msg.contains("siblings-rule"),
-            "error names the rule: {msg}"
-        );
+        assert!(msg.contains("siblings-rule"), "error names the rule: {msg}");
     }
 
     #[test]
@@ -389,7 +376,12 @@ mod tests {
                 Span::new(5, 2),
                 "hello",
             )
-            .suggestion("fix it", Fix::Remove { span: Span::new(5, 2) })
+            .suggestion(
+                "fix it",
+                Fix::Remove {
+                    span: Span::new(5, 2),
+                },
+            )
             .data(serde_json::json!({ "k": 1 })),
         );
         let d = &ctx.take_diagnostics()[0];
@@ -404,15 +396,7 @@ mod tests {
         let src = make_source();
         let project = empty_project();
         let options = serde_json::json!({ "x": 1 });
-        let ctx = RuleContext::new(
-            &src,
-            None,
-            None,
-            &project,
-            &options,
-            "rid",
-            Severity::Warn,
-        );
+        let ctx = RuleContext::new(&src, None, None, &project, &options, "rid", Severity::Warn);
         assert_eq!(ctx.rule_id(), "rid");
         assert_eq!(ctx.severity(), Severity::Warn);
         assert!(

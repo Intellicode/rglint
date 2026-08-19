@@ -106,10 +106,6 @@ jobs:
           name: tarpaulin-report
           path: target/coverage/cobertura.xml
           if-no-files-found: error
-      - uses: codecov/codecov-action@v4
-        with:
-          files: target/coverage/cobertura.xml
-          fail_ci_if_error: true
 
   parity:
     name: parity

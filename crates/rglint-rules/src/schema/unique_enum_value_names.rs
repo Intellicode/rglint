@@ -73,14 +73,13 @@ impl Handler for UniqueEnumValueNamesHandler {
             return;
         }
 
-        self.duplicates.push((value_name, Span::new(span.offset, 0)));
+        self.duplicates
+            .push((value_name, Span::new(span.offset, 0)));
     }
 
     fn finalize(&mut self, ctx: &mut RuleContext) {
         for (name, span) in self.duplicates.drain(..) {
-            let message = format!(
-                "Unexpected case-insensitive enum values duplicates for {name}"
-            );
+            let message = format!("Unexpected case-insensitive enum values duplicates for {name}");
             ctx.report(DiagnosticBuilder::new(
                 ctx.rule_id(),
                 ctx.source_code().path().to_path_buf(),

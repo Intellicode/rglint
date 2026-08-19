@@ -193,8 +193,7 @@ mod tests {
 
     #[test]
     fn option_deserializes_empty() {
-        let opts: Opts =
-            serde_json::from_value(serde_json::json!({})).unwrap_or_default();
+        let opts: Opts = serde_json::from_value(serde_json::json!({})).unwrap_or_default();
         assert!(opts.allowed.is_empty());
     }
 

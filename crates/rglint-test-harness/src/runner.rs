@@ -226,9 +226,7 @@ pub fn build_project_with(
         DocKind::Schema => {
             // The source itself is the schema; optionally load sibling
             // operations from the inline `documents` field.
-            let schema = Some(
-                schema_loader.load(&SchemaSpec::Inline(case.source.clone()), base)?,
-            );
+            let schema = Some(schema_loader.load(&SchemaSpec::Inline(case.source.clone()), base)?);
             let documents = if let Some(doc_str) = &case.documents {
                 // Split the documents into individual operation documents so
                 // an anonymous query doesn't conflict with named operations.

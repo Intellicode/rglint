@@ -63,15 +63,15 @@ impl Handler for NoTypenamePrefixHandler {
         let type_lower = type_name.to_lowercase();
         if field_lower.starts_with(&type_lower) {
             let span = node.span.unwrap_or(Span::new(0, 0));
-            self.diagnostics
-                .push((field_name, type_name, span));
+            self.diagnostics.push((field_name, type_name, span));
         }
     }
 
     fn finalize(&mut self, ctx: &mut RuleContext) {
         for (field_name, type_name, span) in self.diagnostics.drain(..) {
-            let message =
-                format!("Field \"{field_name}\" starts with the name of the parent type \"{type_name}\"");
+            let message = format!(
+                "Field \"{field_name}\" starts with the name of the parent type \"{type_name}\""
+            );
             ctx.report(DiagnosticBuilder::new(
                 ctx.rule_id(),
                 ctx.source_code().path().to_path_buf(),

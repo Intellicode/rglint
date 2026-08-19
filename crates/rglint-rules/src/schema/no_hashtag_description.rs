@@ -13,9 +13,7 @@ pub struct NoHashtagDescription;
 
 impl NoHashtagDescription {
     fn handler(&self, _ctx: &mut RuleContext) -> Box<dyn Handler> {
-        Box::new(NoHashtagDescriptionHandler {
-            spans: Vec::new(),
-        })
+        Box::new(NoHashtagDescriptionHandler { spans: Vec::new() })
     }
 }
 

@@ -39,10 +39,10 @@ struct KindSelector {
 
 #[derive(Clone)]
 enum SelectorPredicate {
-    ParentNameEquals(String),
-    ParentNameNotEquals(String),
-    GqlTypeNameEquals(String),
-    GqlTypeGqlTypeNameEquals(String),
+    ParentName(String),
+    ParentNameNot(String),
+    GqlTypeName(String),
+    NestedGqlTypeName(String),
 }
 
 #[derive(Clone, Default)]
@@ -102,9 +102,12 @@ fn parse_options(raw: &serde_json::Value) -> Opts {
 
         if kind_name == "types" {
             for tk in &[
-                "ObjectTypeDefinition", "InterfaceTypeDefinition",
-                "UnionTypeDefinition", "InputObjectTypeDefinition",
-                "EnumTypeDefinition", "ScalarTypeDefinition",
+                "ObjectTypeDefinition",
+                "InterfaceTypeDefinition",
+                "UnionTypeDefinition",
+                "InputObjectTypeDefinition",
+                "EnumTypeDefinition",
+                "ScalarTypeDefinition",
             ] {
                 opts.kind_configs.push(KindSelector {
                     kind_name: tk.to_string(),
@@ -140,7 +143,7 @@ fn parse_predicate(s: &str) -> Option<SelectorPredicate> {
         let field = s[..pos].trim();
         let value = s[pos + 2..].trim().trim_matches('"');
         if field == "parent.name.value" {
-            return Some(SelectorPredicate::ParentNameNotEquals(value.to_string()));
+            return Some(SelectorPredicate::ParentNameNot(value.to_string()));
         }
         return None;
     }
@@ -148,9 +151,11 @@ fn parse_predicate(s: &str) -> Option<SelectorPredicate> {
         let field = s[..pos].trim();
         let value = s[pos + 1..].trim().trim_matches('"');
         match field {
-            "parent.name.value" => return Some(SelectorPredicate::ParentNameEquals(value.to_string())),
-            "gqlType.name.value" => return Some(SelectorPredicate::GqlTypeNameEquals(value.to_string())),
-            "gqlType.gqlType.name.value" => return Some(SelectorPredicate::GqlTypeGqlTypeNameEquals(value.to_string())),
+            "parent.name.value" => return Some(SelectorPredicate::ParentName(value.to_string())),
+            "gqlType.name.value" => return Some(SelectorPredicate::GqlTypeName(value.to_string())),
+            "gqlType.gqlType.name.value" => {
+                return Some(SelectorPredicate::NestedGqlTypeName(value.to_string()))
+            }
             _ => return None,
         }
     }
@@ -177,33 +182,66 @@ fn parse_kind_config(val: &serde_json::Value) -> KindConfig {
             ..Default::default()
         },
         serde_json::Value::Object(obj) => {
-            let mut config = KindConfig::default();
-            config.style = obj.get("style").and_then(|v| v.as_str()).and_then(parse_case_style);
-            config.prefix = obj.get("prefix").and_then(|v| v.as_str()).map(String::from);
-            config.suffix = obj.get("suffix").and_then(|v| v.as_str()).map(String::from);
+            let mut config = KindConfig {
+                style: obj
+                    .get("style")
+                    .and_then(|v| v.as_str())
+                    .and_then(parse_case_style),
+                prefix: obj.get("prefix").and_then(|v| v.as_str()).map(String::from),
+                suffix: obj.get("suffix").and_then(|v| v.as_str()).map(String::from),
+                ..Default::default()
+            };
             if let Some(arr) = obj.get("forbiddenPrefixes").and_then(|v| v.as_array()) {
-                config.forbidden_prefixes = arr.iter().filter_map(|e| e.as_str().map(String::from)).collect();
+                config.forbidden_prefixes = arr
+                    .iter()
+                    .filter_map(|e| e.as_str().map(String::from))
+                    .collect();
             }
             if let Some(arr) = obj.get("forbiddenSuffixes").and_then(|v| v.as_array()) {
-                config.forbidden_suffixes = arr.iter().filter_map(|e| e.as_str().map(String::from)).collect();
+                config.forbidden_suffixes = arr
+                    .iter()
+                    .filter_map(|e| e.as_str().map(String::from))
+                    .collect();
             }
             if let Some(arr) = obj.get("requiredPrefixes").and_then(|v| v.as_array()) {
-                config.required_prefixes = arr.iter().filter_map(|e| e.as_str().map(String::from)).collect();
+                config.required_prefixes = arr
+                    .iter()
+                    .filter_map(|e| e.as_str().map(String::from))
+                    .collect();
             }
             if let Some(arr) = obj.get("requiredSuffixes").and_then(|v| v.as_array()) {
-                config.required_suffixes = arr.iter().filter_map(|e| e.as_str().map(String::from)).collect();
+                config.required_suffixes = arr
+                    .iter()
+                    .filter_map(|e| e.as_str().map(String::from))
+                    .collect();
             }
             if let Some(arr) = obj.get("forbiddenPatterns").and_then(|v| v.as_array()) {
-                config.forbidden_patterns = arr.iter().filter_map(|e| e.as_str()).filter_map(|s| {
-                    let p = s.strip_prefix('/').and_then(|s| s.strip_suffix('/')).unwrap_or(s);
-                    Regex::new(p).ok()
-                }).collect();
+                config.forbidden_patterns = arr
+                    .iter()
+                    .filter_map(|e| e.as_str())
+                    .filter_map(|s| {
+                        let p = s
+                            .strip_prefix('/')
+                            .and_then(|s| s.strip_suffix('/'))
+                            .unwrap_or(s);
+                        Regex::new(p).ok()
+                    })
+                    .collect();
             }
-            config.required_pattern = obj.get("requiredPattern").and_then(|v| v.as_str()).and_then(|s| {
-                let p = s.strip_prefix('/').and_then(|s| s.strip_suffix('/')).unwrap_or(s);
-                Regex::new(p).ok()
-            });
-            config.ignore_pattern = obj.get("ignorePattern").and_then(|v| v.as_str()).and_then(|s| Regex::new(s).ok());
+            config.required_pattern = obj
+                .get("requiredPattern")
+                .and_then(|v| v.as_str())
+                .and_then(|s| {
+                    let p = s
+                        .strip_prefix('/')
+                        .and_then(|s| s.strip_suffix('/'))
+                        .unwrap_or(s);
+                    Regex::new(p).ok()
+                });
+            config.ignore_pattern = obj
+                .get("ignorePattern")
+                .and_then(|v| v.as_str())
+                .and_then(|s| Regex::new(s).ok());
             config
         }
         _ => KindConfig::default(),
@@ -215,12 +253,22 @@ fn kind_name_str(kind: SyntaxKind) -> &'static str {
         SyntaxKind::FIELD_DEFINITION => "FieldDefinition",
         SyntaxKind::INPUT_VALUE_DEFINITION => "InputValueDefinition",
         SyntaxKind::ENUM_VALUE_DEFINITION | SyntaxKind::ENUM_VALUE => "EnumValueDefinition",
-        SyntaxKind::OBJECT_TYPE_DEFINITION | SyntaxKind::OBJECT_TYPE_EXTENSION => "ObjectTypeDefinition",
-        SyntaxKind::INTERFACE_TYPE_DEFINITION | SyntaxKind::INTERFACE_TYPE_EXTENSION => "InterfaceTypeDefinition",
-        SyntaxKind::UNION_TYPE_DEFINITION | SyntaxKind::UNION_TYPE_EXTENSION => "UnionTypeDefinition",
+        SyntaxKind::OBJECT_TYPE_DEFINITION | SyntaxKind::OBJECT_TYPE_EXTENSION => {
+            "ObjectTypeDefinition"
+        }
+        SyntaxKind::INTERFACE_TYPE_DEFINITION | SyntaxKind::INTERFACE_TYPE_EXTENSION => {
+            "InterfaceTypeDefinition"
+        }
+        SyntaxKind::UNION_TYPE_DEFINITION | SyntaxKind::UNION_TYPE_EXTENSION => {
+            "UnionTypeDefinition"
+        }
         SyntaxKind::ENUM_TYPE_DEFINITION | SyntaxKind::ENUM_TYPE_EXTENSION => "EnumTypeDefinition",
-        SyntaxKind::SCALAR_TYPE_DEFINITION | SyntaxKind::SCALAR_TYPE_EXTENSION => "ScalarTypeDefinition",
-        SyntaxKind::INPUT_OBJECT_TYPE_DEFINITION | SyntaxKind::INPUT_OBJECT_TYPE_EXTENSION => "InputObjectTypeDefinition",
+        SyntaxKind::SCALAR_TYPE_DEFINITION | SyntaxKind::SCALAR_TYPE_EXTENSION => {
+            "ScalarTypeDefinition"
+        }
+        SyntaxKind::INPUT_OBJECT_TYPE_DEFINITION | SyntaxKind::INPUT_OBJECT_TYPE_EXTENSION => {
+            "InputObjectTypeDefinition"
+        }
         SyntaxKind::DIRECTIVE_DEFINITION => "DirectiveDefinition",
         SyntaxKind::OPERATION_DEFINITION => "OperationDefinition",
         SyntaxKind::FRAGMENT_DEFINITION => "FragmentDefinition",
@@ -237,7 +285,9 @@ fn display_name(kind: SyntaxKind) -> &'static str {
         SyntaxKind::UNION_TYPE_DEFINITION | SyntaxKind::UNION_TYPE_EXTENSION => "union",
         SyntaxKind::ENUM_TYPE_DEFINITION | SyntaxKind::ENUM_TYPE_EXTENSION => "enum",
         SyntaxKind::SCALAR_TYPE_DEFINITION | SyntaxKind::SCALAR_TYPE_EXTENSION => "scalar",
-        SyntaxKind::INPUT_OBJECT_TYPE_DEFINITION | SyntaxKind::INPUT_OBJECT_TYPE_EXTENSION => "input",
+        SyntaxKind::INPUT_OBJECT_TYPE_DEFINITION | SyntaxKind::INPUT_OBJECT_TYPE_EXTENSION => {
+            "input"
+        }
         SyntaxKind::DIRECTIVE_DEFINITION => "directive",
         SyntaxKind::FIELD_DEFINITION => "field",
         SyntaxKind::INPUT_VALUE_DEFINITION => "input value",
@@ -346,24 +396,24 @@ impl Handler for NamingConventionHandler {
             }
 
             // Strip allowed underscores for convention checking
-            let check_name: std::borrow::Cow<'_, str> = if self.opts.allow_leading_underscore || self.opts.allow_trailing_underscore {
-                let s = name.trim_start_matches('_');
-                let s = if self.opts.allow_trailing_underscore {
-                    s.trim_end_matches('_')
+            let check_name: std::borrow::Cow<'_, str> =
+                if self.opts.allow_leading_underscore || self.opts.allow_trailing_underscore {
+                    let s = name.trim_start_matches('_');
+                    let s = if self.opts.allow_trailing_underscore {
+                        s.trim_end_matches('_')
+                    } else {
+                        s
+                    };
+                    if s.is_empty() {
+                        std::borrow::Cow::Borrowed(name)
+                    } else {
+                        std::borrow::Cow::Owned(s.to_string())
+                    }
                 } else {
-                    s
-                };
-                if s.is_empty() {
                     std::borrow::Cow::Borrowed(name)
-                } else {
-                    std::borrow::Cow::Owned(s.to_string())
-                }
-            } else {
-                std::borrow::Cow::Borrowed(name)
-            };
+                };
 
             let has_kind_config = self.opts.kind_configs.iter().any(|ks| {
-                
                 if kstr == "Field" && ks.kind_name == "Field" {
                     true
                 } else {
@@ -407,28 +457,30 @@ impl Handler for NamingConventionHandler {
                         continue;
                     }
                     let selector_matches = match &ks.predicate {
-                        Some(SelectorPredicate::ParentNameEquals(val)) => {
+                        Some(SelectorPredicate::ParentName(val)) => {
                             ni.parent_name.as_deref() == Some(val.as_str())
                         }
-                        Some(SelectorPredicate::ParentNameNotEquals(val)) => {
+                        Some(SelectorPredicate::ParentNameNot(val)) => {
                             ni.parent_name.as_deref() != Some(val.as_str())
                         }
-                        Some(SelectorPredicate::GqlTypeNameEquals(val)) => {
-                            ctx.schema.and_then(|s| {
+                        Some(SelectorPredicate::GqlTypeName(val)) => ctx
+                            .schema
+                            .and_then(|s| {
                                 let parent = ni.parent_name.as_ref()?;
-                                s.type_field(parent, name).ok().map(|td| {
-                                    td.node.ty.inner_named_type().to_string() == *val
-                                })
-                            }).unwrap_or(false)
-                        }
-                        Some(SelectorPredicate::GqlTypeGqlTypeNameEquals(val)) => {
-                            ctx.schema.and_then(|s| {
+                                s.type_field(parent, name)
+                                    .ok()
+                                    .map(|td| td.node.ty.inner_named_type().to_string() == *val)
+                            })
+                            .unwrap_or(false),
+                        Some(SelectorPredicate::NestedGqlTypeName(val)) => ctx
+                            .schema
+                            .and_then(|s| {
                                 let parent = ni.parent_name.as_ref()?;
-                                s.type_field(parent, name).ok().map(|td| {
-                                    td.node.ty.inner_named_type().to_string() == *val
-                                })
-                            }).unwrap_or(false)
-                        }
+                                s.type_field(parent, name)
+                                    .ok()
+                                    .map(|td| td.node.ty.inner_named_type().to_string() == *val)
+                            })
+                            .unwrap_or(false),
                         None => true,
                     };
                     if !selector_matches {
@@ -444,12 +496,17 @@ impl Handler for NamingConventionHandler {
                             let converted = convert_case(name, style.0, &[]);
                             ctx.report(
                                 DiagnosticBuilder::new(
-                                    rule_id, path.clone(), span,
+                                    rule_id,
+                                    path.clone(),
+                                    span,
                                     format!("{label} \"{name}\" should be in {} format", style.1),
                                 )
                                 .suggestion(
                                     format!("Convert to {}", style.1),
-                                    Fix::Replace { span, text: converted },
+                                    Fix::Replace {
+                                        span,
+                                        text: converted,
+                                    },
                                 ),
                             );
                             break;
@@ -459,7 +516,9 @@ impl Handler for NamingConventionHandler {
                     if let Some(ref prefix) = config.prefix {
                         if !check_name.starts_with(prefix.as_str()) {
                             ctx.report(DiagnosticBuilder::new(
-                                rule_id, path.clone(), span,
+                                rule_id,
+                                path.clone(),
+                                span,
                                 format!("{label} \"{name}\" should have \"{prefix}\" prefix"),
                             ));
                             break;
@@ -469,7 +528,9 @@ impl Handler for NamingConventionHandler {
                     if let Some(ref suffix) = config.suffix {
                         if !suffix.is_empty() && !check_name.ends_with(suffix.as_str()) {
                             ctx.report(DiagnosticBuilder::new(
-                                rule_id, path.clone(), span,
+                                rule_id,
+                                path.clone(),
+                                span,
                                 format!("{label} \"{name}\" should have \"{suffix}\" suffix"),
                             ));
                             break;
@@ -479,7 +540,9 @@ impl Handler for NamingConventionHandler {
                     for fp in &config.forbidden_prefixes {
                         if name.starts_with(fp.as_str()) {
                             ctx.report(DiagnosticBuilder::new(
-                                rule_id, path.clone(), span,
+                                rule_id,
+                                path.clone(),
+                                span,
                                 format!("{label} \"{name}\" should not have \"{fp}\" prefix"),
                             ));
                             break;
@@ -489,7 +552,9 @@ impl Handler for NamingConventionHandler {
                     for fs in &config.forbidden_suffixes {
                         if name.ends_with(fs.as_str()) {
                             ctx.report(DiagnosticBuilder::new(
-                                rule_id, path.clone(), span,
+                                rule_id,
+                                path.clone(),
+                                span,
                                 format!("{label} \"{name}\" should not have \"{fs}\" suffix"),
                             ));
                             break;
@@ -497,22 +562,38 @@ impl Handler for NamingConventionHandler {
                     }
 
                     if !config.required_prefixes.is_empty() {
-                        let has = config.required_prefixes.iter().any(|rp| check_name.starts_with(rp.as_str()));
+                        let has = config
+                            .required_prefixes
+                            .iter()
+                            .any(|rp| check_name.starts_with(rp.as_str()));
                         if !has {
                             ctx.report(DiagnosticBuilder::new(
-                                rule_id, path.clone(), span,
-                                format!("{label} \"{name}\" should have \"{}\" prefix", config.required_prefixes[0]),
+                                rule_id,
+                                path.clone(),
+                                span,
+                                format!(
+                                    "{label} \"{name}\" should have \"{}\" prefix",
+                                    config.required_prefixes[0]
+                                ),
                             ));
                             break;
                         }
                     }
 
                     if !config.required_suffixes.is_empty() {
-                        let has = config.required_suffixes.iter().any(|rs| check_name.ends_with(rs.as_str()));
+                        let has = config
+                            .required_suffixes
+                            .iter()
+                            .any(|rs| check_name.ends_with(rs.as_str()));
                         if !has {
                             ctx.report(DiagnosticBuilder::new(
-                                rule_id, path.clone(), span,
-                                format!("{label} \"{name}\" should have \"{}\" suffix", config.required_suffixes[0]),
+                                rule_id,
+                                path.clone(),
+                                span,
+                                format!(
+                                    "{label} \"{name}\" should have \"{}\" suffix",
+                                    config.required_suffixes[0]
+                                ),
                             ));
                             break;
                         }
@@ -521,7 +602,9 @@ impl Handler for NamingConventionHandler {
                     for fp in &config.forbidden_patterns {
                         if fp.is_match(name) {
                             ctx.report(DiagnosticBuilder::new(
-                                rule_id, path.clone(), span,
+                                rule_id,
+                                path.clone(),
+                                span,
                                 format!("{label} \"{name}\" should not match pattern \"{fp}\""),
                             ));
                             break;
@@ -531,7 +614,9 @@ impl Handler for NamingConventionHandler {
                     if let Some(ref rp) = config.required_pattern {
                         if !rp.is_match(name) {
                             ctx.report(DiagnosticBuilder::new(
-                                rule_id, path.clone(), span,
+                                rule_id,
+                                path.clone(),
+                                span,
                                 format!("{label} \"{name}\" should match pattern \"{rp}\""),
                             ));
                             break;
@@ -543,13 +628,17 @@ impl Handler for NamingConventionHandler {
             // Global underscore checks (always run, independent of convention checks)
             if !self.opts.allow_leading_underscore && name.starts_with('_') {
                 ctx.report(DiagnosticBuilder::new(
-                    rule_id, path.clone(), span,
+                    rule_id,
+                    path.clone(),
+                    span,
                     "Leading underscores are not allowed".to_string(),
                 ));
             }
             if !self.opts.allow_trailing_underscore && name.ends_with('_') {
                 ctx.report(DiagnosticBuilder::new(
-                    rule_id, path.clone(), span,
+                    rule_id,
+                    path.clone(),
+                    span,
                     "Trailing underscores are not allowed".to_string(),
                 ));
             }
@@ -579,13 +668,19 @@ fn is_case_loose(name: &str, style: CaseStyle) -> bool {
         CaseStyle::ScreamingSnake => {
             detected == Some(CaseStyle::ScreamingSnake)
                 || (!name.contains('-')
-                    && name.chars().filter(|c| c.is_ascii_alphabetic()).all(|c| c.is_ascii_uppercase())
+                    && name
+                        .chars()
+                        .filter(|c| c.is_ascii_alphabetic())
+                        .all(|c| c.is_ascii_uppercase())
                     && name.chars().any(|c| c.is_ascii_uppercase()))
         }
         CaseStyle::ScreamingKebab => {
             detected == Some(CaseStyle::ScreamingKebab)
                 || (!name.contains('_')
-                    && name.chars().filter(|c| c.is_ascii_alphabetic()).all(|c| c.is_ascii_uppercase())
+                    && name
+                        .chars()
+                        .filter(|c| c.is_ascii_alphabetic())
+                        .all(|c| c.is_ascii_uppercase())
                     && name.chars().any(|c| c.is_ascii_uppercase()))
         }
         _ => detected == Some(style),
@@ -604,7 +699,11 @@ fn node_label(kind: SyntaxKind, ni: &NodeInfo, source: &str) -> String {
         }
         _ => {
             let d = display_name(kind);
-            let first = d.chars().next().map(|c| c.to_ascii_uppercase()).unwrap_or('?');
+            let first = d
+                .chars()
+                .next()
+                .map(|c| c.to_ascii_uppercase())
+                .unwrap_or('?');
             let rest = &d[1..];
             format!("{}{}", first, rest)
         }
@@ -618,7 +717,11 @@ fn operation_type_label(source: &str, span: Span) -> String {
         "query" | "mutation" | "subscription" => first_word,
         _ => "operation",
     };
-    let first = op_type.chars().next().map(|c| c.to_ascii_uppercase()).unwrap_or('O');
+    let first = op_type
+        .chars()
+        .next()
+        .map(|c| c.to_ascii_uppercase())
+        .unwrap_or('O');
     let rest = &op_type[1..];
     format!("{}{}", first, rest)
 }

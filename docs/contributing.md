@@ -33,8 +33,13 @@ tooling and are run in GitHub Actions until the matching xtask commands are
 available locally.
 
 Coverage currently ratchets from a 60% workspace line-rate floor while the
-cross-cutting suites are established. `scripts/coverage-gate.sh` also keeps a
-90% floor for each covered `rglint-rules` source module. Raise the workspace
-floor deliberately as coverage improves; both floors can be overridden for a
-local experiment with `RGLINT_COVERAGE_WORKSPACE_MIN` and
+cross-cutting suites are established. `scripts/coverage-gate.sh` targets 90%
+for each `rglint-rules` source module. Modules that predate the gate below that
+target have reviewed floors in `scripts/coverage-baseline.json`; they must not
+regress in either covered-line count or percentage. Two Tarpaulin attribution
+gaps are pinned by exact line count, so edits require an explicit baseline
+review. A passing run publishes the Cobertura report as the required
+`tarpaulin-report` GitHub artifact. Raise or remove baselines deliberately as
+coverage improves. The workspace and default module targets can be overridden
+for a local experiment with `RGLINT_COVERAGE_WORKSPACE_MIN` and
 `RGLINT_COVERAGE_RULES_MODULE_MIN`, but CI uses the checked-in defaults.

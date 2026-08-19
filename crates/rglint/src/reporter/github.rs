@@ -200,10 +200,10 @@ mod tests {
     use std::sync::Arc;
 
     fn source(path: &str) -> Arc<SourceFile> {
-        SourceFile::new(
-            path.into(),
-            include_str!("fixtures/github-multi.graphql").to_owned(),
-        )
+        // The spans below are pinned to LF byte offsets. Git may check this
+        // fixture out with CRLF on Windows, so normalize it before indexing.
+        let text = include_str!("fixtures/github-multi.graphql").replace("\r\n", "\n");
+        SourceFile::new(path.into(), text)
     }
 
     fn result(sources: Vec<Arc<SourceFile>>, diagnostics: Vec<Diagnostic>) -> ProjectLintResult {

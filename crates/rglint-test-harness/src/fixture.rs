@@ -197,7 +197,7 @@ pub enum FixtureLoadError {
     ConfigParse {
         path: PathBuf,
         #[source]
-        source: toml::de::Error,
+        source: Box<toml::de::Error>,
     },
     /// `expected.json` failed to parse.
     #[error("failed to parse expected `{path}`: {source}")]
@@ -426,13 +426,13 @@ fn parse_config(
     let raw: toml::Value =
         toml::from_str(text).map_err(|source| FixtureLoadError::ConfigParse {
             path: path.clone(),
-            source,
+            source: Box::new(source),
         })?;
     let table = raw
         .as_table()
         .ok_or_else(|| FixtureLoadError::ConfigParse {
             path: path.clone(),
-            source: toml::de::Error::custom("config root must be a table"),
+            source: Box::new(toml::de::Error::custom("config root must be a table")),
         })?;
 
     let schema = table

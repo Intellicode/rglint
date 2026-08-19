@@ -28,8 +28,8 @@ rglint_test_suite!("no-duplicate-fields", root = "../../rules-fixtures");
 #[test]
 fn duplicate_field_in_schema_type_reported_once() {
     use rglint_core::{
-        LintEngine, LoadedDocuments, Project, ProjectConfig, RuleConfig, RulesConfig,
-        SchemaLoader, SchemaSpec, Severity, Siblings,
+        LintEngine, LoadedDocuments, Project, ProjectConfig, RuleConfig, RulesConfig, SchemaLoader,
+        SchemaSpec, Severity, Siblings,
     };
 
     let schema_loader = SchemaLoader::new();

@@ -8,9 +8,7 @@
 
 use std::collections::HashMap;
 
-use rglint_core::{
-    DiagnosticBuilder, Handler, Node, RuleContext, Span, SyntaxKind,
-};
+use rglint_core::{DiagnosticBuilder, Handler, Node, RuleContext, Span, SyntaxKind};
 use rglint_derive::Rule;
 
 /// The `no-duplicate-fields` rule.
@@ -107,10 +105,7 @@ impl Handler for NoDuplicateFieldsHandler {
         };
 
         // Use the container's byte-offset as a unique key within this file.
-        let container_key = container
-            .span
-            .unwrap_or(Span::new(0, 0))
-            .offset;
+        let container_key = container.span.unwrap_or(Span::new(0, 0)).offset;
 
         let span = node.span.unwrap_or(Span::new(0, 0));
 
@@ -213,7 +208,10 @@ mod tests {
             .with_parent(&fields_def)
             .with_span(Span::new(6, 3));
         handler.on_node(&field1, Some(&fields_def));
-        assert!(handler.duplicates.is_empty(), "first occurrence is not a duplicate");
+        assert!(
+            handler.duplicates.is_empty(),
+            "first occurrence is not a duplicate"
+        );
 
         // Second field "a": should be buffered as a duplicate.
         let field2 = Node::new(SyntaxKind::FIELD_DEFINITION)
@@ -221,15 +219,18 @@ mod tests {
             .with_parent(&fields_def)
             .with_span(Span::new(12, 3));
         handler.on_node(&field2, Some(&fields_def));
-        assert_eq!(handler.duplicates.len(), 1, "second occurrence is a duplicate");
+        assert_eq!(
+            handler.duplicates.len(),
+            1,
+            "second occurrence is a duplicate"
+        );
         assert_eq!(handler.duplicates[0].0, "a");
         assert!(handler.duplicates[0].1, "FIELD_DEFINITION is schema");
         assert_eq!(handler.duplicates[0].2, Span::new(12, 0));
 
         // Operation field "a" in a selection set at a different offset so
         // the container key doesn't collide with the schema container above.
-        let sel_set = Node::new(SyntaxKind::SELECTION_SET)
-            .with_span(Span::new(100, 10));
+        let sel_set = Node::new(SyntaxKind::SELECTION_SET).with_span(Span::new(100, 10));
         let selection = Node::new(SyntaxKind::SELECTION)
             .with_parent(&sel_set)
             .with_span(Span::new(101, 8));

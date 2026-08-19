@@ -146,9 +146,7 @@ pub enum ProjectResolveError {
     },
     /// `schema` pointed at a remote `http://` / `https://` URL, which v1 of
     /// the engine does not support yet (PLAN §11 stretch).
-    #[error(
-        "project `{project}`: remote schema URL `{url}` is not supported yet"
-    )]
+    #[error("project `{project}`: remote schema URL `{url}` is not supported yet")]
     UnsupportedRemoteSchema {
         /// The name of the offending project.
         project: String,
@@ -234,14 +232,12 @@ impl ProjectResolver {
                         url: url.to_owned(),
                     });
                 }
-                Some(
-                    schema_loader
-                        .load(spec, &self.base)
-                        .map_err(|source| ProjectResolveError::Schema {
-                            project: cfg.name.clone(),
-                            source,
-                        })?,
-                )
+                Some(schema_loader.load(spec, &self.base).map_err(|source| {
+                    ProjectResolveError::Schema {
+                        project: cfg.name.clone(),
+                        source,
+                    }
+                })?)
             }
             None => None,
         };
@@ -391,7 +387,9 @@ mod tests {
             ProjectConfig {
                 name: "admin".to_owned(),
                 schema: Some(SchemaSpec::File(PathBuf::from("admin/schema.graphqls"))),
-                documents: Some(DocumentSpec::Files(vec![PathBuf::from("admin/doc.graphql")])),
+                documents: Some(DocumentSpec::Files(vec![PathBuf::from(
+                    "admin/doc.graphql",
+                )])),
                 ignore: Vec::new(),
             },
         ]
@@ -505,7 +503,9 @@ mod tests {
         let cfg = ProjectConfig {
             name: "schemaless".to_owned(),
             schema: None,
-            documents: Some(DocumentSpec::Files(vec![PathBuf::from("admin/doc.graphql")])),
+            documents: Some(DocumentSpec::Files(vec![PathBuf::from(
+                "admin/doc.graphql",
+            )])),
             ignore: Vec::new(),
         };
         let projects = resolver
@@ -535,10 +535,7 @@ mod tests {
             .resolve(std::slice::from_ref(&cfg))
             .expect("schema-only resolve");
         assert!(projects[0].schema.is_some(), "schema loaded");
-        assert!(
-            projects[0].documents.docs.is_empty(),
-            "no documents loaded"
-        );
+        assert!(projects[0].documents.docs.is_empty(), "no documents loaded");
         assert!(
             projects[0].documents.by_file.is_empty(),
             "no by_file entries"
