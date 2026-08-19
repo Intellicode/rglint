@@ -12,12 +12,12 @@ path coverage that don't belong to any single rule (PLAN §6.5, §6.6).
 
 **In scope — coverage gate:**
 
-- A `xtask coverage` (or `scripts/coverage.sh`) wrapper using LLVM source
-  instrumentation so coverage is merged across separately linked test binaries:
-  `cargo tarpaulin --workspace --engine llvm --out xml --output-dir target/coverage`.
+- A `xtask coverage` (or `scripts/coverage.sh`) wrapper:
+  `cargo tarpaulin --workspace --out xml --output-dir target/coverage`.
 - A gate script `scripts/coverage-gate.sh` that parses
-  `target/coverage/cobertura.xml` and fails if workspace coverage < 85% or
-  any `rglint-rules` module < 90% (PLAN §6.7).
+  `target/coverage/cobertura.xml`, targets 85% workspace coverage and 90% for
+  each `rglint-rules` module, and enforces reviewed ratchets until those
+  targets are reached (PLAN §6.7).
 - CI wiring lives in spec-067; this spec owns the gate logic + thresholds.
 
 **In scope — invariant tests:**
@@ -54,6 +54,7 @@ path coverage that don't belong to any single rule (PLAN §6.5, §6.6).
 - `crates/rglint/tests/negative_paths.rs` (registry-driven macro
   parametrization; the workspace does not otherwise depend on `rstest`).
 - `scripts/coverage-gate.sh`.
+- `scripts/coverage-baseline.json` (reviewed module ratchets below the target).
 - `xtask/src/coverage.rs` (thin wrapper) — optional.
 
 ## Interface / API
@@ -72,8 +73,12 @@ rstest::fixture! fn all_rules() -> Vec<&'static str> { ... }
 
 ## Behavior
 
-- Coverage gate reads `cobertura.xml` line-rate attributes; compares against
-  thresholds; prints per-crate breakdown; exits non-zero on failure.
+- Coverage gate reads `cobertura.xml` source-line hits, compares the workspace
+  and per-rule-module rates against their thresholds, prints the complete
+  module breakdown, and exits non-zero on failure. Pre-existing modules below
+  the 90% target use reviewed, checked-in ratchets that reject regressions in
+  both covered-line count and rate; collector attribution exemptions pin their
+  exact executable-line count and require review whenever it changes.
 - Invariant tests use the test harness (spec-014) to build configs + fixtures
   inline.
 - Negative-path: each registered rule gets the shared malformed operation

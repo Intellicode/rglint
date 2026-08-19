@@ -1,0 +1,54 @@
+{
+  "meta.rs": {
+    "covered": 35,
+    "total": 42,
+    "reason": "Existing builder error and optional metadata branches are not yet covered."
+  },
+  "operations/match_document_filename.rs": {
+    "covered": 50,
+    "total": 88,
+    "reason": "Existing option and filename-shape branches are not yet covered."
+  },
+  "schema/description_style.rs": {
+    "covered": 87,
+    "total": 103,
+    "reason": "Existing description option branches are not yet covered."
+  },
+  "schema/input_name.rs": {
+    "covered": 95,
+    "total": 107,
+    "reason": "Existing input naming option branches are not yet covered."
+  },
+  "schema/naming_convention.rs": {
+    "covered": 312,
+    "total": 351,
+    "reason": "Existing selector and naming option branches are not yet covered."
+  },
+  "schema/no_deprecated.rs": {
+    "covered": 0,
+    "total": 143,
+    "collector_exempt": true,
+    "reason": "Tarpaulin does not attribute the passing fixture suite to this linked rule module."
+  },
+  "schema/no_unused_fields.rs": {
+    "covered": 55,
+    "total": 66,
+    "reason": "Existing schema reachability branches are not yet covered."
+  },
+  "schema/require_deprecation_reason.rs": {
+    "covered": 41,
+    "total": 47,
+    "reason": "Existing directive argument branches are not yet covered."
+  },
+  "schema/require_selections.rs": {
+    "covered": 159,
+    "total": 177,
+    "reason": "Existing nested selection branches are not yet covered."
+  },
+  "shared/case_styles.rs": {
+    "covered": 0,
+    "total": 9,
+    "collector_exempt": true,
+    "reason": "Tarpaulin does not attribute calls from the covered case conversion module to this enum module."
+  }
+}
