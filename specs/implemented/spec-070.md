@@ -78,9 +78,8 @@ rstest::fixture! fn all_rules() -> Vec<&'static str> { ... }
   module breakdown, and exits non-zero on failure. Pre-existing modules below
   the 90% target use reviewed, checked-in ratchets that reject regressions in
   both covered-line count and rate; collector attribution exemptions pin their
-  exact executable-line count and require review whenever it changes. The CI
-  upload to Codecov authenticates with a job-scoped GitHub OIDC token rather
-  than a repository secret.
+  exact executable-line count and require review whenever it changes. CI
+  publishes the passing Cobertura report as a required GitHub artifact.
 - Invariant tests use the test harness (spec-014) to build configs + fixtures
   inline.
 - Negative-path: each registered rule gets the shared malformed operation

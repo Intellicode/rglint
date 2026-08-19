@@ -19,9 +19,9 @@ docs-check.
   3. `deny` — `cargo deny check` (uses spec-001's `deny.toml`).
   4. `test` — `cargo test --workspace` (unit + fixture + snapshot).
   5. `coverage` — `cargo tarpaulin --workspace --out xml` (Linux only;
-     tarpaulin doesn't support mac/win) → upload to codecov + enforce 85%
-     floor (spec-070 owns the gate logic; this job runs tarpaulin and posts
-     the report).
+     tarpaulin doesn't support mac/win) → enforce the reviewed coverage
+     ratchets and publish the Cobertura report as a required GitHub artifact
+     (spec-070 owns the gate logic).
   6. `bench-compile` — `cargo bench --workspace --no-run` (compile-only per
      PLAN §9).
   7. `parity` — `xtask check-parity` (spec-069; installs pnpm + node,
@@ -59,6 +59,8 @@ None (workflow YAML).
   in `docs/contributing.md`).
 - `parity` and `docs-check` are Linux-only (Node/xtask convenience).
 - Coverage floor enforced in the `coverage` job via spec-070's script.
+- A passing coverage job publishes `tarpaulin-report`; external Codecov upload
+  is intentionally omitted because this repository is not onboarded there.
 
 ## Testing
 

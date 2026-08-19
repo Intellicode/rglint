@@ -38,7 +38,8 @@ for each `rglint-rules` source module. Modules that predate the gate below that
 target have reviewed floors in `scripts/coverage-baseline.json`; they must not
 regress in either covered-line count or percentage. Two Tarpaulin attribution
 gaps are pinned by exact line count, so edits require an explicit baseline
-review. Raise or remove baselines deliberately as coverage improves. The
-workspace and default module targets can be overridden for a local experiment
-with `RGLINT_COVERAGE_WORKSPACE_MIN` and
+review. A passing run publishes the Cobertura report as the required
+`tarpaulin-report` GitHub artifact. Raise or remove baselines deliberately as
+coverage improves. The workspace and default module targets can be overridden
+for a local experiment with `RGLINT_COVERAGE_WORKSPACE_MIN` and
 `RGLINT_COVERAGE_RULES_MODULE_MIN`, but CI uses the checked-in defaults.
