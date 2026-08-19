@@ -12,8 +12,9 @@ path coverage that don't belong to any single rule (PLAN §6.5, §6.6).
 
 **In scope — coverage gate:**
 
-- A `xtask coverage` (or `scripts/coverage.sh`) wrapper:
-  `cargo tarpaulin --workspace --out xml --output-dir target/coverage`.
+- A `xtask coverage` (or `scripts/coverage.sh`) wrapper using LLVM source
+  instrumentation so coverage is merged across separately linked test binaries:
+  `cargo tarpaulin --workspace --engine llvm --out xml --output-dir target/coverage`.
 - A gate script `scripts/coverage-gate.sh` that parses
   `target/coverage/cobertura.xml` and fails if workspace coverage < 85% or
   any `rglint-rules` module < 90% (PLAN §6.7).

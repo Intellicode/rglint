@@ -67,8 +67,6 @@ pub fn all_rules() -> &'static [RuleEntry] {
 
 #[cfg(test)]
 mod tests {
-    use std::path::PathBuf;
-
     use rglint_core::{Handler, RuleContext};
     use rglint_derive::Rule as DeriveRule;
 
@@ -151,41 +149,5 @@ mod tests {
         // The derive above contributes at least one entry; guard against the
         // linker accidentally dropping the linkme section.
         assert!(!all_rules().is_empty());
-    }
-
-    #[test]
-    fn registered_rule_fixtures_pass_in_library_test_binary() {
-        // Exercise the registered handlers together in the library test binary.
-        // Besides checking the merged registry boundary, this keeps coverage
-        // instrumentation from losing rule executions split across many small
-        // integration-test binaries.
-        let fixture_root = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .join("..")
-            .join("..")
-            .join("rules-fixtures");
-        let mut suites_run = 0;
-        let mut failures = Vec::new();
-
-        for entry in all_rules() {
-            let rule_id = entry.meta.id;
-            let suite_root = fixture_root.join(rule_id);
-            if rule_id.starts_with("__") || !suite_root.is_dir() {
-                continue;
-            }
-            suites_run += 1;
-            for (case_id, error) in rglint_test_harness::run_suite(rule_id, &suite_root) {
-                failures.push(format!("{rule_id}/{case_id}: {error}"));
-            }
-        }
-
-        assert!(
-            suites_run > 0,
-            "no registered rule fixture suites were found"
-        );
-        assert!(
-            failures.is_empty(),
-            "registered rule fixture failures:\n{}",
-            failures.join("\n")
-        );
     }
 }

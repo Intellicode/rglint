@@ -98,7 +98,10 @@ jobs:
       - name: Generate coverage report
         # rglint-napi is a cdylib whose tests require Node's N-API runtime;
         # tarpaulin cannot link that native module as a standalone test binary.
-        run: cargo tarpaulin --locked --workspace --exclude rglint-napi --out xml --output-dir target/coverage
+        # LLVM source instrumentation reliably merges coverage from the
+        # workspace's separately linked rule fixture binaries. The default
+        # Linux ptrace engine misses some of those executions.
+        run: cargo tarpaulin --locked --workspace --exclude rglint-napi --engine llvm --out xml --output-dir target/coverage
       - name: Enforce coverage thresholds
         run: scripts/coverage-gate.sh
       - uses: actions/upload-artifact@v4
