@@ -88,6 +88,9 @@ jobs:
   coverage:
     name: coverage
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -110,6 +113,7 @@ jobs:
         with:
           files: target/coverage/cobertura.xml
           fail_ci_if_error: true
+          use_oidc: true
 
   parity:
     name: parity
