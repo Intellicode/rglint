@@ -6,11 +6,38 @@ on:
       - "v*"
 
 permissions:
-  contents: write
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
+  validate-tag:
+    name: Validate release tag
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.97.1
+
+      - name: Match tag to package version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(cargo metadata --locked --no-deps --format-version 1 \
+            | jq -r '.packages[] | select(.name == "rglint") | .version')"
+          if [[ "$GITHUB_REF_NAME" != "v${version}" ]]; then
+            echo "release tag $GITHUB_REF_NAME must match package version v${version}" >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
   build:
     name: Build ${{ matrix.target }}
+    needs: validate-tag
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
@@ -25,11 +52,11 @@ jobs:
             cross: true
             archive: tgz
           - target: x86_64-apple-darwin
-            runner: macos-13
+            runner: macos-15-intel
             cross: false
             archive: tgz
           - target: aarch64-apple-darwin
-            runner: macos-14
+            runner: macos-15
             cross: false
             archive: tgz
           - target: x86_64-pc-windows-msvc
@@ -40,7 +67,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@1.97.1
         with:
           targets: ${{ matrix.target }}
 
@@ -48,35 +75,63 @@ jobs:
         if: matrix.cross
         uses: taiki-e/install-action@v2
         with:
-          tool: cross
+          tool: cross@0.2.5
 
       - name: Build release binary
         shell: bash
         env:
+          ARCHIVE: ${{ matrix.archive }}
           TARGET: ${{ matrix.target }}
         run: |
           set -euo pipefail
+          if [[ "$ARCHIVE" == "tgz" ]]; then
+            export CARGO_PROFILE_RELEASE_STRIP=symbols
+          fi
           if [[ "${{ matrix.cross }}" == "true" ]]; then
             cross build --locked --release --target "$TARGET" -p rglint
           else
             cargo build --locked --release --target "$TARGET" -p rglint
           fi
 
+      - name: Verify native binary version
+        if: matrix.cross == false
+        shell: bash
+        env:
+          RELEASE_VERSION: ${{ needs.validate-tag.outputs.version }}
+          TARGET: ${{ matrix.target }}
+        run: |
+          set -euo pipefail
+          executable="target/${TARGET}/release/rglint"
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            executable="${executable}.exe"
+          fi
+          actual="$("$executable" --version)"
+          expected="rglint ${RELEASE_VERSION} (${TARGET})"
+          if [[ "$actual" != "$expected" ]]; then
+            echo "expected '$expected', got '$actual'" >&2
+            exit 1
+          fi
+
       - name: Package Unix artifact
         if: matrix.archive == 'tgz'
         shell: bash
         env:
+          RELEASE_VERSION: ${{ needs.validate-tag.outputs.version }}
           TARGET: ${{ matrix.target }}
         run: |
           set -euo pipefail
-          version="${GITHUB_REF_NAME#v}"
-          root="rglint-${version}-${TARGET}"
+          root="rglint-${RELEASE_VERSION}-${TARGET}"
           archive="${root}.tar.gz"
           mkdir "$root"
           cp "target/${TARGET}/release/rglint" "$root/rglint"
-          strip "$root/rglint"
           tar -czf "$archive" "$root"
-          tar -tzf "$archive" | grep -Fx "$root/rglint"
+          expected="$(printf '%s\n%s' "${root}/" "${root}/rglint")"
+          actual="$(tar -tzf "$archive")"
+          if [[ "$actual" != "$expected" ]]; then
+            echo "unexpected archive contents:" >&2
+            printf '%s\n' "$actual" >&2
+            exit 1
+          fi
           if command -v sha256sum >/dev/null 2>&1; then
             sha256sum "$archive" > "${archive}.sha256"
           else
@@ -87,10 +142,10 @@ jobs:
         if: matrix.archive == 'zip'
         shell: pwsh
         env:
+          RELEASE_VERSION: ${{ needs.validate-tag.outputs.version }}
           TARGET: ${{ matrix.target }}
         run: |
-          $version = $env:GITHUB_REF_NAME.TrimStart('v')
-          $root = "rglint-$version-$env:TARGET"
+          $root = "rglint-$env:RELEASE_VERSION-$env:TARGET"
           $archive = "$root.zip"
           New-Item -ItemType Directory -Path $root | Out-Null
           Copy-Item "target/$env:TARGET/release/rglint.exe" "$root/rglint.exe"
@@ -98,8 +153,9 @@ jobs:
           Add-Type -AssemblyName System.IO.Compression.FileSystem
           $zip = [System.IO.Compression.ZipFile]::OpenRead($archive)
           try {
-            if (-not ($zip.Entries.FullName -contains "$root/rglint.exe")) {
-              throw "archive does not contain the expected executable"
+            $files = @($zip.Entries | Where-Object { -not $_.FullName.EndsWith('/') })
+            if ($files.Count -ne 1 -or $files[0].FullName -ne "$root/rglint.exe") {
+              throw "archive does not contain exactly $root/rglint.exe"
             }
           } finally {
             $zip.Dispose()
@@ -133,8 +189,10 @@ jobs:
 
   publish:
     name: Publish GitHub release
-    needs: build
+    needs: [validate-tag, build]
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -144,13 +202,32 @@ jobs:
 
       - name: Verify all release checksums
         working-directory: dist
-        run: sha256sum --check ./*.sha256
+        env:
+          RELEASE_VERSION: ${{ needs.validate-tag.outputs.version }}
+        run: |
+          set -euo pipefail
+          archives=(
+            "rglint-${RELEASE_VERSION}-x86_64-unknown-linux-gnu.tar.gz"
+            "rglint-${RELEASE_VERSION}-aarch64-unknown-linux-gnu.tar.gz"
+            "rglint-${RELEASE_VERSION}-x86_64-apple-darwin.tar.gz"
+            "rglint-${RELEASE_VERSION}-aarch64-apple-darwin.tar.gz"
+            "rglint-${RELEASE_VERSION}-x86_64-pc-windows-msvc.zip"
+          )
+          for archive in "${archives[@]}"; do
+            test -f "$archive"
+            test -f "${archive}.sha256"
+          done
+          test "$(find . -maxdepth 1 -type f | wc -l)" -eq 10
+          sha256sum --check ./*.sha256
 
       - name: Create immutable release
         env:
+          GH_REPO: ${{ github.repository }}
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.ref_name }}
         run: |
           set -euo pipefail
-          gh release create "$TAG" --verify-tag --title "$TAG" --generate-notes
-          gh release upload "$TAG" dist/*
+          gh release create "$TAG" dist/* \
+            --verify-tag \
+            --title "$TAG" \
+            --generate-notes
