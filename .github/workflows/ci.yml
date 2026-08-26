@@ -101,7 +101,7 @@ jobs:
         run: cargo tarpaulin --locked --workspace --exclude rglint-napi --out xml --output-dir target/coverage
       - name: Enforce coverage thresholds
         run: scripts/coverage-gate.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: tarpaulin-report
           path: target/coverage/cobertura.xml
