@@ -11,7 +11,7 @@ expression: "render(&[result(vec![first, second], vec![error, warning],)])"
       "tool": {
         "driver": {
           "name": "rglint",
-          "version": "0.1.0",
+          "version": "0.1.1",
           "rules": [
             {
               "id": "no-hero",

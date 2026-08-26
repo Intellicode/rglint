@@ -161,7 +161,12 @@ jobs:
             $zip.Dispose()
           }
           $hash = (Get-FileHash -Algorithm SHA256 $archive).Hash.ToLowerInvariant()
-          "$hash  $archive" | Out-File -Encoding ascii "$archive.sha256"
+          $checksum = "$hash  $archive`n"
+          [System.IO.File]::WriteAllText(
+            "$archive.sha256",
+            $checksum,
+            [System.Text.Encoding]::ASCII
+          )
 
       - name: Verify package checksum
         shell: bash
