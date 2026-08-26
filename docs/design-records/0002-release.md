@@ -19,11 +19,20 @@ Each archive contains a single top-level directory named
 `rglint-<version>-<target>/` with the executable inside. This keeps manual
 downloads inspectable and gives `cargo-binstall` a stable `bin-dir`.
 
-The release workflow builds Linux ARM through `cross` and uses native GitHub
-host runners for the other targets. Unix binaries are stripped. The Windows
-MSVC binary is packaged as a ZIP and retains the toolchain's normal PE
-metadata because a Windows-hosted `strip` equivalent is not guaranteed by the
-runner image.
+The release workflow first requires the pushed tag to exactly match the
+workspace package version (for example, package version `1.2.3` requires tag
+`v1.2.3`). It builds Linux ARM through `cross` and uses native GitHub host
+runners for the other targets. Unix binaries are stripped by the target
+toolchain during compilation. The Windows MSVC binary is packaged as a ZIP and
+retains the toolchain's normal PE metadata because a Windows-hosted `strip`
+equivalent is not guaranteed by the runner image. Rust and `cross` versions
+are pinned in the workflow so a tag always builds with a reviewable toolchain.
+
+Every native build runs `rglint --version` and verifies both the package
+version and target marker. Packaging checks the complete archive contents, and
+the publish job requires all five archives and their checksum files before it
+creates the release. Build jobs have read-only repository access; only the
+publish job receives `contents: write`.
 
 The package manifest uses only the current supported `cargo-binstall` keys:
 `pkg-url`, `pkg-fmt`, and `bin-dir`, with a Windows ZIP override. Current
